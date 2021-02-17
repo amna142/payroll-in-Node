@@ -1,0 +1,18 @@
+
+<!-- Modal Structure -->
+<div id="modal1" class="modal">
+	<div class="modal-content">
+		<p>Are you Sure?</p>
+	</div>
+	<div class="modal-footer">
+		<a href="#!" class="modal-close waves-effect waves-red btn-flat">Cancel</a>
+		<a href="<%= data %>" class="modal-close waves-effect waves-green btn-flat">Agree</a>
+</div>
+</div>
+
+
+<script>
+	$(document).ready(function () {
+		$('.modal').modal();
+	});
+</script>

@@ -1,0 +1,73 @@
+<%- include('../includes/header'); %>
+<!-- <link rel="stylesheet" href="../../app/public/css/adminHome.css"> -->
+<script>
+	$(document).ready(function () {
+		$('.button-collapse').sidenav();
+		$('.collapsible').collapsible();
+
+		// $('select').material_select();
+	});
+</script>
+
+<style>
+	header,
+	main,
+	footer {
+		padding-left: 240px;
+	}
+
+	body {
+		background-color: white;
+	}
+
+	@media only screen and (max-width: 992px) {
+
+		header,
+		main,
+		footer {
+			padding-left: 0;
+		}
+	}
+
+	#credits li,
+	#credits li a {
+		color: white;
+	}
+
+	#credits li a {
+		font-weight: bold;
+	}
+
+	.footer-copyright .container,
+	.footer-copyright .container a {
+		color: #BCC2E2;
+	}
+
+	#slide-out li {
+		padding-right: 0px;
+	}
+
+	
+</style>
+</head>
+<body>
+<% if (isAuthenticated) { %>
+
+<%- include('./partials/side-nav.ejs', {data: name}) %>
+
+<%- include('./partials/nav-bar.ejs'); %>
+
+<%- include('./partials/main-body'); %>
+
+<% } %>
+
+
+
+
+
+
+<%- include('../includes/footer'); %>
+
+
+
+

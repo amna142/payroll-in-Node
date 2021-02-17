@@ -1,0 +1,75 @@
+<%- include('../includes/header'); %>
+
+<style>
+	.user-message {
+		margin: auto;
+		width: 90%;
+		border: 1px solid #4771fa;
+		padding: 1rem;
+		border-radius: 3px;
+		text-align: center;
+		background-color: #b9c9ff;
+
+	}
+
+	.user-message--error {
+		border-color: red;
+		background: rgb(255, 176, 176);
+	}
+</style>
+
+</head>
+
+<body>
+	<% if(!isAuthenticated) {%>
+
+	<div class="container" style="padding-top: 8%; margin-left: 15%;">
+
+		<div class="col s12 m8 offset-m2 l6 offset-l1">
+			<div class="card-panel blue lighten-5 z-depth-1">
+				<div class="row valign-wrapper">
+					<div class="col s7">
+						<img src="/img.jpg" alt="" class="responsive-img">
+						<!-- notice the "circle" class -->
+					</div>
+					<div class="col s5">
+						<form method="POST" action="" name="form2">
+							<% if(errorMessage) { %>
+
+							<div class="col s8 user-message user-message--error"><%= errorMessage %>
+							</div>
+							<% } %>
+
+							<div class="input-field col s8">
+								<input id="email" name="email" type="email" class="validate" required="" value="">
+								<label for="email">Email</label>
+							</div>
+							<div class="input-field col s8">
+								<input id="password" name="password" type="password" class="validate" required=""
+									value="">
+								<label for="password">Password</label>
+							</div>
+							<div class="input-field col s8">
+								<button class="btn waves-effect waves-light right" type="submit">Login
+									<i class="material-icons right">send</i>
+								</button>
+							</div>
+
+						</form>
+					</div>
+
+				</div>
+				<div class="col s8">
+					<a href="/reset" class="center" style="margin-left: 85%;">Reset Password</a>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<% } else { %>
+	<%- include('../404/Error404', {data: url}); %>
+	<%} %>
+
+</body>
+
+</html>

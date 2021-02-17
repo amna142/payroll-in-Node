@@ -1,0 +1,61 @@
+<%- include('../includes/header'); %>
+</head>
+
+
+<body>
+	<%- include('../admin/partials/side-nav'); %>
+
+	<%- include('../admin/partials/nav-bar.ejs'); %>
+	<div class="container" style="padding-top: 3%; padding-left: 15%;">
+
+		<div class="row">
+			<form action="/admin/employee/edit/<%= id %>" method="post" name="form1">
+				<div class="col s12">
+					<blockquote>
+						<div class="row">
+							<div class="input-field col s6">
+								<input type="text" class="form-control" name="name" id="name" value="<%= name %>"
+									>
+								<label for="name">Your Name</label>
+							</div>
+						</div>
+					</blockquote>
+				</div>
+				<div class="col s12">
+					<blockquote>
+						<div class="row">
+							<div class="input-field col s6">
+								<input type="email" name="email" id="email"
+									value="<%= email %>" >
+								<label for="email">Email</label>
+							</div>
+						</div>
+					</blockquote>
+				</div>
+				<div class="col s12">
+					<blockquote>
+						<div class="row">
+							<div class="input-field col s6">
+								<input type="password" name="password" id="password"
+									value="<%= password %>" 
+									>
+								<label for="password">Password</label>
+							</div>
+						</div>
+					</blockquote>
+				</div>
+				<div class="col s12">
+					<div class="row">
+						<button class="btn waves-effect waves-light" type="submit">Update
+							<i class="material-icons right"></i>
+						</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+
+
+	<%- include('../admin/partials/footer'); %>
+
+	<%- include('../includes/footer'); %>

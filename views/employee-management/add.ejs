@@ -1,0 +1,87 @@
+<%- include('../includes/header'); %>
+<style>
+	footer {
+		padding-left: 240px
+	}
+
+	@media only screen and (max-width: 992px) {
+		footer {
+			padding-left: 0;
+		}
+
+	}
+
+	.footer-copyright .container,
+	.footer-copyright .container a {
+		color: #BCC2E2;
+	}
+</style>
+</head>
+
+<body>
+	<%- include('../admin/partials/side-nav'); %>
+
+	<%- include('../admin/partials/nav-bar.ejs'); %>
+
+	<div class="container" style="padding-top: 3%; padding-left: 15%;">
+
+		<div class="row">
+			<form action="/employee/add" method="POST" name="form1">
+				<div class="col s12">
+					<blockquote>
+						<div class="row">
+							<div class="input-field col s6">
+								<input type="text" required="" aria-required="true" class="form-control" name="name" id="name" value=""
+									placeholder="Name">
+								<label for="name">Your Name</label>
+							</div>
+						</div>
+					</blockquote>
+				</div>
+				<div class="col s12">
+					<blockquote>
+						<div class="row">
+							<div class="input-field col s6">
+								<input type="email" name="email" id="email" aria-describedby="emailHelp"
+									placeholder="Enter email" value="" required="" aria-required="true">
+								<label for="email">Email</label>
+							</div>
+						</div>
+					</blockquote>
+				</div>
+				<div class="col s12">
+					<blockquote>
+						<div class="row">
+							<div class="input-field col s6">
+								<input type="password" name="password" id="password" aria-describedby="password"
+									placeholder="Enter password" value="" required="" aria-required="true">
+								<label for="password">Password</label>
+							</div>
+						</div>
+					</blockquote>
+				</div>
+				<div class="col s12">
+					<blockquote>
+						<div class="row">
+							<div class="input-field col s6">
+								<input type="password" name="confirmPassword" id="confirmPassword"
+									aria-describedby="password" placeholder="Retype password" value="" required=""
+									aria-required="true">
+								<label for="confrimPassword">Confirm Password</label>
+							</div>
+						</div>
+					</blockquote>
+				</div>
+				<div class="col s12">
+					<div class="row">
+						<button class="btn waves-effect waves-light" type="submit" value="Add">Submit
+							<i class="material-icons right"></i>
+						</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+
+
+	<%- include('../includes/footer'); %>
