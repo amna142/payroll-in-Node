@@ -9,6 +9,7 @@ const path = require('path')
 const accountRoutes = require('./app/routes/authRoutes')
 const errorRoutes = require('./app/routes/errorRoutes')
 const adminRoutes = require('./app/routes/adminRoutes')
+const logsRoutes = require('./app/routes/logsRoutes')
 const flash = require('connect-flash')
 const secretKey = require('./app/config/secret') 
 
@@ -33,6 +34,7 @@ store.sync();
 app.use(flash())
 app.use(accountRoutes)
 app.use(adminRoutes)
+app.use(logsRoutes)
 app.use(errorRoutes)
 
 const PORT = process.env.PORT || 3000

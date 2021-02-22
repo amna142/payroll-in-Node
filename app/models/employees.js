@@ -6,10 +6,10 @@ module.exports = (sequelize, Sequelize) => {
 			autoIncrement: true,
 			primaryKey: true
 		},
-	
+
 		name: {
 			type: Sequelize.STRING,
-			notEmpty: true
+			notEmpty: false
 		},
 		email: {
 			notEmpty: true,
@@ -24,6 +24,36 @@ module.exports = (sequelize, Sequelize) => {
 			allowNull: false,
 			required: true,
 			len: [4, 8]
+		},
+		dob: {
+			notEmpty: true,
+			type: Sequelize.DATE,
+			allowNull: false,
+			required: true
+		},
+		address: {
+			type: Sequelize.STRING,
+			allowNull: true,
+			required: false,
+			notEmpty: false
+		},
+		phone: {
+			type: Sequelize.STRING,
+			allowNull: true,
+			required: false,
+			notEmpty: false
+		},
+		starting_date: {
+			type: Sequelize.DATE,
+			allowNull: false,
+			notEmpty: true,
+			required: true
+		},
+		resume: {
+			type: Sequelize.STRING,
+			allowNull: false,
+			required: true,
+			notEmpty: false
 		},
 		resetToken: {
 			type: Sequelize.STRING

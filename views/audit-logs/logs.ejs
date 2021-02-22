@@ -1,0 +1,49 @@
+<%- include('../includes/header'); %>
+<script>
+	$(document).ready(function () {
+		$('.collapsible').collapsible({
+			accordion: false // A setting that changes the collapsible behavior to expandable instead of the default accordion style
+		});
+	});
+</script>
+</head>
+
+<body>
+	<ul class="collapsible popout" data-collapsible="accordion">
+		<li>
+			<div class="collapsible-header"><i class="material-icons">filter_drama</i>First</div>
+			<div class="collapsible-body">
+				<table>
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Updated Time</th>
+							<th>Old Value</th>
+							<th>New Value</th>
+						</tr>
+					</thead>
+
+					<tbody>
+						<tr>
+							<td>Alvin</td>
+							<td>Eclair</td>
+							<td>$0.87</td>
+						</tr>
+						<tr>
+							<td>Alan</td>
+							<td>Jellybean</td>
+							<td>$3.76</td>
+						</tr>
+						<tr>
+							<td>Jonathan</td>
+							<td>Lollipop</td>
+							<td>$7.00</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</li>
+	</ul>
+</body>
+
+</html>

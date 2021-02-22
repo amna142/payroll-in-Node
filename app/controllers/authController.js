@@ -1,22 +1,9 @@
 const db = require('../util/database')
 const bcrypt = require('bcrypt')
-const nodeMailer = require('nodemailer')
-const {
-	Op
-} = require("sequelize");
-const sendMailerTransporter = require('nodemailer-sendgrid-transport')
+const constants = require('../util/constants')
+
 const crypto = require('crypto');
-const {
-	DefaultDeserializer
-} = require('v8');
-const { url } = require('inspector');
-
-
-const transporter = nodeMailer.createTransport(sendMailerTransporter({
-	auth: {
-		api_key: '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'
-	}
-}))
+const {transporter} = require('../config/email.config')
 
 
 exports.getLogin = (req, res) => {
@@ -28,9 +15,11 @@ exports.getLogin = (req, res) => {
 	}
 	let isLoggedIn = req.session.isLoggedIn
 	let url = ''
-	if(isLoggedIn){
-		url = '/home'
-	}else { url = '/login'}
+	if (isLoggedIn) {
+		url = '/'
+	} else {
+		url = '/login'
+	}
 
 	console.log('isLoggedIn for login page', isLoggedIn)
 	//show login page
@@ -75,7 +64,7 @@ exports.postLogin = (req, res) => {
 							return req.session.save(err => {
 								console.log('err in saving session', err)
 								console.log('req.session.user.title', req.session.user.title)
-								res.redirect('/home')
+								res.redirect('/')
 							})
 						} else {
 							console.log('error in comapring password for admin')
@@ -91,7 +80,7 @@ exports.postLogin = (req, res) => {
 					if (isPasswordValid) {
 						req.session.isLoggedIn = true;
 						req.session.user = employee
-						res.redirect('/home')
+						res.redirect('/')
 					} else {
 						console.log('error in comapring password')
 						req.flash('error', 'Invalid Password')
@@ -133,7 +122,6 @@ exports.getReset = (req, res, next) => {
 	})
 }
 
-
 exports.postReset = (req, res, next) => {
 	let email = req.body.email
 	crypto.randomBytes(32, (err, buffer) => {
@@ -163,7 +151,7 @@ exports.postReset = (req, res, next) => {
 			res.redirect('/login')
 			return transporter.sendMail({
 				to: email,
-				from: 'amna@dynasoftcloud.com',
+				from: constants.FROM,
 				subject: 'Password Reset',
 				html: `
 				<p>You requested a password reset</p>

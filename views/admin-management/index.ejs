@@ -23,23 +23,18 @@
 
 	<%- include('../admin/partials/nav-bar.ejs'); %>
 
-	<div style="padding-left: 17%;">
+	<div class="container" style="padding-left: 5%;">
 		<% if(!isEmployee) { %>
 		<a class="btn blue lighten-2" style="margin-top: 10px;" href="/employee/add" class="btn btn-secondary">New
-			Employee</a>
+			Admin</a>
 		<% } %>
 		<table class="striped responsive-table">
 			<thead>
 				<tr>
+					<th>Admin ID</th>
 					<th>Name</th>
 					<th>Email</th>
-					<th>Phone</th>
-					<th>Birth Date</th>
-					<th>Address</th>
-					<th>Hiring Date</th>
-					<th>Designation</th>
-					<th>Type</th>
-					<th>Actions</th>
+					<th>Role</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -47,23 +42,10 @@
 
   for(var i = 0; i< data.length; i++) {%>
 				<tr>
+					<th><%= data[i].id %></th>
 					<td><%= data[i].name%></td>
 					<td><%= data[i].email%></td>
-					<td><%= data[i].phone%></td>
-					<td><%= data[i].dob%></td>
-					<td><%= data[i].address%></td>
-					<td><%= data[i].hiring_date%></td>
-					<td><%= data[i].designation%></td>
-					<td><%= data[i].employee_type%></td>
-
-					<td>
-						<a class="btn edit" href="../employee/edit/<%=data[i].id%>">Edit</a>
-						<% if(!isEmployee) { %>
-						<a class="btn delete modal-trigger red accent-3" href="#modal1">Delete</a>
-						<%- include('../includes/confirmation-modal', {data: '../employee/delete/' + data[i].id}); %>
-						<% } %>
-					</td>
-
+					<td><%= data[i].roles.title%></td>
 				</tr>
 				<% }
 

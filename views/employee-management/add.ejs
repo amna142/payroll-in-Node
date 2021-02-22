@@ -1,4 +1,10 @@
 <%- include('../includes/header'); %>
+<script>
+	$(document).ready(function () {
+		$('select').formSelect();
+		$('.datepicker').datepicker();
+	});
+</script>
 <style>
 	footer {
 		padding-left: 240px
@@ -23,65 +29,114 @@
 
 	<%- include('../admin/partials/nav-bar.ejs'); %>
 
-	<div class="container" style="padding-top: 3%; padding-left: 15%;">
+	<div class="container" style="padding-top: 3%; padding-left: 5%;">
 
 		<div class="row">
-			<form action="/employee/add" method="POST" name="form1">
-				<div class="col s12">
-					<blockquote>
-						<div class="row">
-							<div class="input-field col s6">
-								<input type="text" required="" aria-required="true" class="form-control" name="name" id="name" value=""
-									placeholder="Name">
-								<label for="name">Your Name</label>
-							</div>
-						</div>
-					</blockquote>
-				</div>
-				<div class="col s12">
-					<blockquote>
-						<div class="row">
-							<div class="input-field col s6">
-								<input type="email" name="email" id="email" aria-describedby="emailHelp"
-									placeholder="Enter email" value="" required="" aria-required="true">
-								<label for="email">Email</label>
-							</div>
-						</div>
-					</blockquote>
-				</div>
-				<div class="col s12">
-					<blockquote>
-						<div class="row">
-							<div class="input-field col s6">
-								<input type="password" name="password" id="password" aria-describedby="password"
-									placeholder="Enter password" value="" required="" aria-required="true">
-								<label for="password">Password</label>
-							</div>
-						</div>
-					</blockquote>
-				</div>
-				<div class="col s12">
-					<blockquote>
-						<div class="row">
-							<div class="input-field col s6">
-								<input type="password" name="confirmPassword" id="confirmPassword"
-									aria-describedby="password" placeholder="Retype password" value="" required=""
-									aria-required="true">
-								<label for="confrimPassword">Confirm Password</label>
-							</div>
-						</div>
-					</blockquote>
-				</div>
-				<div class="col s12">
+			<div class="row">
+				<form class="col s12" action="/employee/add" method="POST" name="form1">
+					<h5><b style="color: coral;">Personal History</b></h5>
+					<div class="divider"></div>
+					<br />
 					<div class="row">
-						<button class="btn waves-effect waves-light" type="submit" value="Add">Submit
-							<i class="material-icons right"></i>
-						</button>
+						<div class="input-field col s4">
+							<i class="material-icons prefix">account_circle</i>
+							<input id="icon_prefix" type="text" class="validate" required="" aria-required="true"
+								class="form-control" name="name" id="name" value="">
+							<label for="icon_prefix">First Name</label>
+						</div>
+						<div class="input-field col s4">
+							<i class="material-icons prefix">email</i>
+							<input id="icon_email" type="email" name="email" id="email" aria-describedby="emailHelp"
+								value="" required="" aria-required="true">
+							<label for="icon_email">Email</label>
+						</div>
+						<div class="input-field col s4">
+							<i class="material-icons prefix">phone</i>
+							<input id="icon_telephone" type="tel" name="phone" id="phone" value="" required=""
+								aria-required="true" class="validate">
+							<label for="icon_telephone">Telephone</label>
+						</div>
 					</div>
-				</div>
-			</form>
+					<div class="row">
+						<div class="input-field col s6">
+							<i class="material-icons prefix">home</i>
+							<textarea class="materialize-textarea" class="validate" class="form-control" name="Address"
+								id="Address" value=""></textarea>
+							<label for="Address">Address</label>
+						</div>
+						<div class="input-field col s3">
+							<i class="material-icons prefix">vpn_key</i>
+							<input type="password" name="password" id="password" aria-describedby="password" value=""
+								required="" aria-required="true">
+							<label for="password">Password</label>
+						</div>
+						<div class="input-field col s3">
+							<i class="material-icons prefix">date_range</i>
+							<input type="text" class="datepicker" name="dob" id="dob" value="" required=""
+								aria-required="true">
+							<label for="dob">DOB</label>
+						</div>
+					</div>
+					<h5><b style="color: coral;">Employment History</b></h5>
+					<div class="divider"></div>
+					<br />
+					<div class="row">
+						<div class="input-field col s6">
+							<i class="material-icons prefix">person_add</i>
+							<select name="employee_type" required="" aria-required="true">
+								<option value="" disabled selected>Choose Employee Type</option>
+								<% if(employeeTypes.length) { 
+										for(var i = 0; i< employeeTypes.length; i++) { %>
+								<option value="<%=employeeTypes[i].id %>"><%= employeeTypes[i].employee_type %>
+								</option>
+								<% } } %>
+							</select>
+						</div>
+						<div class="input-field col s6">
+							<i class="material-icons prefix">verified_user</i>
+							<select name="designation" required="" aria-required="true">
+								<option value="" disabled selected>Choose Employee Designation</option>
+								<% if(employeeDesignations.length) { 
+										for(var i = 0; i< employeeDesignations.length; i++) { %>
+								<option value="<%= employeeDesignations[i].id %>">
+									<%= employeeDesignations[i].designation_type %> </option> <% } } %>
+							</select>
+						</div>
+					</div>
+					<div class="row">
+						<div class="input-field col s4">
+							<i class="material-icons prefix">date_range</i>
+							<input type="text" class="datepicker" name="starting_date" value="" id="starting_date"
+								required="" aria-required="true">
+							<label for="starting_date">Starting Date</label>
+						</div>
+
+						<div class="row">
+							<div class="file-field input-field col s6">
+								<div class="btn">
+									<span>Upload Resume</span>
+									<input type="file">
+								</div>
+								<div class="file-path-wrapper">
+									<input class="file-path validate" type="text" name="filePath" value="" required=""
+										aria-required="true">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row right">
+						<div class="input-field col s12">
+							<button class="btn waves-effect waves-light" type="submit" value="Add">Submit
+								<i class="material-icons right">person</i>
+							</button>
+							<a class="btn waves-effect waves-light" href="/employees">
+								<i class="material-icons right">close</i>Cancel</a>
+						</div>
+
+					</div>
+				</form>
+			</div>
 		</div>
 	</div>
-
 
 	<%- include('../includes/footer'); %>
