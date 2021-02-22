@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 
 var logsController = require('../controllers/logsController')
-
-router.get('/logs', logsController.getLogs)
+const isAuth = require('../middlewares/is-auth')
+router.get('/logs', isAuth, logsController.getLogs)
 
 module.exports = router

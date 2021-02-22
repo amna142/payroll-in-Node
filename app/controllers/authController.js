@@ -1,10 +1,14 @@
 const db = require('../util/database')
 const bcrypt = require('bcrypt')
 const constants = require('../util/constants')
-
+const logsController = require('./logsController')
 const crypto = require('crypto');
-const {transporter} = require('../config/email.config')
+const {
+	transporter
+} = require('../config/email.config');
+const auditLogs = require('../models/auditLogs');
 
+var AUDIT_LOGS = []
 
 exports.getLogin = (req, res) => {
 	let message = req.flash('error')
@@ -61,6 +65,16 @@ exports.postLogin = (req, res) => {
 						if (empPassword == employee.password) {
 							req.session.isLoggedIn = true
 							req.session.user = employee
+							AUDIT_LOGS.push({
+								name: req.session.user.name,
+								date: new Date(),
+								time: getTime(),
+								action: constants.READ,
+								record_type: 'Employee'
+							})
+							console.log('AUDIT_LOGS', AUDIT_LOGS)
+							logsController.insertLogs(AUDIT_LOGS)
+							// insertLogs(AUDIT_LOGS)
 							return req.session.save(err => {
 								console.log('err in saving session', err)
 								console.log('req.session.user.title', req.session.user.title)
@@ -80,6 +94,15 @@ exports.postLogin = (req, res) => {
 					if (isPasswordValid) {
 						req.session.isLoggedIn = true;
 						req.session.user = employee
+						AUDIT_LOGS.push({
+							name: req.session.user.name,
+							date: new Date(),
+							time: getTime(),
+							action: constants.READ,
+							record_type: 'Employee'
+						})
+						console.log('AUDIT_LOGS', AUDIT_LOGS)
+						logsController.insertLogs(AUDIT_LOGS)
 						res.redirect('/')
 					} else {
 						console.log('error in comapring password')
@@ -93,6 +116,14 @@ exports.postLogin = (req, res) => {
 	}).finally(() => {
 		db.sequelize.close
 	})
+}
+
+function getTime() {
+	var d = new Date()
+	var hours = d.getHours()
+	var minutes = d.getMinutes()
+	var seconds = d.getSeconds()
+	return (hours + ':' + minutes + ':' + seconds)
 }
 
 //logout request

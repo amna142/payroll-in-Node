@@ -1,13 +1,13 @@
 const db = require('../util/database')
 const bcrypt = require('bcrypt')
-
+const constants = require('../util/constants')
 const email = require('../util/constants')
 const {
 	transporter
 } = require('../config/email.config')
-
+const logsController = require('./logsController')
 var beforeEdit;
-
+var AUDIT_LOGS = []
 exports.adminHome = (req, res) => {
 	//get Cookie
 	// console.log('session', req.session.user.name)
@@ -77,8 +77,8 @@ exports.employeesIndexPage = async (req, res) => {
 	}
 }
 
-function convertDate(dob) {
-	var date = new Date(dob),
+function convertDate(d) {
+	var date = new Date(d),
 		mnth = ("0" + (date.getMonth() + 1)).slice(-2),
 		day = ("0" + date.getDate()).slice(-2);
 	return [date.getFullYear(), mnth, day].join("/");
@@ -136,6 +136,14 @@ exports.getDeleteEmployee = (req, res) => {
 		}
 	}).then(() => {
 		console.log('employee is destroyed')
+		AUDIT_LOGS.push({
+			name: req.session.user.name,
+			date: new Date(),
+			time: getTime(),
+			action: constants.DELETE,
+			record_type: 'Employee'
+		})
+		logsController.insertLogs(AUDIT_LOGS)
 		res.redirect('/employees')
 	})
 }
@@ -198,6 +206,15 @@ let employeeByEmail = function (email) {
 	})
 }
 
+function getTime() {
+	var d = new Date()
+	var hours = d.getHours()
+	var minutes = d.getMinutes()
+	var seconds = d.getSeconds()
+	return (hours + ':' + minutes + ':' + seconds)
+}
+
+
 function findById(empId) {
 	return db.employee.findOne({
 		where: {
@@ -217,8 +234,8 @@ function findById(empId) {
 				dob: emp.dob,
 				address: emp.address,
 				phone: emp.phone,
-				hiring_date: emp.starting_date,
-				resume: emp.resume,
+				starting_date: emp.starting_date,
+				file: emp.resume,
 				designation: emp.employeeDesignationId,
 				type: emp.employeeTypeId
 			}
@@ -247,9 +264,18 @@ exports.postAddEmployee = async (req, res) => {
 	let value = await employeeByEmail(params.email)
 	console.log(value)
 	if (value) {
+		console.log('params amna', params)
 		// now add employee
 		db.employee.create(params).then((employee) => {
 			console.log('employee', employee)
+			AUDIT_LOGS.push({
+				name: req.session.user.name,
+				date: new Date(),
+				time: getTime(),
+				action: constants.CREATE,
+				record_type: 'Employee'
+			})
+			logsController.insertLogs(AUDIT_LOGS)
 			res.redirect('/employees')
 			return transporter.sendMail({
 				to: email,
@@ -294,7 +320,7 @@ exports.getEditEmployee = async (req, res) => {
 			id: parseInt(empId),
 			phone: employeeFound.phone,
 			address: employeeFound.address,
-			hiring_date: convertDate(employeeFound.hiring_date),
+			starting_date: convertDate(employeeFound.starting_date),
 			file: employeeFound.resume,
 			dob: convertDate(employeeFound.dob),
 			employeeTypes: employeeTypes,
@@ -308,24 +334,28 @@ exports.getEditEmployee = async (req, res) => {
 	}
 }
 
-exports.postEditEmployee = (req, res) => {
-	console.log(' i am here')
-	let employeeId = req.params.id;
+exports.postEditEmployee = async (req, res) => {
 	console.log('req.body', req.body)
-	console.log('employeeId', employeeId)
+	console.log('beforeEdit.designation', beforeEdit.designation)
+	let employeeId = req.params.id;
+	// let des = await designation(beforeEdit.designation)
+	// let employee_type = await type(beforeEdit.type)
 	var afterEdit = {
 		id: parseInt(employeeId),
 		name: req.body.name,
 		email: req.body.email,
-		phone: req.body.phone,
-		address: req.body.phone,
-		starting_date: req.body.starting_date,
 		dob: req.body.dob,
-		filePath: req.body.filePath
+		address: req.body.address,
+		phone: req.body.phone,
+		starting_date: req.body.starting_date,
+		file: req.body.filePath,
+		designation: beforeEdit.designation,
+		type: beforeEdit.type,
 	}
+	console.log('after Edit', afterEdit)
 	var updatedObj = shallowEqual(afterEdit)
 	console.log('uopdatedObj', updatedObj)
-	if (Object.entries(updatedObj).length === 0) {
+	if (Object.keys(updatedObj).length === 0) {
 		console.log('You didnt updated anything')
 		req.flash('error', 'You didnt updated anything. please update fields or move back')
 		let message = req.flash('error')
@@ -344,10 +374,14 @@ exports.postEditEmployee = (req, res) => {
 			phone: afterEdit.phone,
 			isEmployee: isEmployee,
 			address: afterEdit.address,
-			filePath: afterEdit.filePath,
-			dob: afterEdit.dob,
+			file: afterEdit.filePath,
+			dob: afterEdit.dob[0] === afterEdit.dob[1] ? afterEdit.dob[0] : '',
 			hiring_date: afterEdit.starting_date,
-			errorMessage: message
+			errorMessage: message,
+			employeeDesignations: employeeDesignations,
+			employeeTypes: employeeTypes,
+			type: employee_type,
+			designation: des
 		})
 	}
 	if (updatedObj.hasOwnProperty('email')) {
@@ -418,8 +452,9 @@ function shallowEqual(afterEdit) {
 	const beforeKeys = Object.keys(beforeEdit);
 	const beforeValues = Object.values(beforeEdit)
 	const afterKeys = Object.keys(afterEdit);
-	console.log('afterKeys', afterKeys)
 	const afterValues = Object.values(afterEdit)
+	console.log('beforeValues', beforeValues)
+	console.log('afterValues', afterValues)
 	key_value = ''
 	if (beforeKeys.length !== afterKeys.length) {
 		return false;

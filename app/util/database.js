@@ -33,7 +33,7 @@ db.employee = require('../models/employees.js')(sequelize, Sequelize)
 db.role = require('../models/roles.js')(sequelize, Sequelize)
 db.employee_type = require('../models/employeeType.js')(sequelize, Sequelize)
 db.employee_designation = require('../models/employeeDesignation.js')(sequelize, Sequelize)
-
+db.logs = require('../models/auditLogs.js')(sequelize, Sequelize)
 //1 employee can have many roles
 //1 role can be assigend to many employees (1(role) -> many(employees))
 

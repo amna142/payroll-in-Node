@@ -11,34 +11,43 @@
 <body>
 	<ul class="collapsible popout" data-collapsible="accordion">
 		<li>
-			<div class="collapsible-header"><i class="material-icons">filter_drama</i>First</div>
+			<div class="collapsible-header"><i class="material-icons">filter_drama</i>Audit LOGS</div>
 			<div class="collapsible-body">
 				<table>
 					<thead>
 						<tr>
 							<th>Name</th>
-							<th>Updated Time</th>
+							<th>Date</th>
+							<th>Action</th>
+							<th>Record Type</th>
+							<th>Time</th>
+							<th>Field id</th>
 							<th>Old Value</th>
 							<th>New Value</th>
 						</tr>
 					</thead>
 
 					<tbody>
+						<% if(data.length){
+
+  for(var i = 0; i< data.length; i++) {%>
 						<tr>
-							<td>Alvin</td>
-							<td>Eclair</td>
-							<td>$0.87</td>
+							<td><%= data[i].name%></td>
+							<td><%= data[i].date%></td>
+							<td><%= data[i].action%></td>
+							<td><%= data[i].record_type%></td>
+							<td><%= data[i].time%></td>
+							<td><%= data[i].field_id%></td>
+							<td><%= data[i].old_value%></td>
+							<td><%= data[i].new_value%></td>
 						</tr>
+						<% }
+
+   }else{ %>
 						<tr>
-							<td>Alan</td>
-							<td>Jellybean</td>
-							<td>$3.76</td>
+							<td colspan="3">No Logs</td>
 						</tr>
-						<tr>
-							<td>Jonathan</td>
-							<td>Lollipop</td>
-							<td>$7.00</td>
-						</tr>
+						<% } %>
 					</tbody>
 				</table>
 			</div>
