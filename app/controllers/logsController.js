@@ -1,6 +1,5 @@
 const db = require("../util/database")
 
-
 exports.getLogs = async (req, res) =>{
 	console.log(' hello logs')
 	let logs = await getLogs()

@@ -1,58 +1,107 @@
-<%- include('../includes/header'); %>
-<script>
-	$(document).ready(function () {
-		$('.collapsible').collapsible({
-			accordion: false // A setting that changes the collapsible behavior to expandable instead of the default accordion style
-		});
-	});
-</script>
+</head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+	body {
+		font-family: Arial;
+	}
+
+	/* Style the tab */
+	.tab {
+		overflow: hidden;
+		border: 1px solid #ccc;
+		background-color: #f1f1f1;
+	}
+
+	/* Style the buttons inside the tab */
+	.tab button {
+		background-color: inherit;
+		float: left;
+		border: none;
+		outline: none;
+		cursor: pointer;
+		padding: 14px 16px;
+		transition: 0.3s;
+		font-size: 17px;
+	}
+
+	/* Change background color of buttons on hover */
+	.tab button:hover {
+		background-color: #ddd;
+	}
+
+	/* Create an active/current tablink class */
+	.tab button.active {
+		background-color: #ccc;
+	}
+
+	/* Style the tab content */
+	.tabcontent {
+		display: none;
+		padding: 6px 12px;
+		border: 1px solid #ccc;
+		border-top: none;
+	}
+</style>
 </head>
 
 <body>
-	<ul class="collapsible popout" data-collapsible="accordion">
-		<li>
-			<div class="collapsible-header"><i class="material-icons">filter_drama</i>Audit LOGS</div>
-			<div class="collapsible-body">
-				<table>
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th>Date</th>
-							<th>Action</th>
-							<th>Record Type</th>
-							<th>Time</th>
-							<th>Field id</th>
-							<th>Old Value</th>
-							<th>New Value</th>
-						</tr>
-					</thead>
+	<div class="tab">
+		<button class="tablinks" onclick="openCity(event, 'logs')">System Logs</button>
+	</div>
 
-					<tbody>
-						<% if(data.length){
+	<div id="logs" class="tabcontent">
+		<table>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Action</th>
+					<th>Record Type</th>
+					<th>Time</th>
+					<th>Field id</th>
+					<th>Old Value</th>
+					<th>New Value</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				<% if(data.length){
 
   for(var i = 0; i< data.length; i++) {%>
-						<tr>
-							<td><%= data[i].name%></td>
-							<td><%= data[i].date%></td>
-							<td><%= data[i].action%></td>
-							<td><%= data[i].record_type%></td>
-							<td><%= data[i].time%></td>
-							<td><%= data[i].field_id%></td>
-							<td><%= data[i].old_value%></td>
-							<td><%= data[i].new_value%></td>
-						</tr>
-						<% }
-
+				<tr>
+					<td><%= data[i].name%></td>
+					<td><%= data[i].action%></td>
+					<td><%= data[i].record_type%></td>
+					<td><%= data[i].time%></td>
+					<td><%= data[i].field_id%></td>
+					<td><%= data[i].old_value%></td>
+					<td><%= data[i].new_value%></td>
+				</tr>
+				<% }
    }else{ %>
-						<tr>
-							<td colspan="3">No Logs</td>
-						</tr>
-						<% } %>
-					</tbody>
-				</table>
-			</div>
-		</li>
-	</ul>
+				<tr>
+					<td colspan="3">No Logs</td>
+				</tr>
+				<% } %>
+			</tbody>
+		</table>
+	</div>
+
+	<script>
+		function openCity(evt, cityName) {
+			var i, tabcontent, tablinks;
+			tabcontent = document.getElementsByClassName("tabcontent");
+			for (i = 0; i < tabcontent.length; i++) {
+				tabcontent[i].style.display = "none";
+			}
+			tablinks = document.getElementsByClassName("tablinks");
+			for (i = 0; i < tablinks.length; i++) {
+				tablinks[i].className = tablinks[i].className.replace(" active", "");
+			}
+			document.getElementById(cityName).style.display = "block";
+			evt.currentTarget.className += " active";
+		}
+	</script>
+
 </body>
 
 </html>

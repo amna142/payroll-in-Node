@@ -8,17 +8,32 @@ const {
 const logsController = require('./logsController')
 var beforeEdit;
 var AUDIT_LOGS = []
-exports.adminHome = (req, res) => {
+exports.adminHome = async (req, res) => {
 	//get Cookie
 	// console.log('session', req.session.user.name)
+
 	console.log('isLoggedIn', req.session.isLoggedIn)
+	let logsArray = await getLogs()
+	console.log('logsArray', logsArray)
 	res.render('admin/home', {
 		isAuthenticated: req.session.isLoggedIn,
 		name: req.session.user.title,
+		data: logsArray,
 		errorMessage: req.flash('error')
 	})
 }
 
+function getLogs() {
+	let logsArray = []
+	return db.logs.findAll().then(logArr => {
+		logArr.forEach(element => {
+			logsArray.push(element.dataValues)
+		});
+		return logsArray
+	}).catch(err => {
+		console.log('err in logs', err)
+	})
+}
 exports.employeesIndexPage = async (req, res) => {
 	let emp = await findAllEmployees()
 	let employeesArray = []
