@@ -6,16 +6,25 @@ const {
 	transporter
 } = require('../config/email.config')
 const logsController = require('./logsController')
-var beforeEdit;
+var oldRecord;
 var AUDIT_LOGS = []
+
 exports.adminHome = async (req, res) => {
 	//get Cookie
 	// console.log('session', req.session.user.name)
-
+	let logsArray = []
 	console.log('isLoggedIn', req.session.isLoggedIn)
-	let logsArray = await getLogs()
-	console.log('logsArray', logsArray)
+	var user = req.session.user;
+	var isEmployee = false
+	if (user.roleId === null) {
+		logsArray = await logsController.employeeLogs(req.session.user.id)
+		isEmployee = true
+	} else {
+		logsArray = await getLogs()
+		isEmployee = false
+	}
 	res.render('admin/home', {
+		isEmployee: isEmployee,
 		isAuthenticated: req.session.isLoggedIn,
 		name: req.session.user.title,
 		data: logsArray,
@@ -35,25 +44,29 @@ function getLogs() {
 	})
 }
 exports.employeesIndexPage = async (req, res) => {
+	let logsArray = []
 	let emp = await findAllEmployees()
 	let employeesArray = []
-	console.log('emp', emp)
+	//get role of user to restrict access
+	var user = req.session.user;
+	var isEmployee = false
+	if (user.roleId === null) {
+		logsArray = await logsController.employeeLogs(req.session.user.id)
+		isEmployee = true
+	} else {
+		logsArray = await getLogs()
+		isEmployee = false
+	}
 	if (emp.length > 0) {
 		let employee_designation, employee_type;
-		// console.log('employee', employee)
-
-		// console.log('employee inside', employee.length)
 		for (var i = 0; i < emp.length; i++) {
 			let unitEmployee = emp[i]
 			//fetch employee designation
 			employee_designation = await designation(unitEmployee.employeeDesignationId)
 			employee_type = await type(unitEmployee.employeeDesignationId)
-			console.log('demployee_designationes', employee_designation)
-
 			//convert date 
 			let convertedDOB = convertDate(unitEmployee.dob)
 			let convertedHiringDate = convertDate(unitEmployee.starting_date)
-			console.log('convertedDOB', convertedDOB)
 			employeesArray.push({
 				id: unitEmployee.id,
 				name: unitEmployee.name,
@@ -66,28 +79,22 @@ exports.employeesIndexPage = async (req, res) => {
 				employee_type: employee_type
 			})
 		}
-		console.log('employeesArray', employeesArray)
-		//get role of user to restrict access
-		var user = req.session.user;
-		var isEmployee = false
-		if (user.roleId === null) {
-			isEmployee = true
-		} else {
-			console.log('user', user)
-		}
-		console.log('amna', isEmployee)
 		res.render('employee-management', {
 			data: employeesArray,
 			pageTitle: 'Employees',
 			isEmployee: isEmployee,
-			name: req.session.user.name
+			name: req.session.user.name,
+			logsData: logsArray,
+			errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null
 		})
 	} else {
 		res.render('employee-management', {
 			data: employeesArray,
 			pageTitle: 'Employees',
 			isEmployee: isEmployee,
-			name: req.session.user.name
+			name: req.session.user.name,
+			logsData: logsArray,
+			errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null
 		})
 	}
 }
@@ -110,7 +117,7 @@ let findAllEmployees = (req, res) => {
 		employees.forEach(emp => {
 			empArray.push(emp.dataValues)
 		});
-		console.log("employee found", empArray);
+
 		return empArray
 	}).catch(err => {
 		console.log('err', err)
@@ -151,8 +158,10 @@ exports.getDeleteEmployee = (req, res) => {
 		}
 	}).then(() => {
 		console.log('employee is destroyed')
+		console.log('employee Id', req.session.user.id)
 		AUDIT_LOGS.push({
 			name: req.session.user.name,
+			emp_id: req.session.user.id,
 			date: new Date(),
 			time: getTime(),
 			action: constants.DELETE,
@@ -213,9 +222,7 @@ let employeeByEmail = function (email) {
 			console.log('employe not Found by EMail', employee)
 			return true
 		} else {
-			console.log('employee found by email', employee.get({
-				plain: true
-			}))
+			console.log('employee found')
 			return false
 		}
 	})
@@ -254,7 +261,6 @@ function findById(empId) {
 				designation: emp.employeeDesignationId,
 				type: emp.employeeTypeId
 			}
-			console.log('beforeEdit', beforeEdit)
 			return beforeEdit
 		}
 	})
@@ -276,20 +282,29 @@ exports.postAddEmployee = async (req, res) => {
 		employeeTypeId: parseInt(req.body.employee_type),
 		employeeDesignationId: parseInt(req.body.designation)
 	}
+	if (Object.keys(params).length > 0) {
+		Object.keys(params).forEach(function (key) {
+			var value = params[key]
+			console.log(key, value)
+			AUDIT_LOGS.push({
+				name: req.session.user.name,
+				emp_id: req.session.user.id,
+				date: convertDate(new Date()),
+				time: getTime(),
+				action: constants.SET,
+				record_type: 'Employee',
+				field_id: key,
+				new_value: value
+			})
+		})
+	}
 	let value = await employeeByEmail(params.email)
 	console.log(value)
 	if (value) {
 		console.log('params amna', params)
 		// now add employee
 		db.employee.create(params).then((employee) => {
-			console.log('employee', employee)
-			AUDIT_LOGS.push({
-				name: req.session.user.name,
-				date: new Date(),
-				time: getTime(),
-				action: constants.CREATE,
-				record_type: 'Employee'
-			})
+			console.log('employee created', employee)
 			logsController.insertLogs(AUDIT_LOGS)
 			res.redirect('/employees')
 			return transporter.sendMail({
@@ -310,10 +325,8 @@ exports.postAddEmployee = async (req, res) => {
 
 exports.getEditEmployee = async (req, res) => {
 	var empId = req.params.id
-	console.log('edit employee', empId)
 	var employeeFound = await findById(empId)
-	beforeEdit = employeeFound;
-	console.log('employeeFound', employeeFound)
+	oldRecord = employeeFound;
 	let employeeDesignations = await employeeDesignation()
 	let employeeTypes = await typesOfEmployeee();
 	let des = await designation(employeeFound.designation)
@@ -323,9 +336,8 @@ exports.getEditEmployee = async (req, res) => {
 	if (user.roleId === null) {
 		isEmployee = true
 	} else {
-		console.log('user', user)
+		isEmployee = false
 	}
-	console.log('isEmployee', isEmployee)
 	if (employeeFound) {
 		res.render('employee-management/edit', {
 			pageTitle: 'Employee Edit Form',
@@ -336,7 +348,7 @@ exports.getEditEmployee = async (req, res) => {
 			phone: employeeFound.phone,
 			address: employeeFound.address,
 			starting_date: convertDate(employeeFound.starting_date),
-			file: employeeFound.resume,
+			file: employeeFound.file,
 			dob: convertDate(employeeFound.dob),
 			employeeTypes: employeeTypes,
 			employeeDesignations: employeeDesignations,
@@ -350,12 +362,14 @@ exports.getEditEmployee = async (req, res) => {
 }
 
 exports.postEditEmployee = async (req, res) => {
+	AUDIT_LOGS = []
 	console.log('req.body', req.body)
-	console.log('beforeEdit.designation', beforeEdit.designation)
+	//convert old record date into new record date type
+	oldRecord.dob = convertDate(oldRecord.dob)
+	oldRecord.starting_date = convertDate(oldRecord.starting_date)
+	console.log('oldRecord', oldRecord)
 	let employeeId = req.params.id;
-	// let des = await designation(beforeEdit.designation)
-	// let employee_type = await type(beforeEdit.type)
-	var afterEdit = {
+	var newRecord = {
 		id: parseInt(employeeId),
 		name: req.body.name,
 		email: req.body.email,
@@ -364,12 +378,16 @@ exports.postEditEmployee = async (req, res) => {
 		phone: req.body.phone,
 		starting_date: req.body.starting_date,
 		file: req.body.filePath,
-		designation: beforeEdit.designation,
-		type: beforeEdit.type,
+		designation: oldRecord.designation,
+		type: oldRecord.type,
 	}
-	console.log('after Edit', afterEdit)
-	var updatedObj = shallowEqual(afterEdit)
+	console.log('newRecord', newRecord)
+	var updatedObj = shallowEqual(newRecord)
 	console.log('uopdatedObj', updatedObj)
+	let employeeDesignations = await employeeDesignation()
+	let employeeTypes = await typesOfEmployeee();
+	let des = await designation(newRecord.designation)
+	let employee_type = await type(newRecord.type)
 	if (Object.keys(updatedObj).length === 0) {
 		console.log('You didnt updated anything')
 		req.flash('error', 'You didnt updated anything. please update fields or move back')
@@ -380,75 +398,75 @@ exports.postEditEmployee = async (req, res) => {
 		if (user.roleId === null) {
 			isEmployee = true
 		} else {
-			console.log('user', user)
+			isEmployee = false
 		}
-		res.render('employee-management/edit', {
-			email: afterEdit.email,
-			id: employeeId,
-			name: afterEdit.name,
-			phone: afterEdit.phone,
-			isEmployee: isEmployee,
-			address: afterEdit.address,
-			file: afterEdit.filePath,
-			dob: afterEdit.dob[0] === afterEdit.dob[1] ? afterEdit.dob[0] : '',
-			hiring_date: afterEdit.starting_date,
-			errorMessage: message,
-			employeeDesignations: employeeDesignations,
-			employeeTypes: employeeTypes,
-			type: employee_type,
-			designation: des
+		newRecord['errorMessage'] = message
+		newRecord['isEmployee'] = isEmployee
+		newRecord['employeeDesignations'] = employeeDesignations;
+		newRecord['employeeTypes'] = employeeTypes
+		newRecord['type'] = employee_type
+		newRecord['designation'] = des
+		console.log('new record', newRecord)
+		res.render('employee-management/edit', newRecord)
+	} else {
+		Object.keys(updatedObj).forEach(function (key) {
+			var value = updatedObj[key]
+			console.log(key, value)
+			AUDIT_LOGS.push({
+				name: req.session.user.name,
+				emp_id: req.session.user.id,
+				date: convertDate(new Date()),
+				time: getTime(),
+				action: constants.UPDATE,
+				record_type: 'Employee',
+				field_id: key,
+				old_value: oldRecord[key],
+				new_value: value
+			})
 		})
 	}
 	if (updatedObj.hasOwnProperty('email')) {
-		employeeByEmail(afterEdit.email).then(result => {
-			console.log('result', result)
-			if (result) {
-				// Change everyone without a last name to "Doe"
-				db.employee.update(updatedObj, {
-					where: {
-						id: afterEdit.id
-					}
-				}).then((updatedEmployee) => {
-					if (updatedEmployee) {
-						console.log("Done", updatedEmployee);
-						res.redirect('/employees')
-					} else {
-						req.flash('error', 'Employee is Not Updated')
-						console.log('not updated')
-					}
-				}).catch(err => {
-					req.flash('error', 'Error in Updating Employee')
-					console.log('error in updating object', err)
-				})
-			} else {
-				console.log('Employee with the email already exist')
-				req.flash('error', 'Employee with Email Already Exist. Please Try with some other Email')
-				let message = req.flash('error')
-				message = message.length > 0 ? message : null
-				res.render('employee-management/edit', {
-					email: afterEdit.email,
-					id: employeeId,
-					name: afterEdit.name,
-					phone: afterEdit.phone,
-					isEmployee: isEmployee,
-					address: afterEdit.address,
-					filePath: afterEdit.filePath,
-					dob: afterEdit.dob,
-					hiring_date: afterEdit.starting_date,
-					errorMessage: message
-				})
-			}
-		}).catch(err => {
-			console.log('err', err)
-		})
+		let employee = await employeeByEmail(updatedObj.email)
+		console.log('employeee found', employee)
+		if (!employee) {
+			console.log('Employee with the email already exist')
+			req.flash('error', 'Employee with Email Already Exist. Please Try with some other Email')
+			let message = req.flash('error')
+			message = message.length > 0 ? message : null
+			newRecord['errorMessage'] = message
+			newRecord['isEmployee'] = isEmployee
+			newRecord['employeeDesignations'] = employeeDesignations;
+			newRecord['employeeTypes'] = employeeTypes
+			newRecord['type'] = employee_type
+			newRecord['designation'] = des
+			res.render('employee-management/edit', newRecord)
+		} else {
+			db.employee.update(updatedObj, {
+				where: {
+					id: newRecord.id
+				}
+			}).then(result => {
+				if (result) {
+					logsController.insertLogs(AUDIT_LOGS)
+					console.log('updated done', AUDIT_LOGS)
+					res.redirect('/employees')
+				} else {
+					req.flash('error', 'Employee is Not Updated')
+					console.log('not updated')
+				}
+			}).catch(err => {
+				console.log('err in updating email', err)
+			})
+		}
 	} else {
 		db.employee.update(updatedObj, {
 			where: {
-				id: afterEdit.id
+				id: newRecord.id
 			}
 		}).then((updatedEmployee) => {
 			if (updatedEmployee) {
 				console.log("Done", updatedEmployee);
+				logsController.insertLogs(AUDIT_LOGS)
 				res.redirect('/employees')
 			} else {
 				req.flash('error', 'Employee is Not Updated')
@@ -459,26 +477,27 @@ exports.postEditEmployee = async (req, res) => {
 			console.log('error in updating object', err)
 		})
 	}
-
 }
 
-function shallowEqual(afterEdit) {
+function shallowEqual(newRecord) {
 	var obj = {}
-	const beforeKeys = Object.keys(beforeEdit);
-	const beforeValues = Object.values(beforeEdit)
-	const afterKeys = Object.keys(afterEdit);
-	const afterValues = Object.values(afterEdit)
-	console.log('beforeValues', beforeValues)
-	console.log('afterValues', afterValues)
+	const oldRecordKeys = Object.keys(oldRecord);
+	const oldRecordValues = Object.values(oldRecord)
+	const newRecordKeys = Object.keys(newRecord);
+	const newRecordValues = Object.values(newRecord)
+	console.log('oldRecordValues', oldRecordValues)
+	console.log('newRecordValues', newRecordValues)
 	key_value = ''
-	if (beforeKeys.length !== afterKeys.length) {
+	if (oldRecordKeys.length !== newRecordKeys.length) {
 		return false;
 	}
-	for (var i = 0; i < beforeValues.length; i++) {
-		if (beforeValues[i] !== afterValues[i]) {
-			key_value = afterKeys[i];
-			console.log('key_Value', key_value)
-			obj[key_value] = afterValues[i]
+	for (var i = 0; i < oldRecordValues.length; i++) {
+		if (newRecordValues[i] !== undefined) {
+			if (oldRecordValues[i] !== newRecordValues[i]) {
+				key_value = newRecordKeys[i];
+				console.log('key_Value', key_value)
+				obj[key_value] = newRecordValues[i]
+			}
 		}
 	}
 	console.log('updatedFields', obj)

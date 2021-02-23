@@ -67,6 +67,7 @@ exports.postLogin = (req, res) => {
 							req.session.user = employee
 							AUDIT_LOGS.push({
 								name: req.session.user.name,
+								emp_id: req.session.user.id,
 								date: new Date(),
 								time: getTime(),
 								action: constants.READ,
@@ -96,6 +97,7 @@ exports.postLogin = (req, res) => {
 						req.session.user = employee
 						AUDIT_LOGS.push({
 							name: req.session.user.name,
+							emp_id: req.session.user.id,
 							date: new Date(),
 							time: getTime(),
 							action: constants.READ,
@@ -245,7 +247,6 @@ exports.postNewPassword = (req, res, next) => {
 					id: userId
 				}
 			}).then(employee => {
-				console.log('employee found', employee)
 				resetUser = employee
 				return bcrypt.hashSync(newPassword, 8)
 			}).then((hashedPassword) => {

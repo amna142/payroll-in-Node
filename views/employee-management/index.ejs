@@ -22,7 +22,11 @@
 	<%- include('../admin/partials/side-nav'); %>
 
 	<%- include('../admin/partials/nav-bar.ejs'); %>
+	<% if(errorMessage) { %>
 
+	<div class="col s8 user-message user-message--error"><%= errorMessage %>
+	</div>
+	<% } %>
 	<div style="padding-left: 17%;">
 		<% if(!isEmployee) { %>
 		<a class="btn blue lighten-2" style="margin-top: 10px;" href="/employee/add" class="btn btn-secondary">New
@@ -74,6 +78,11 @@
 				<% } %>
 			</tbody>
 		</table>
+		</br>
+		</br>
+		</br>
+		</br>
+		<%- include('../audit-logs/logs', {data: logsData}); %>
 
 	</div>
 

@@ -1,5 +1,4 @@
-</head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
 	body {
 		font-family: Arial;
@@ -43,7 +42,6 @@
 	}
 </style>
 </head>
-
 <body>
 	<div class="tab">
 		<button class="tablinks" onclick="openCity(event, 'logs')">System Logs</button>
@@ -53,6 +51,7 @@
 		<table>
 			<thead>
 				<tr>
+					<th>Emp Id</th>
 					<th>Name</th>
 					<th>Action</th>
 					<th>Record Type</th>
@@ -68,6 +67,7 @@
 
   for(var i = 0; i< data.length; i++) {%>
 				<tr>
+					<td><%= data[i].emp_id %></td>
 					<td><%= data[i].name%></td>
 					<td><%= data[i].action%></td>
 					<td><%= data[i].record_type%></td>
@@ -101,7 +101,4 @@
 			evt.currentTarget.className += " active";
 		}
 	</script>
-
-</body>
-
-</html>
+ </main>

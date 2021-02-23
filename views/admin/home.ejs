@@ -58,7 +58,13 @@
 
 	<%- include('./partials/nav-bar.ejs'); %>
 
-	<%- include('./partials/main-body.ejs', {data: data}); %>
+
+	<%- include('./partials/main-body.ejs'); %>
+	
+	<%- include('../audit-logs/logs.ejs', {data: data}); %>
+
+
+
 
 	<% } %>
 

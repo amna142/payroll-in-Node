@@ -26,7 +26,7 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.STRING,
 			allowNull: true,
 			required: false
-		}, 
+		},
 		new_value: {
 			type: Sequelize.STRING,
 			allowNull: true,
@@ -39,13 +39,18 @@ module.exports = (sequelize, Sequelize) => {
 		},
 		time: {
 			type: Sequelize.TIME,
-			allowNull: true, 
+			allowNull: true,
 			required: false
 		},
 		name: {
 			type: Sequelize.STRING,
 			allowNull: false,
 			required: true
+		},
+		emp_id: {
+			type: Sequelize.INTEGER,
+			allowNull: false,
+			required: false
 		}
 	});
 	return AuditLogs
