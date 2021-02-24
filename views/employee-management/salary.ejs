@@ -1,0 +1,58 @@
+<script>
+	$(document).ready(function () {
+		$('#salary').change(function () {
+			var employee_salary = document.getElementById("salary").value;
+			var employee_grade_id = document.getElementById('grade').value
+			if (employee_grade_id) {
+				var employee_grade = $("#grade option:selected").text();
+				employee_grade = JSON.stringify(employee_grade).split(/[.>\),<]/)
+				if (employee_salary >= employee_grade[1] && employee_salary <= employee_grade[3]) {
+					console.log('i am focused out', employee_grade)
+					var span_msg = document.getElementById('msg')
+					if (span_msg.hasAttribute('data-success')) {
+						span_msg.setAttribute('data-success', 'Salary selected' + employee_salary)
+						console.log('data-success', span_msg)
+					}
+					console.log('span_msg', span_msg)
+				} else {
+					var span_msg = document.getElementById('msg')
+					if (span_msg.hasAttribute('data-error')) {
+						span_msg.setAttribute('data-error', 'Salary is out of range')
+						console.log('data-error', span_msg)
+					}
+				}
+			}
+		})
+		$('#grade').change(function () {
+			let grade_id = document.getElementById('grade').value
+			if (grade_id) {
+				var d = document.getElementById('salary')
+				if (d.hasAttribute('disabled')) {
+					d.removeAttribute('disabled')
+					console.log('d', d)
+				}
+			}
+		})
+	})
+</script>
+<h5><b style="color: coral;">Salary History</b></h5>
+<div class="divider"></div>
+<br />
+<div class="row">
+	<div class="input-field col s6">
+		<i class="material-icons prefix">grade</i>
+		<select name="employee_grade" id='grade' required="" aria-required="true">
+			<option value="" disabled selected>Choose Employee Grade</option>
+			<% if(grades.length) { 
+										for(var i = 0; i< grades.length; i++) { %>
+			<option value="<%=grades[i].id %>"><%= grades[i].grade %> (><%= grades[i].min_salary %>,
+				<<%= grades[i].max_salary %>) </option> <% } } %> </select> </div> <div class="input-field col s6">
+					<i class="material-icons prefix">attach_money</i>
+					<input type="number" disabled size="8" class="validate" required="" aria-required="true"
+						class="form-control" name="salary" id="salary" value="">
+					<label for="icon_prefix">Employee Basic Salary</label>
+					<span class="helper-text" id="msg" data-error="" data-success="">Choose Money in between
+						Range</span>
+	</div>
+
+</div>

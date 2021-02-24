@@ -8,7 +8,8 @@ const {
 const logsController = require('./logsController')
 var oldRecord;
 var AUDIT_LOGS = []
-
+const employeeController = require('./employeeController')
+const salariesController = require('./employeeSalaries')
 exports.adminHome = async (req, res) => {
 	//get Cookie
 	// console.log('session', req.session.user.name)
@@ -54,7 +55,7 @@ exports.employeesIndexPage = async (req, res) => {
 		logsArray = await logsController.employeeLogs(req.session.user.id)
 		isEmployee = true
 	} else {
-		logsArray = await getLogs()
+		logsArray = await logsController.getLogs()
 		isEmployee = false
 	}
 	if (emp.length > 0) {
@@ -173,13 +174,16 @@ exports.getDeleteEmployee = (req, res) => {
 }
 
 exports.getAddEmployee = async (req, res) => {
+
+	var grades = await employeeController.getAllGrades()
+	console.log('grades', grades)
 	//fetch employee type from DB
 	let employeeDesignations = await employeeDesignation()
-	console.log('employeeDesignations', employeeDesignations)
 	let employeeTypes = await typesOfEmployeee();
 	res.render('employee-management/add', {
 		employeeTypes: employeeTypes,
-		employeeDesignations: employeeDesignations
+		employeeDesignations: employeeDesignations,
+		grades: grades
 	})
 }
 
@@ -249,6 +253,7 @@ function findById(empId) {
 			var emp = employee.get({
 				plain: true
 			})
+			console.log('emp', emp)
 			var beforeEdit = {
 				id: emp.id,
 				name: emp.name,
@@ -259,7 +264,8 @@ function findById(empId) {
 				starting_date: emp.starting_date,
 				file: emp.resume,
 				designation: emp.employeeDesignationId,
-				type: emp.employeeTypeId
+				type: emp.employeeTypeId,
+				employee_grade_id: emp.employeeGradeId
 			}
 			return beforeEdit
 		}
@@ -267,6 +273,7 @@ function findById(empId) {
 }
 
 exports.postAddEmployee = async (req, res) => {
+
 	console.log('params', req.body)
 	var hashedPassword = bcrypt.hashSync(req.body.password, 8);
 	console.log('hashedPassword', hashedPassword)
@@ -280,7 +287,8 @@ exports.postAddEmployee = async (req, res) => {
 		starting_date: req.body.starting_date,
 		resume: req.body.filePath,
 		employeeTypeId: parseInt(req.body.employee_type),
-		employeeDesignationId: parseInt(req.body.designation)
+		employeeDesignationId: parseInt(req.body.designation),
+		employeeGradeId: req.body.employee_grade
 	}
 	if (Object.keys(params).length > 0) {
 		Object.keys(params).forEach(function (key) {
@@ -301,10 +309,12 @@ exports.postAddEmployee = async (req, res) => {
 	let value = await employeeByEmail(params.email)
 	console.log(value)
 	if (value) {
-		console.log('params amna', params)
 		// now add employee
 		db.employee.create(params).then((employee) => {
 			console.log('employee created', employee)
+			let empId = employee.dataValues.id
+			//before employee creation, the create employee salary record
+			salariesController.createSalary(empId, req.body.salary)
 			logsController.insertLogs(AUDIT_LOGS)
 			res.redirect('/employees')
 			return transporter.sendMail({
@@ -324,6 +334,8 @@ exports.postAddEmployee = async (req, res) => {
 }
 
 exports.getEditEmployee = async (req, res) => {
+	var grades = await employeeController.getAllGrades()
+	console.log('grades', grades)
 	var empId = req.params.id
 	var employeeFound = await findById(empId)
 	oldRecord = employeeFound;
@@ -338,6 +350,9 @@ exports.getEditEmployee = async (req, res) => {
 	} else {
 		isEmployee = false
 	}
+	console.log('employeeFound', employeeFound)
+	let GRADE_OBJ = await employeeController.findGradeById(employeeFound.employee_grade_id)
+	console.log('amna', GRADE_OBJ.grade + '(>' + GRADE_OBJ.min_salary + ',<' + GRADE_OBJ.max_salary + ')')
 	if (employeeFound) {
 		res.render('employee-management/edit', {
 			pageTitle: 'Employee Edit Form',
@@ -349,11 +364,13 @@ exports.getEditEmployee = async (req, res) => {
 			address: employeeFound.address,
 			starting_date: convertDate(employeeFound.starting_date),
 			file: employeeFound.file,
+			grades: grades,
 			dob: convertDate(employeeFound.dob),
 			employeeTypes: employeeTypes,
 			employeeDesignations: employeeDesignations,
 			type: employee_type,
 			designation: des,
+			employee_grade: GRADE_OBJ.grade,
 			errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null
 		})
 	} else {

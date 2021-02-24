@@ -1,12 +1,6 @@
 const db = require("../util/database")
 
-exports.getLogs = async (req, res) => {
-	console.log(' hello logs')
-	let logs = await getLogs()
-	res.render('audit-logs/logs', {
-		data: logs
-	})
-}
+
 
 exports.insertLogs = (AUDIT_LOGS) => {
 	console.log('AUDIT_LOGS', AUDIT_LOGS)
@@ -20,7 +14,7 @@ exports.insertLogs = (AUDIT_LOGS) => {
 }
 
 
-function getLogs() {
+exports.getLogs = () => {
 	let logsArray = []
 	return db.logs.findAll().then(logArr => {
 		logArr.forEach(element => {

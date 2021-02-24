@@ -1,0 +1,98 @@
+<%- include('../includes/header'); %>
+
+<script>
+	$(document).ready(function () {
+		Materialize.toast('Ready', 4000)
+	});
+</script>
+<style>
+	body {
+		height: 50em;
+		background: #f1f1f1;
+	}
+
+	.navbar-fixed {
+		height: auto !important;
+	}
+
+	nav {
+		height: auto;
+	}
+
+	.mb-0 {
+		margin-bottom: 0px;
+	}
+
+
+	.pt-10 {
+		padding-top: 10em;
+	}
+
+	.tabs .indicator {
+		background-color: #fff;
+	}
+
+	.header {
+		margin: 1em 0em;
+		font-weight: 600;
+		color: #333;
+		text-transform: uppercase;
+	}
+</style>
+</head>
+
+<body>
+	<%- include('../admin/partials/side-nav'); %>
+
+	<%- include('../admin/partials/nav-bar.ejs'); %>
+
+	<div class="navbar-fixed">
+		<nav>
+			<div class="nav-wrapper blue ">
+				<div class="row mb-0">
+					<div class='col s12 m6   l4 offset-l2'>
+
+
+						<ul class="tabs blue">
+							<li class="tab col s1 "><a href="#test1" class='active white-text'>Grades</a></li>
+							<li class="tab col s1"><a class=" white-text" href="#test2">Allowances</a></li>
+							<li class="tab col s1"><a href="#test3" class='white-text'>Results</a></li>
+						</ul>
+
+					</div>
+				</div>
+
+			</div>
+		</nav>
+	</div>
+
+
+	<div class="container pt-11">
+		<div class="row card" style="margin-left: 12%;">
+			<div id="test1" class="col s12">
+				<h3 class='header'>Grades</h3>
+				<%- include('./grades/index'); %>
+
+			</div>
+			<div id="test2" class="col s12">
+				<h3 class='header'>Allowances</h3>
+
+				<ul class="collection">
+					<li class="collection-item">1</li>
+					<li class="collection-item">2</li>
+					<li class="collection-item">3</li>
+					<li class="collection-item">4</li>
+				</ul>
+
+			</div>
+			<div id="test3" class="col s12">
+				<h3 class='header'>Results</h3>
+
+				<div class="progress">
+					<div class="indeterminate"></div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	<%- include('../includes/footer'); %>

@@ -34,6 +34,9 @@ db.role = require('../models/roles.js')(sequelize, Sequelize)
 db.employee_type = require('../models/employeeType.js')(sequelize, Sequelize)
 db.employee_designation = require('../models/employeeDesignation.js')(sequelize, Sequelize)
 db.logs = require('../models/auditLogs.js')(sequelize, Sequelize)
+db.employee_grade = require('../models/employeeGrade.js')(sequelize, Sequelize)
+db.salaries = require('../models/salaries.js')(sequelize, Sequelize)
+db.allowances = require('../models/allowances.js')(sequelize, Sequelize)
 //1 employee can have many roles
 //1 role can be assigend to many employees (1(role) -> many(employees))
 
@@ -73,6 +76,44 @@ db.employee.belongsTo(db.employee_designation, {
 	onDelete: null,
 	onUpdate: 'CASCADE'
 })
+
+//employee grade with employee
+db.employee_grade.hasMany(db.employee, {
+	foreignKey: {
+		allowNull: true
+	}
+})
+db.employee.belongsTo(db.employee_grade, {
+	constraints: false,
+	onDelete: null,
+	onUpdate: 'CASCADE'
+})
+
+//employee with salaries: one-to-one relation
+db.employee.hasOne(db.salaries, {
+	foreignKey: {
+		allowNull: false
+	}
+})
+db.salaries.belongsTo(db.employee, {
+	constraints: false,
+	onDelete: null,
+	onUpdate: 'CASCADE'
+})
+
+
+//employee grade with alloeances -- many-to-many relation
+db.allowances.belongsToMany(db.employee_grade, {
+	through: 'EmpGrade_Allowances'
+})
+db.employee_grade.belongsToMany(db.allowances, {
+	through: 'EmpGrade_Allowances'
+})
+
+
+
+
+
 
 
 module.exports = db;
