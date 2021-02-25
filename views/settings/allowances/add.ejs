@@ -1,0 +1,77 @@
+<script>
+</script>
+<style>
+	footer {
+		padding-left: 240px
+	}
+
+	@media only screen and (max-width: 992px) {
+		footer {
+			padding-left: 0;
+		}
+
+	}
+
+	.footer-copyright .container,
+	.footer-copyright .container a {
+		color: #BCC2E2;
+	}
+</style>
+<%- include('../../includes/header'); %>
+</head>
+
+<body>
+	<%- include('../../admin/partials/side-nav'); %>
+
+
+	<div class="container" style="padding-top: 3%; padding-left: 5%;">
+		<div class="row">
+			<form class="col s12" action="/settings/allowances/add" method="POST" name="form1">
+				<h5><b style="color: coral;">Allowances Details</b></h5>
+				<div class="divider"></div>
+				<br />
+				<blockquote>
+					<div class="row">
+
+						<div class="input-field col s6">
+							<i class="material-icons prefix">check_box_outline_blank</i>
+							<input id="icon_prefix" type="text" class="validate" required="" aria-required="true"
+								class="form-control" name="allowance_name" id="allowance_name" value="">
+							<label for="icon_prefix">Allowance Name</label>
+						</div>
+
+					</div>
+				</blockquote>
+				<blockquote>
+					<div class="row">
+						<div class="input-field col s6">
+							<i class="material-icons prefix">short_text</i>
+							<textarea class="materialize-textarea" class="validate" class="form-control"
+								name="allowance_description" id="allowance_description" value=""></textarea>
+							<label for="allowance_description">Allowance Description</label>
+						</div>
+					</div>
+				</blockquote>
+				<blockquote>
+					<div class="row">
+						<div class="input-field col s6">
+							<i class="material-icons prefix">money</i>
+							<input type="number" class="validate" required="" aria-required="true" class="form-control"
+								name="allowance_amount" id="allowance_amount" value="">
+							<label for="allowance_amount">Allowance Amount</label>
+						</div>
+					</div>
+				</blockquote>
+				<div class="row left">
+					<div class="input-field col s12">
+						<button class="btn waves-effect waves-light" type="submit" value="Add">Submit
+							<i class="material-icons right">done</i>
+						</button>
+						<a class="btn waves-effect waves-light" href="/employees">
+							<i class="material-icons right">close</i>Cancel</a>
+					</div>
+
+				</div>
+			</form>
+		</div>
+	</div>
