@@ -104,12 +104,15 @@ db.salaries.belongsTo(db.employee, {
 
 //employee grade with alloeances -- many-to-many relation
 db.allowances.belongsToMany(db.employee_grade, {
-	through: 'EmpGrade_Allowances'
+	through: 'EmpGrade_Allowances',
+	as: 'grades',
+	foreignKey: "grade_id"
 })
 db.employee_grade.belongsToMany(db.allowances, {
-	through: 'EmpGrade_Allowances'
+	through: 'EmpGrade_Allowances',
+	as: 'allowances',
+	foreignKey: 'allowance_id'
 })
-
 
 
 

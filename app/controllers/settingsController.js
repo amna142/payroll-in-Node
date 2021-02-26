@@ -1,4 +1,3 @@
-
 const CRUD = require('../util/crud')
 const db = require('../util/database')
 const AllowanceController = require('./allowanceController')
@@ -18,14 +17,29 @@ exports.getAllGrades = (req, res) => {
 exports.getPage = async (req, res, next) => {
 	let path = req.path;
 	let pathArray = path.split('/')
+	let allowances = []
 	if (pathArray.includes('grades')) {
 		//get allowancesto show in dropdown
-		let allowances = await AllowanceController.findAll()
+		allowances = await AllowanceController.findAll()
 		console.log('allowances', allowances)
 	}
 	path = path.replace(path[0], '')
 	console.log('path', path)
-	res.render(path)
+	res.render(path, {
+		allowances: allowances
+	})
+}
+
+//get Allowances
+
+exports.getSettings = async (req, res) => {
+	let allowances = await AllowanceController.findAll()
+	let grades = await GradeController.findAll()
+	console.log('grades', grades)
+	res.render('settings', {
+		allowances: allowances,
+		grades: grades
+	})
 }
 
 //create Allowances
@@ -47,18 +61,30 @@ exports.postAddAllowances = async (req, res) => {
 
 exports.postAddGrade = async (req, res) => {
 	console.log('req.boy', req.body)
+	let temp = []
+	var juntionTable
 	let params = {
 		grade: req.body.grade_short_form,
 		min_salary: req.body.min_salary,
 		max_salary: req.body.max_salary
 	}
-	//create grade in Database
+	let selectedAllowances = req.body.selected_allowances
+	if(!(Array.isArray(selectedAllowances))){
+		temp.push(selectedAllowances)
+	}
+	selectedAllowances = temp	//create grade in Database
 	let grade = await GradeController.create(params)
 	if (grade) {
-		console.log('allowance_id', allowance_id)
-		let juntionTable = await GradeController.addAllowances(grade.id, allowance_id);
+		if (Array.isArray(selectedAllowances)) {
+			selectedAllowances.forEach(element => {
+				juntionTable = GradeController.addAllowances(grade.id, element).then(result => {
+					console.log('result', result)
+				}).catch(err => {
+					console.log('err', err)
+				})
+			});
+		}
 		console.log('juntionTable', juntionTable)
 		grade.id ? res.redirect('/settings') : null
 	}
-
 }

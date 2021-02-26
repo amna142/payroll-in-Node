@@ -15,7 +15,17 @@
 	.footer-copyright .container a {
 		color: #BCC2E2;
 	}
+
+	td.details-control {
+		background: url('/details_open.png') no-repeat center center;
+		cursor: pointer;
+	}
+
+	tr.shown td.details-control {
+		background: url('/details_close.png') no-repeat center center;
+	}
 </style>
+
 </head>
 
 <body>
@@ -23,18 +33,102 @@
 	<div style="padding-left: 1%;">
 		<a class="btn blue lighten-2" style="margin-top: 7px;" href="/settings/grades/add" class="btn btn-secondary">New
 			Grade</a>
-		<table class="striped responsive-table">
+		<% var d = JSON.stringify(grades) %>
+		<table id="example" class="display" style="width:100%">
 			<thead>
 				<tr>
+					<th></th>
 					<th>ID</th>
 					<th>Grade</th>
 					<th>Min Salary</th>
 					<th>Max Salary</th>
+					<th>Actions</th>
 				</tr>
 			</thead>
 		</table>
-		</br>
-		</br>
-		</br>
-		</br>
+		<div id="modal1" class="modal">
+			<div class="modal-content">
+				<h4>Modal Header</h4>
+				<p>A bunch of text</p>
+			</div>
+			<div class="modal-footer">
+				<a href="#!" class="modal-close waves-effect waves-green btn-flat">Agree</a>
+			</div>
+		</div>
 	</div>
+
+
+	<script>
+		var editor;
+		$(document).ready(function () {
+			$('.modal-trigger').leanModal();
+			var dataSet = '<%- d %>'
+			console.log('dataSet', dataSet)
+
+			var table = $('#example').DataTable({
+				data: JSON.parse(dataSet),
+				"columns": [{
+						"className": 'details-control',
+						"orderable": false,
+						"data": null,
+						"defaultContent": ''
+					},
+					{
+						data: "id"
+					},
+					{
+						data: "grade"
+					},
+					{
+						data: "min_salary",
+						render: $.fn.dataTable.render.number(',', '.', 0, '$')
+					},
+					{
+						data: "max_salary",
+						render: $.fn.dataTable.render.number(',', '.', 0, '$')
+					},
+					{
+						data: null,
+						className: "center",
+						defaultContent: '<a href="#modal1 class="editor_edit">Edit</a> / <a href="#modal1" class="editor_remove modal-trigger">Delete</a>'
+					}
+				],
+				"order": [
+					[1, 'asc']
+				]
+			});
+			// Add event listener for opening and closing details
+			$('#example tbody').on('click', 'td.details-control', function () {
+				var tr = $(this).closest('tr');
+				var row = table.row(tr);
+
+				if (row.child.isShown()) {
+					// This row is already open - close it
+					row.child.hide();
+					tr.removeClass('shown');
+				} else {
+					// Open this row
+					row.child(format(row.data())).show();
+					tr.addClass('shown');
+				}
+			});
+
+		})
+		/* Formatting function for row details - modify as you need */
+		function format(d) {
+			console.log('d', d)
+			let str = '<table cellpadding="5" cellspacing="0" border="0"">'
+			str = str + '<tr>'
+			str = str + '<th> Name </th>'
+			str = str + '<th> Amount </th>'
+			str = str + '</tr>'
+			d.allowances.forEach(element => {
+				str = str + '<tr>'
+				str = str + '<td>' + element.name + '</td>'
+				str = str + '<td>' + element.amount + '</td>'
+				str = str + '</tr>'
+			});
+			str = str + '</table>'
+			return str
+		}
+	</script>

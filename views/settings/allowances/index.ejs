@@ -1,4 +1,3 @@
-
 <style>
 	footer {
 		padding-left: 240px
@@ -21,16 +20,36 @@
 <body>
 	<%- include('../../admin/partials/side-nav'); %>
 	<div style="padding-left: 1%;">
-		<a class="btn blue lighten-2" style="margin-top: 1px;" href="/settings/allowances/add" class="btn btn-secondary">Add Allowance</a>
+		<a class="btn blue lighten-2" style="margin-top: 1px;" href="/settings/allowances/add"
+			class="btn btn-secondary">Add Allowance</a>
 		<table class="striped responsive-table">
 			<thead>
 				<tr>
 					<th>ID</th>
-					<th>Grade</th>
-					<th>Min Salary</th>
-					<th>Max Salary</th>
+					<th>Name</th>
+					<th>Description</th>
+					<th>Amount</th>
+					<th>Actions</th>
 				</tr>
 			</thead>
+			<tbody>
+				<% if(data.length){
+
+  for(var i = 0; i< data.length; i++) {%>
+				<tr>
+					<td><%= data[i].id%></td>
+					<td><%= data[i].name%></td>
+					<td><%= data[i].description%></td>
+					<td><%= data[i].amount%></td>
+				</tr>
+				<% }
+
+   }else{ %>
+				<tr>
+					<td colspan="3">No Allowances</td>
+				</tr>
+				<% } %>
+			</tbody>
 		</table>
 		</br>
 		</br>

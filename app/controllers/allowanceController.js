@@ -20,7 +20,6 @@ exports.findAll = () => {
 	let arr = []
 	return Allowance.findAll()
 		.then((allowances) => {
-			console.log('alloiwances in findAll', allowances)
 			if (allowances.length > 0) {
 				allowances.forEach(element => {
 					arr.push(element.dataValues)

@@ -1,4 +1,3 @@
-
 const db = require('../util/database')
 const Grade = db.employee_grade
 const Allowance = db.allowances
@@ -15,12 +14,16 @@ exports.create = (params) => {
 		});
 };
 
-
 exports.findAll = () => {
 	let arr = []
 	return Grade.findAll({
 		include: [{
-			model: Allowance
+			model: Allowance,
+			as: 'allowances',
+			attributes: ['id', 'name', 'description', 'amount'],
+			through: {
+				attributes: []
+			}
 		}]
 	}).then(results => {
 		console.log('results', results)
