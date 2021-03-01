@@ -26,12 +26,13 @@ exports.findAll = () => {
 			}
 		}]
 	}).then(results => {
-		console.log('results', results)
+		console.log(">> Created grade: " + JSON.stringify(results, null, 2))
 		if (results.length > 0) {
 			results.forEach(element => {
 				arr.push(element.dataValues)
 			});
 		}
+		console.log('arr', arr)
 		return arr
 	}).catch(err => {
 		console.log('err in getAllRecord', err)
@@ -57,7 +58,6 @@ exports.findById = (id) => {
 //add allowances to grade
 
 exports.addAllowances = (gradeId, allowanceId) => {
-	console.log('gradeId', gradeId + allowanceId)
 	return Grade.findByPk(gradeId)
 		.then((grade) => {
 			if (!grade) {
@@ -71,6 +71,7 @@ exports.addAllowances = (gradeId, allowanceId) => {
 				}
 				grade.addAllowances(allowance);
 				console.log(`>> added allowance id=${allowance.id} to grade id=${grade.id}`);
+				console.log('grade', grade)
 				return grade;
 			});
 		})
@@ -78,3 +79,19 @@ exports.addAllowances = (gradeId, allowanceId) => {
 			console.log(">> Error while adding alloeances to grade: ", err);
 		});
 };
+
+
+exports.delete = (gradeId) => {
+	return Grade.destroy({
+		where: {
+			id: gradeId
+		}
+	}).then(result => {
+		console.log('grade row is deleted', result)
+		if(result){
+			return result
+		}
+	}).catch(err => {
+		console.log('err', err)
+	})
+}

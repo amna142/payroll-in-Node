@@ -14,4 +14,6 @@ router.get('/settings/grades', isAuth, settingsController.getAllGrades)
 router.get('/settings/allowances/add', isAuth, settingsController.getPage)
 router.post('/settings/allowances/add', isAuth, settingsController.postAddAllowances)
 router.get('/settings', isAuth, settingsController.getSettings)
+
+router.get('/settings/grade/delete/(:id)', isAuth, settingsController.deleteGrade)
 module.exports = router

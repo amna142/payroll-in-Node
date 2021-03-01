@@ -2,7 +2,7 @@
 
 <script>
 	$(document).ready(function () {
-		$('select').material_select();
+		$('select').formSelect()
 		$('#min_salary').change(function () {
 			var min_salary = document.getElementById('min_salary').value
 			console.log('min_salary', min_salary)
@@ -76,7 +76,7 @@
 							<label for="grade_description">Grade Description</label>
 						</div>
 						<div class="input-field col s6">
-							<select multiple required name="selected_allowances" >
+							<select multiple required name="selected_allowances">
 								<option value="" disabled selected>Choose Allowances</option>
 								<% if(allowances.length) { 
 										for(var i = 0; i< allowances.length; i++) { %>
@@ -84,6 +84,7 @@
 								<%} } %>
 							</select>
 						</div>
+
 					</div>
 					<div class=" row">
 						<div class="input-field col s6">

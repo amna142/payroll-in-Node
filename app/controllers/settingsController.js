@@ -60,31 +60,39 @@ exports.postAddAllowances = async (req, res) => {
 }
 
 exports.postAddGrade = async (req, res) => {
-	console.log('req.boy', req.body)
-	let temp = []
-	var juntionTable
+	var junctionTable
 	let params = {
 		grade: req.body.grade_short_form,
 		min_salary: req.body.min_salary,
 		max_salary: req.body.max_salary
 	}
 	let selectedAllowances = req.body.selected_allowances
-	if(!(Array.isArray(selectedAllowances))){
-		temp.push(selectedAllowances)
-	}
-	selectedAllowances = temp	//create grade in Database
 	let grade = await GradeController.create(params)
+	console.log(">> Created grade: " + JSON.stringify(grade, null, 2))
 	if (grade) {
-		if (Array.isArray(selectedAllowances)) {
-			selectedAllowances.forEach(element => {
-				juntionTable = GradeController.addAllowances(grade.id, element).then(result => {
-					console.log('result', result)
-				}).catch(err => {
-					console.log('err', err)
-				})
-			});
-		}
-		console.log('juntionTable', juntionTable)
+		selectedAllowances.forEach(allowance_id => {
+			console.log('gradeId', grade.id)
+			junctionTable = GradeController.addAllowances(grade.id, allowance_id).then(result => {
+				console.log('addes allowance in grade table', grade.id + allowance_id )
+				console.log('resultssssss', result)
+			}).catch(err => {
+				console.log('err', err)
+			})
+		});
 		grade.id ? res.redirect('/settings') : null
 	}
+
+}
+
+
+exports.deleteGrade = async (req, res) =>{
+	let gradeId = req.params.id
+	console.log('gradeId', gradeId)
+	//call destroy function from database
+	let grade_destroyed = await GradeController.delete(gradeId)
+	console.log('grade_destroyed', grade_destroyed)
+	if(grade_destroyed){
+		res.redirect('/settings')
+	}
+	
 }
