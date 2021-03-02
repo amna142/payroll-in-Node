@@ -81,10 +81,10 @@
 	<script>
 		var editor;
 		$(document).ready(function () {
-			// $('.modal-trigger').leanModal()
 			var elems = document.querySelectorAll('.modal');
 			var instances = M.Modal.init(elems, {
-				dismissible: true
+				dismissible: true,
+				outDuration: 300
 			});
 			var dataSet = '<%- d %>'
 			console.log('dataSet', dataSet)
@@ -118,8 +118,10 @@
 						data: null,
 						className: "center",
 						render: function (data, type, row) {
-							return `<a class="waves-effect waves-light btn modal-trigger" href="#modal1">Delete</a>`
+							return `<a class="btn-floating waves-effect waves-light red modal-trigger" href="#modal1"><i
+								class="material-icons">delete</i></a>`
 						}
+					
 					}
 				],
 				"order": [

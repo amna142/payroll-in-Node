@@ -1,3 +1,6 @@
+const {
+	param
+} = require('../routes/adminRoutes');
 const db = require('../util/database')
 const Grade = db.employee_grade
 const Allowance = db.allowances
@@ -48,3 +51,40 @@ exports.findById = (id) => {
 			console.log(">> Error while finding allowances: ", err);
 		});
 };
+
+
+exports.delete = (allowanceId) => {
+	return Allowance.destroy({
+		where: {
+			id: allowanceId
+		}
+	}).then(result => {
+		console.log('Allowance row is deleted', result)
+		if (result) {
+			return result
+		}
+	}).catch(err => {
+		console.log('err', err)
+	})
+}
+
+
+exports.edit = (params, id) => {
+	console.log('params', params)
+	console.log('id', parseInt(id))
+	return Allowance.update(params, {
+		where: {
+			id: parseInt(id)
+		}
+	}).then(result => {
+		if (result) {
+			console.log('updated', result)
+			return result
+		} else {
+			req.flash('error', 'Employee is Not Updated')
+			console.log('not updated')
+		}
+	}).catch(err => {
+		console.log('err in edit allowance', err)
+	})
+}

@@ -1,6 +1,11 @@
+<script>
+	$(document).ready(function () {
+		// $('.dropdown-trigger').dropdown({
+		// 	alignment: 'left'
+		// });
+	})
+</script>
 <header>
-
-
 	<nav class="indigo" role="navigation">
 		<div class="nav-wrapper">
 			<a data-activates="slide-out" class="button-collapse show-on-" href="#!"><img
@@ -9,21 +14,22 @@
 
 			<ul class="right hide-on-med-and-down">
 				<li>
-					
-					<a class='right dropdown-button' href='' data-activates='user_dropdown'><i
-							class='material-icons'>account_circle</i></a>
+					<form action="/logout" method="POST">
+						<button class="red"  type="submit"><i
+								class='material-icons'>logout</i></button>
+					</form>
 				</li>
 			</ul>
-			<ul class="dropdown-content" id="user_dropdown">
+			<!-- <ul class="dropdown-content right" id="user_dropdown">
 				<li><a class="indigo-text" href="#!">Profile</a></li>
 				<li>
-					<form action="/logout" method="POST"> <button class="indigo-text" type="submit">Logout</button> 
+					<form action="/logout" method="POST"> <button class="indigo-text" type="submit">Logout</button>
 					</form>
 
-					<!-- <form action="/logout" method="POST"> <a class="indigo-text" type="submit">Logout</a>
-					</form> -->
+					<form action="/logout" method="POST"> <a class="indigo-text" type="submit">Logout</a>
+					</form>
 				</li>
-			</ul>
+			</ul> -->
 
 			<a href="#" data-activates="slide-out" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
 		</div>
@@ -31,7 +37,7 @@
 
 	<nav>
 		<div class="nav-wrapper indigo darken-2">
-			
+
 			<a style="margin-left: 20px; color: orange;" class="breadcrumb" href="#!">Admin</a>
 			<a class="breadcrumb" style="color: orange;" href="#!">Index</a>
 

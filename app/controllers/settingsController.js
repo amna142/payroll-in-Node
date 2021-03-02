@@ -24,7 +24,7 @@ exports.getPage = async (req, res, next) => {
 		console.log('allowances', allowances)
 	}
 	path = path.replace(path[0], '')
-	console.log('path', path)
+	// console.log('path', path)
 	res.render(path, {
 		allowances: allowances
 	})
@@ -35,7 +35,6 @@ exports.getPage = async (req, res, next) => {
 exports.getSettings = async (req, res) => {
 	let allowances = await AllowanceController.findAll()
 	let grades = await GradeController.findAll()
-	console.log('grades', grades)
 	res.render('settings', {
 		allowances: allowances,
 		grades: grades
@@ -55,7 +54,7 @@ exports.postAddAllowances = async (req, res) => {
 	if (allowance) {
 		console.log('allowance.id', allowance.id)
 		allowance_id = allowance.id
-		allowance.id ? res.redirect('/settings') : null
+		allowance.id ? res.redirect('/settings#allowances') : null
 	}
 }
 
@@ -73,7 +72,7 @@ exports.postAddGrade = async (req, res) => {
 		selectedAllowances.forEach(allowance_id => {
 			console.log('gradeId', grade.id)
 			junctionTable = GradeController.addAllowances(grade.id, allowance_id).then(result => {
-				console.log('addes allowance in grade table', grade.id + allowance_id )
+				console.log('addes allowance in grade table', grade.id + allowance_id)
 				console.log('resultssssss', result)
 			}).catch(err => {
 				console.log('err', err)
@@ -85,14 +84,38 @@ exports.postAddGrade = async (req, res) => {
 }
 
 
-exports.deleteGrade = async (req, res) =>{
+exports.deleteGrade = async (req, res) => {
 	let gradeId = req.params.id
 	console.log('gradeId', gradeId)
 	//call destroy function from database
 	let grade_destroyed = await GradeController.delete(gradeId)
 	console.log('grade_destroyed', grade_destroyed)
-	if(grade_destroyed){
-		res.redirect('/settings')
+	if (grade_destroyed) {
+		res.redirect('/settings#grades')
 	}
-	
+}
+
+
+exports.deleteAllowance = async (req, res) => {
+	let allowanceId = req.params.id
+	console.log('allowanceId', allowanceId)
+	//call destroy function from database
+	let allowance_destroyed = await AllowanceController.delete(allowanceId)
+	console.log('allowance_destroyed', allowance_destroyed)
+	if (allowance_destroyed) {
+		res.redirect('/settings#allowances')
+	}
+}
+
+exports.editAllowance = async (req, res, next) => {
+	console.log('req 123', req.body)
+	let id = req.body.allowance_id
+	let params = {
+		name: req.body.allowance_name,
+		description: req.body.allowance_description,
+		amount: req.body.allowance_amount
+	}
+	let updated_allowance = await AllowanceController.edit(params, id)
+	console.log('updated_allowance', updated_allowance)
+	updated_allowance ? res.redirect('/settings#allowances') :null
 }

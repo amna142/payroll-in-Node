@@ -16,4 +16,8 @@ router.post('/settings/allowances/add', isAuth, settingsController.postAddAllowa
 router.get('/settings', isAuth, settingsController.getSettings)
 
 router.get('/settings/grade/delete/(:id)', isAuth, settingsController.deleteGrade)
+router.get('/settings/allowance/delete/(:id)', isAuth, settingsController.deleteAllowance)
+
+
+router.post('/settings/allowance/edit/', isAuth, settingsController.editAllowance)
 module.exports = router

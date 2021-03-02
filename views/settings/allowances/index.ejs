@@ -10,19 +10,47 @@
 
 	}
 
+	.modal-body div {
+		float: left;
+		width: 100%
+	}
+
+	.modal-body div p {
+		float: left;
+		width: 20%;
+		font-weight: 600;
+	}
+
+	.modal-body div span {
+		float: left;
+		width: 80%
+	}
+
 	.footer-copyright .container,
 	.footer-copyright .container a {
 		color: #BCC2E2;
 	}
 </style>
+
 </head>
 
 <body>
+	<!-- Modal Structure -->
+	<div id="modal2" class="modal">
+		<div class="modal-content">
+			<h4>Delete Allowance</h4>
+			<p>Are you sure to delete allowance?</p>
+		</div>
+		<div class="modal-footer" id='del-allowance-confirm-modal'>
+		</div>
+	</div>
+
+
 	<%- include('../../admin/partials/side-nav'); %>
 	<div style="padding-left: 1%;">
 		<a class="btn blue lighten-2" style="margin-top: 1px;" href="/settings/allowances/add"
 			class="btn btn-secondary">Add Allowance</a>
-		<table class="striped responsive-table">
+		<table class="striped responsive-table" id="allowance_table">
 			<thead>
 				<tr>
 					<th>ID</th>
@@ -37,11 +65,20 @@
 
   for(var i = 0; i< data.length; i++) {%>
 				<tr>
-					<td><%= data[i].id%></td>
+					<td id="allowance_id"><%= data[i].id%></td>
 					<td><%= data[i].name%></td>
 					<td><%= data[i].description%></td>
 					<td><%= data[i].amount%></td>
-					<td><i class="indigo-text text-lighten-1 material-icons">edit</i><i class="red-text text-lighten-1 material-icons">delete</i></td>
+					<td>
+
+						<a class="modal-trigger" href="#allowance-edit-modal" id="edit-modal"><i
+								class="indigo-text text-lighten-1 material-icons">edit</i></a>
+						<%- include('./edit.ejs', {id: data[i].id}); %>
+
+						<a href="#modal2" class="modal-trigger"><i
+								class="red-text text-lighten-1 material-icons">delete</i></a>
+
+					</td>
 				</tr>
 				<% }
 
@@ -57,3 +94,33 @@
 		</br>
 		</br>
 	</div>
+
+
+
+	<script>
+		$(document).ready(function () {
+			var elems = document.querySelectorAll('.modal');
+			var instances = M.Modal.init(elems, {
+				dismissible: true
+			});
+
+			$('#allowance_table tbody').on('click', 'a.modal-trigger', function () {
+				var $row = $(this).closest("tr"); // Find the row
+				var $text = $row.find("#allowance_id").text();
+				console.log('$text', $text)
+				// modal population.
+				// <a href="#!" class="modal-close waves-effect waves-green btn-flat">Agree</a>
+				document.querySelector('#del-allowance-confirm-modal').innerHTML =
+					`<a href="/settings/allowance/delete/${$text}" class="modal-close waves-effect waves-green btn-flat" id='${$text}'>Agree</a>`;
+			})
+			$('#allowance_table tbody').on('click', '#edit-modal', function () {
+				var td = $(this).parents('tr').find('td:lt(4)');
+				var $row = $(this).closest("tr"); // Find the row
+				var $id = $row.find("#allowance_id").text();
+				$('#allowance_name').val($(td[1]).text());
+				$('#allowance_description').val($(td[2]).text());
+				$('#allowance_amount').val($(td[3]).text());
+			})
+
+		})
+	</script>

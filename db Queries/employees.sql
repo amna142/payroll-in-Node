@@ -37,8 +37,9 @@ delete from employee_types where id = 3
 
 select * from salaries
 
-delete from employee_grades 
+select * from employee_grades 
 
+select * from EmpGrade_Allowances
 delete    from employee_grades
 
 INSERT INTO employee_grades(grade, min_salary, max_salary, createdAt, updatedAt) VALUES ('OG3', 40000, 60000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)

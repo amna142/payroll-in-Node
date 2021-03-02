@@ -12,7 +12,6 @@ const employeeController = require('./employeeController')
 const salariesController = require('./employeeSalaries')
 exports.adminHome = async (req, res) => {
 	//get Cookie
-	// console.log('session', req.session.user.name)
 	let logsArray = []
 	console.log('isLoggedIn', req.session.isLoggedIn)
 	var user = req.session.user;
@@ -176,7 +175,6 @@ exports.getDeleteEmployee = (req, res) => {
 exports.getAddEmployee = async (req, res) => {
 
 	var grades = await employeeController.getAllGrades()
-	console.log('grades', grades)
 	//fetch employee type from DB
 	let employeeDesignations = await employeeDesignation()
 	let employeeTypes = await typesOfEmployeee();
@@ -335,7 +333,6 @@ exports.postAddEmployee = async (req, res) => {
 
 exports.getEditEmployee = async (req, res) => {
 	var grades = await employeeController.getAllGrades()
-	console.log('grades', grades)
 	var empId = req.params.id
 	var employeeFound = await findById(empId)
 	oldRecord = employeeFound;

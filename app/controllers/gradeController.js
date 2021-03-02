@@ -26,13 +26,12 @@ exports.findAll = () => {
 			}
 		}]
 	}).then(results => {
-		console.log(">> Created grade: " + JSON.stringify(results, null, 2))
+		// console.log(">> Created grade: " + JSON.stringify(results, null, 2))
 		if (results.length > 0) {
 			results.forEach(element => {
 				arr.push(element.dataValues)
 			});
 		}
-		console.log('arr', arr)
 		return arr
 	}).catch(err => {
 		console.log('err in getAllRecord', err)

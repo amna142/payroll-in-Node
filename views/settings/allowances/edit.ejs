@@ -1,0 +1,50 @@
+<!-- Modal Structure -->
+
+
+<form class="col s12" name="form1" method="POST" action="/settings/allowance/edit/">
+	<div class="row">
+
+
+		<div id="allowance-edit-modal" class="modal modal-fixed-footer">
+
+			<div class="modal-content">
+				<h4>Edit Record</h4>
+				<div class="row">
+					<input type="hidden" name="allowance_id" value="<%= id %>" />
+					<div class="input-field col s6">
+						<i class="material-icons prefix">check_box_outline_blank</i>
+						<input id="allowance_name" type="text" class="validate form-control" required=""
+							aria-required="true" placeholder="Allowance Name" name="allowance_name" value="">
+						<label for="allowance_name">Allowance Name</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="input-field col s6">
+						<i class="material-icons prefix">short_text</i>
+						<textarea class="materialize-textarea" class="validate form-control"
+							placeholder="Allowance Description" name="allowance_description" id="allowance_description"
+							value=""></textarea>
+						<label for="allowance_description">Allowance Description</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="input-field col s6">
+						<i class="material-icons prefix">money</i>
+						<input type="number" class="validate form-control" required="" aria-required="true"
+							placeholder="Allowance Amount" name="allowance_amount" id="allowance_amount" value="">
+						<label for="allowance_amount">Allowance Amount</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="modal-footer">
+						<button class="waves-effect modal-close waves-red btn-flat">Cancel</button>
+						<button type="submit" class="waves-effect waves-green btn-flat" value="Add">Update</button>
+
+					</div>
+				</div>
+
+</form>
+</div>
+</div>
+
+</div>

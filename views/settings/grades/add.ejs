@@ -2,7 +2,10 @@
 
 <script>
 	$(document).ready(function () {
-		$('select').formSelect()
+		var elems = document.querySelectorAll('select');
+		var instances = M.FormSelect.init(elems, {
+			isMultiple: true
+		});
 		$('#min_salary').change(function () {
 			var min_salary = document.getElementById('min_salary').value
 			console.log('min_salary', min_salary)
