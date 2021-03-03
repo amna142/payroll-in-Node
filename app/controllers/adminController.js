@@ -545,7 +545,6 @@ exports.getAdminIndexPage = (req, res, next) => {
 						roles: employee[i].dataValues.role.dataValues
 					})
 				}
-				console.log('arr', arr)
 				//get role of user to restrict access
 				var user = req.session.user;
 				var userRole = false

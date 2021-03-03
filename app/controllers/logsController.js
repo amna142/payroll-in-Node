@@ -14,9 +14,11 @@ exports.insertLogs = (AUDIT_LOGS) => {
 }
 
 
-exports.getLogs = () => {
+exports.getLogs = (considtion) => {
 	let logsArray = []
-	return db.logs.findAll().then(logArr => {
+	return db.logs.findAll({
+		where: considtion
+	}).then(logArr => {
 		logArr.forEach(element => {
 			logsArray.push(element.dataValues)
 		});
@@ -41,4 +43,20 @@ exports.employeeLogs = (id) => {
 	}).catch(err => {
 		console.log('err in logs', err)
 	})
+}
+
+
+exports.convertDate = (d) => {
+	var date = new Date(d),
+		mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+		day = ("0" + date.getDate()).slice(-2);
+	return [date.getFullYear(), mnth, day].join("/");
+}
+
+exports.getTime = () => {
+	var d = new Date()
+	var hours = d.getHours()
+	var minutes = d.getMinutes()
+	var seconds = d.getSeconds()
+	return (hours + ':' + minutes + ':' + seconds)
 }

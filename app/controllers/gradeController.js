@@ -87,10 +87,33 @@ exports.delete = (gradeId) => {
 		}
 	}).then(result => {
 		console.log('grade row is deleted', result)
-		if(result){
+		if (result) {
 			return result
 		}
 	}).catch(err => {
 		console.log('err', err)
 	})
+}
+
+
+exports.findByName = (name) => {
+	return Grade.findOne({
+			where: {
+				name: name
+			},
+			include: [{
+				model: Allowance,
+				as: 'allowances'
+			}, ],
+		})
+		.then((grade) => {
+			if (grade) {
+				return grade.dataValues
+			} else {
+				console.log('no grade found')
+			}
+		})
+		.catch((err) => {
+			console.log(">> Error while finding grades: ", err);
+		});
 }

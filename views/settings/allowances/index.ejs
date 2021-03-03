@@ -61,19 +61,19 @@
 				</tr>
 			</thead>
 			<tbody>
-				<% if(data.length){
+				<% if(allowances.length){
 
-  for(var i = 0; i< data.length; i++) {%>
+  for(var i = 0; i< allowances.length; i++) {%>
 				<tr>
-					<td id="allowance_id"><%= data[i].id%></td>
-					<td><%= data[i].name%></td>
-					<td><%= data[i].description%></td>
-					<td><%= data[i].amount%></td>
+					<td id="allowance_id"><%= allowances[i].id%></td>
+					<td><%= allowances[i].name%></td>
+					<td><%= allowances[i].description%></td>
+					<td><%= allowances[i].amount%></td>
 					<td>
 
 						<a class="modal-trigger" href="#allowance-edit-modal" id="edit-modal"><i
 								class="indigo-text text-lighten-1 material-icons">edit</i></a>
-						<%- include('./edit.ejs', {id: data[i].id}); %>
+						<%- include('./edit.ejs', {id: allowances[i].id}); %>
 
 						<a href="#modal2" class="modal-trigger"><i
 								class="red-text text-lighten-1 material-icons">delete</i></a>
@@ -88,14 +88,13 @@
 				<% } %>
 			</tbody>
 		</table>
+
+		</br>
+		</br>
+		</br>
+		</br>
 		
-		</br>
-		</br>
-		</br>
-		</br>
 	</div>
-
-
 
 	<script>
 		$(document).ready(function () {
@@ -107,9 +106,7 @@
 			$('#allowance_table tbody').on('click', 'a.modal-trigger', function () {
 				var $row = $(this).closest("tr"); // Find the row
 				var $text = $row.find("#allowance_id").text();
-				console.log('$text', $text)
 				// modal population.
-				// <a href="#!" class="modal-close waves-effect waves-green btn-flat">Agree</a>
 				document.querySelector('#del-allowance-confirm-modal').innerHTML =
 					`<a href="/settings/allowance/delete/${$text}" class="modal-close waves-effect waves-green btn-flat" id='${$text}'>Agree</a>`;
 			})

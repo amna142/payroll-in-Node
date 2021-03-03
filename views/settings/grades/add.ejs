@@ -2,10 +2,7 @@
 
 <script>
 	$(document).ready(function () {
-		var elems = document.querySelectorAll('select');
-		var instances = M.FormSelect.init(elems, {
-			isMultiple: true
-		});
+		$('select').selectpicker();
 		$('#min_salary').change(function () {
 			var min_salary = document.getElementById('min_salary').value
 			console.log('min_salary', min_salary)
@@ -79,7 +76,7 @@
 							<label for="grade_description">Grade Description</label>
 						</div>
 						<div class="input-field col s6">
-							<select multiple required name="selected_allowances">
+							<select required name="selected_allowances" class="selectpicker" multiple data-live-search="true">
 								<option value="" disabled selected>Choose Allowances</option>
 								<% if(allowances.length) { 
 										for(var i = 0; i< allowances.length; i++) { %>

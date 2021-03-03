@@ -1,0 +1,45 @@
+<!-- Modal Structure -->
+
+
+<form class="col s12" name="form1" method="POST" action="/settings/grades/edit/">
+	<div class="row">
+
+
+		<div id="grade-edit-modal" class="modal modal-fixed-footer">
+
+			<div class="modal-content">
+				<h4>Edit Record</h4>
+				<div class="row">
+					<div class="input-field col s6">
+						<i class="material-icons prefix">grade</i>
+						<textarea class="materialize-textarea" class="validate form-control"
+							placeholder="Grade Short Form" name="grade_short_form" id="grade_short_form"
+							value=""></textarea>
+						<label for="grade_short_form">Grade Short Form</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="input-field col s6">
+						<i class="material-icons prefix">money</i>
+						<input type="number" class="validate form-control" required="" aria-required="true"
+							placeholder="Minimum Salary" name="min_salary" id="min_salary" value="">
+						<label for="min_salary">Minimum Salary</label>
+					</div>
+					<div class="input-field col s6">
+						<i class="material-icons prefix">money</i>
+						<input type="number" class="validate form-control" required="" aria-required="true"
+							placeholder="Maximum Salary" name="max_salary" id="max_salary" value="">
+						<label for="max_salary">Maximum Salary</label>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="modal-footer">
+						<button class="waves-effect modal-close waves-red btn-flat">Cancel</button>
+						<button type="submit" class="waves-effect waves-green btn-flat" value="Add">Update</button>
+					</div>
+</form>
+</div>
+</div>
+
+</div>
