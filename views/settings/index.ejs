@@ -68,7 +68,7 @@
 
 
 	<div class="container pt-11">
-		<div class="row card" style="margin-left: 12%;">
+		<div class="row card" style="margin-left: 5%;">
 			<div id="grades" class="col s12">
 				<h3 class='header' style="padding-top: 2%;">Grades</h3>
 				<%- include('./grades/index', {data: allowances}); %>
@@ -86,10 +86,19 @@
 				</div>
 			</div>
 		</div>
+<<<<<<< HEAD
 
 	</div>
 	<div class="col-12" style="margin-left: 16%;">
 		<%- include('../audit-logs/logs', {data: logsData}); %>
+=======
+	
+>>>>>>> a40dbf3e1cab105bd696ec451da39aff34d3946e
 	</div>
+
+	<div class="col-12" style="margin-left: 5%;">
+			<%- include('../audit-logs/logs', {data: logsData}); %>
+		</div>
+
 
 	<%- include('../includes/footer'); %>
