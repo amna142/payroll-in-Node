@@ -35,8 +35,8 @@ store.sync();
 app.use(flash())
 app.use(accountRoutes)
 app.use(adminRoutes)
-app.use(logsRoutes)
 app.use(settingsRoutes)
+app.use(logsRoutes)
 app.use(errorRoutes)
 const PORT = process.env.PORT || 3000
 

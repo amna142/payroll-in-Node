@@ -2,10 +2,8 @@ const CRUD = require('../util/crud')
 const db = require('../util/database')
 const AllowanceController = require('./allowanceController')
 const GradeController = require('./gradeController')
-
-var allowance_id;
-
-
+const LogsController = require('../controllers/logsController')
+var AUDIT_LOGS = []
 exports.getAllGrades = (req, res) => {
 	CRUD.findAll(db.employee_grade, db.allowances).then(result => {
 		console.log('results', result)
@@ -13,6 +11,7 @@ exports.getAllGrades = (req, res) => {
 		console.log('err in getAllGrades', err)
 	})
 }
+
 
 exports.getPage = async (req, res, next) => {
 	let path = req.path;
@@ -24,11 +23,12 @@ exports.getPage = async (req, res, next) => {
 		console.log('allowances', allowances)
 	}
 	path = path.replace(path[0], '')
-	// console.log('path', path)
+	console.log('path', path)
 	res.render(path, {
 		allowances: allowances
 	})
 }
+
 
 //get Allowances
 
@@ -50,16 +50,23 @@ exports.postAddAllowances = async (req, res) => {
 		description: req.body.allowance_description,
 		amount: req.body.allowance_amount
 	}
-	let allowance = await AllowanceController.create(params)
-	if (allowance) {
-		console.log('allowance.id', allowance.id)
-		allowance_id = allowance.id
-		allowance.id ? res.redirect('/settings#allowances') : null
+	let allowance_found = await AllowanceController.findByName(params.name)
+	console.log('allowance_found', allowance_found)
+	if (!allowance_found) {
+		let allowance = await AllowanceController.create(params)
+		if (allowance) {
+			res.redirect('/settings#allowances')
+		}
+	} else {
+		console.log('duplicate allowance isnt allowed')
+		res.redirect('/settings/allowances/add')
 	}
 }
 
 exports.postAddGrade = async (req, res) => {
-	var junctionTable
+	console.log('i am clicked')
+	let temp = []
+	let junctionTable
 	let params = {
 		grade: req.body.grade_short_form,
 		min_salary: req.body.min_salary,
@@ -68,9 +75,13 @@ exports.postAddGrade = async (req, res) => {
 	let selectedAllowances = req.body.selected_allowances
 	let grade = await GradeController.create(params)
 	console.log(">> Created grade: " + JSON.stringify(grade, null, 2))
+	if (!Array.isArray(selectedAllowances)) {
+		temp.push(selectedAllowances)
+	} else {
+		temp = selectedAllowances
+	}
 	if (grade) {
-		selectedAllowances.forEach(allowance_id => {
-			console.log('gradeId', grade.id)
+		temp.forEach(allowance_id => {
 			junctionTable = GradeController.addAllowances(grade.id, allowance_id).then(result => {
 				console.log('addes allowance in grade table', grade.id + allowance_id)
 				console.log('resultssssss', result)
@@ -80,7 +91,6 @@ exports.postAddGrade = async (req, res) => {
 		});
 		grade.id ? res.redirect('/settings') : null
 	}
-
 }
 
 
@@ -117,5 +127,5 @@ exports.editAllowance = async (req, res, next) => {
 	}
 	let updated_allowance = await AllowanceController.edit(params, id)
 	console.log('updated_allowance', updated_allowance)
-	updated_allowance ? res.redirect('/settings#allowances') :null
+	updated_allowance ? res.redirect('/settings#allowances') : null
 }

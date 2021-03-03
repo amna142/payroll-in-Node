@@ -1,6 +1,4 @@
-const {
-	param
-} = require('../routes/adminRoutes');
+
 const db = require('../util/database')
 const Grade = db.employee_grade
 const Allowance = db.allowances
@@ -35,6 +33,29 @@ exports.findAll = () => {
 		});
 };
 
+
+exports.findByName = (name) => {
+	return Allowance.findOne({
+			where: {
+				name: name
+			},
+			include: [{
+				model: Grade,
+				as: 'grades'
+			}, ],
+		})
+		.then((allowance) => {
+			if(allowance){
+				return allowance.dataValues
+			}else {
+				console.log('no Allowance found')
+			}
+			return allowance;
+		})
+		.catch((err) => {
+			console.log(">> Error while finding allowances: ", err);
+		});
+}
 
 //Get the allowance for a given allowance id
 

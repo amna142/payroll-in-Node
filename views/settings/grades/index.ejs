@@ -118,7 +118,9 @@
 						data: null,
 						className: "center",
 						render: function (data, type, row) {
-							return `<a class="btn-floating waves-effect waves-light red modal-trigger" href="#modal1"><i
+							return `<a class="btn-floating waves-effect waves-light modal-trigger" id="edit-modal" href="#modal1"><i
+								class="material-icons">edit</i></a>
+								<a class="btn-floating waves-effect waves-light red modal-trigger" href="#modal1"><i
 								class="material-icons">delete</i></a>`
 						}
 					
@@ -150,6 +152,9 @@
 				// <a href="#!" class="modal-close waves-effect waves-green btn-flat">Agree</a>
 				document.querySelector('#del-confirm-modal').innerHTML =
 					`<a href="/settings/grade/delete/${row.data().id}" class="modal-close waves-effect waves-green btn-flat" id='${row.data().id}'>Agree</a>`;
+			})
+			$('#example tbody').on('click', '#edit-modal', function () {
+				console.log('i am clicked')
 			})
 		})
 
