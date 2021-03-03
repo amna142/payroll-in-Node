@@ -22,7 +22,16 @@
 	<%- include('../admin/partials/side-nav'); %>
 
 	<%- include('../admin/partials/nav-bar.ejs'); %>
+	<div id="delete_employee" class="modal">
+		<div class="modal-content">
+			<h4>Delete Employee</h4>
+			<p>Are you sure to delete Employee?</p>
+		</div>
+		<div class="modal-footer" id='del-employee-confirm-modal'>
+		</div>
+	</div>
 	<% if(errorMessage) { %>
+	<!-- Modal Structure -->
 
 	<div class="col s8 user-message user-message--error"><%= errorMessage %>
 	</div>
@@ -32,7 +41,7 @@
 		<a class="btn blue lighten-2" style="margin-top: 10px;" href="/employee/add" class="btn btn-secondary">New
 			Employee</a>
 		<% } %>
-		<table class="striped responsive-table">
+		<table class="striped responsive-table" id="employee_table">
 			<thead>
 				<tr>
 					<th>Name</th>
@@ -51,6 +60,7 @@
 
   for(var i = 0; i< data.length; i++) {%>
 				<tr>
+					<td hidden id="employee_id"><%= data[i].id%></td>
 					<td><%= data[i].name%></td>
 					<td><%= data[i].email%></td>
 					<td><%= data[i].phone%></td>
@@ -60,14 +70,15 @@
 					<td><%= data[i].designation%></td>
 					<td><%= data[i].employee_type%></td>
 
-					<td>
-						<a class="btn edit" href="../employee/edit/<%=data[i].id%>">Edit</a>
+					<td>	
+						<a class="btn-floating waves-effect waves-light modal-trigger edit" href="../employee/edit/<%=data[i].id%>"><i
+								class="material-icons">edit</i></a>
 						<% if(!isEmployee) { %>
-						<a class="btn delete modal-trigger red accent-3" href="#modal1">Delete</a>
-						<%- include('../includes/confirmation-modal', {data: '../employee/delete/' + data[i].id}); %>
+							<a class="btn-floating delete modal-trigger waves-effect waves-light red accent-3" href="#delete_employee"><i
+								class="material-icons">delete</i></a>
+						<!-- <a class="btn delete modal-trigger red accent-3" href="#delete_employee">Delete</a> -->
 						<% } %>
 					</td>
-
 				</tr>
 				<% }
 
@@ -88,3 +99,20 @@
 
 
 	<%- include('../includes/footer'); %>
+
+
+	<script>
+		$(document).ready(function () {
+			var elems = document.querySelectorAll('.modal');
+			var instances = M.Modal.init(elems, {
+				dismissible: true
+			});
+			$('#employee_table tbody').on('click', 'a.modal-trigger', function () {
+				var $row = $(this).closest("tr"); // Find the row
+				var $text = $row.find("#employee_id").text();
+				// modal population.
+				document.querySelector('#del-employee-confirm-modal').innerHTML =
+					`<a href="/employee/delete/${$text}" class="modal-close waves-effect waves-green btn-flat" id='${$text}'>Agree</a>`;
+			})
+		})
+	</script>

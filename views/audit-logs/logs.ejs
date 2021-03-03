@@ -44,11 +44,11 @@
 
 <body>
 	<div class="tab">
-		<button class="tablinks" onclick="openCity(event, 'logs')">System Logs</button>
+		<button class="tablinks" onclick="openLogs(event, 'logs')">System Logs</button>
 	</div>
 	<% var d = JSON.stringify(data) %>
 	<div id="logs" class="tabcontent">
-		<table id="example" class="display" width="100%">
+		<table id="logs_table" class="display" width="100%">
 			<thead>
 				<tr>
 					<th>EMP ID</th>
@@ -68,7 +68,7 @@
 		var dataSet = '<%- d; %>'
 		console.log('dataSet', JSON.parse(dataSet))
 		$(document).ready(function () {
-			$('#example').DataTable({
+			$('#logs_table').DataTable({
 				data: JSON.parse(dataSet),
 				columns: [{
 						data: "emp_id"
@@ -96,7 +96,7 @@
 			});
 		});
 
-		function openCity(evt, cityName) {
+		function openLogs(evt, logName) {
 			var i, tabcontent, tablinks;
 			tabcontent = document.getElementsByClassName("tabcontent");
 			for (i = 0; i < tabcontent.length; i++) {
@@ -106,7 +106,7 @@
 			for (i = 0; i < tablinks.length; i++) {
 				tablinks[i].className = tablinks[i].className.replace(" active", "");
 			}
-			document.getElementById(cityName).style.display = "block";
+			document.getElementById(logName).style.display = "block";
 			evt.currentTarget.className += " active";
 		}
 	</script>

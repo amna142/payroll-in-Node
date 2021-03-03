@@ -2,7 +2,8 @@
 <script>
 	$(document).ready(function () {
 		$('select').formSelect();
-		$('.datepicker').datepicker();
+		var elems = document.querySelectorAll('.datepicker');
+		var instances = M.Datepicker.init(elems);
 	});
 </script>
 <style>
@@ -72,8 +73,8 @@
 						</div>
 						<div class="input-field col s3">
 							<i class="material-icons prefix">date_range</i>
-							<input type="text" class="datepicker" name="dob" id="dob" value="" required=""
-								aria-required="true">
+							<input type="date" name="dob" id="dob" value="" required=""
+								aria-required="true" placeholder="DOB">
 							<label for="dob">DOB</label>
 						</div>
 					</div>
@@ -83,7 +84,7 @@
 					<div class="row">
 						<div class="input-field col s6">
 							<i class="material-icons prefix">person_add</i>
-							<select name="employee_type" required="" aria-required="true" required >
+							<select name="employee_type" required="" aria-required="true" required>
 								<option value="" disabled selected>Choose Employee Type</option>
 								<% if(employeeTypes.length) { 
 										for(var i = 0; i< employeeTypes.length; i++) { %>
@@ -106,8 +107,8 @@
 					<div class="row">
 						<div class="input-field col s4">
 							<i class="material-icons prefix">date_range</i>
-							<input type="text" class="datepicker" name="starting_date" value="" id="starting_date"
-								required="" aria-required="true">
+							<input type="date"  name="starting_date" value="" id="starting_date"
+								required="" aria-required="true" placeholder="Starting Date">
 							<label for="starting_date">Starting Date</label>
 						</div>
 

@@ -56,12 +56,13 @@
 		</div>
 	</div>
 	<%- include('../../admin/partials/side-nav'); %>
+	<%- include('./edit.ejs'); %>
 	<!-- Modal Structure -->
 	<div style="padding-left: 1%;">
 		<a class="btn blue lighten-2" style="margin-top: 7px;" href="/settings/grades/add" class="btn btn-secondary">New
 			Grade</a>
 		<% var d = JSON.stringify(grades) %>
-		<table id="example" class="display" style="width:100%">
+		<table id="grades_table" class="display" style="width:100%">
 			<thead>
 				<tr>
 					<th></th>
@@ -73,15 +74,13 @@
 				</tr>
 			</thead>
 		</table>
-
 	</div>
-
-
 
 	<script>
 		var editor;
 		$(document).ready(function () {
 			var elems = document.querySelectorAll('.modal');
+
 			var instances = M.Modal.init(elems, {
 				dismissible: true,
 				outDuration: 300
@@ -89,14 +88,12 @@
 			var dataSet = '<%- d %>'
 			console.log('dataSet', dataSet)
 
-			var table = $('#example').DataTable({
+			var table = $('#grades_table').DataTable({
 				data: JSON.parse(dataSet),
-				buttons: [
-					'reload'
-				],
 				"columns": [{
 						"className": 'details-control',
-						"orderable": false,
+						"orderable": true,
+						"search": true,
 						"data": null,
 						"defaultContent": ''
 					},
@@ -108,22 +105,21 @@
 					},
 					{
 						data: "min_salary",
-						render: $.fn.dataTable.render.number(',', '.', 0, '$')
+						// render: $.fn.dataTable.render.number(',', '.', 0, '$')
 					},
 					{
-						data: "max_salary",
-						render: $.fn.dataTable.render.number(',', '.', 0, '$')
+						data: "max_salary"
+						// render: $.fn.dataTable.render.number(',', '.', 0, '$')
 					},
 					{
 						data: null,
 						className: "center",
 						render: function (data, type, row) {
-							return `<a class="btn-floating waves-effect waves-light modal-trigger" id="edit-modal" href="#modal1"><i
+							return `<a class="btn-floating waves-effect waves-light modal-trigger" id="grade-modal" href="#grade-edit-modal"><i
 								class="material-icons">edit</i></a>
 								<a class="btn-floating waves-effect waves-light red modal-trigger" href="#modal1"><i
 								class="material-icons">delete</i></a>`
 						}
-					
 					}
 				],
 				"order": [
@@ -131,7 +127,7 @@
 				]
 			});
 			// Add event listener for opening and closing details
-			$('#example tbody').on('click', 'td.details-control', function () {
+			$('#grades_table tbody').on('click', 'td.details-control', function () {
 				var tr = $(this).closest('tr');
 				var row = table.row(tr);
 
@@ -145,7 +141,7 @@
 					tr.addClass('shown');
 				}
 			});
-			$('#example tbody').on('click', 'a.modal-trigger', function () {
+			$('#grades_table tbody').on('click', 'a.modal-trigger', function () {
 				var tr = $(this).closest('tr');
 				var row = table.row(tr);
 				// modal population.
@@ -153,8 +149,12 @@
 				document.querySelector('#del-confirm-modal').innerHTML =
 					`<a href="/settings/grade/delete/${row.data().id}" class="modal-close waves-effect waves-green btn-flat" id='${row.data().id}'>Agree</a>`;
 			})
-			$('#example tbody').on('click', '#edit-modal', function () {
-				console.log('i am clicked')
+			$('#grades_table tbody').on('click', '#grade-modal', function () {
+				var td = $(this).parents('tr').find('td:lt(6)');
+				console.log('td', td)
+				$('#grade_short_form').val($(td[2]).text());
+				$('#min_salary').val($(td[3]).text());
+				$('#max_salary').val($(td[4]).text())
 			})
 		})
 
