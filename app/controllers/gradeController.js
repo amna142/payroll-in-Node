@@ -44,6 +44,7 @@ exports.findById = (id) => {
 	return Grade.findByPk(id, {
 			include: [{
 				model: Allowance,
+				as: 'allowances'
 			}, ],
 		})
 		.then((grade) => {
@@ -56,23 +57,16 @@ exports.findById = (id) => {
 
 //add allowances to grade
 
-exports.addAllowances = (gradeId, allowanceId) => {
+exports.addAllowances = (gradeId, allowances) => {
 	return Grade.findByPk(gradeId)
 		.then((grade) => {
 			if (!grade) {
 				console.log("grade not found!");
 				return null;
 			}
-			return Allowance.findByPk(allowanceId).then((allowance) => {
-				if (!allowance) {
-					console.log("allowances not found!");
-					return null;
-				}
-				grade.addAllowances(allowance);
-				console.log(`>> added allowance id=${allowance.id} to grade id=${grade.id}`);
-				console.log('grade', grade)
-				return grade;
-			});
+			grade.addAllowances(allowances);
+			console.log(`>> added allowance id=${allowance.id} to grade id=${grade.id}`);
+			return grade;
 		})
 		.catch((err) => {
 			console.log(">> Error while adding alloeances to grade: ", err);
@@ -116,4 +110,44 @@ exports.findByName = (name) => {
 		.catch((err) => {
 			console.log(">> Error while finding grades: ", err);
 		});
+}
+
+
+
+exports.update = (params, id, allowances) => {
+	return Grade.update(params, {
+		where: {
+			id: id
+		}
+	}).then(result => {
+		if (result) {
+			console.log('result', result)
+
+			// return result
+		} else {
+			console.log('no rsult found to update')
+		}
+
+	}).catch(err => {
+		console.log('err in updating grade', err)
+	})
+}
+
+exports.updateAllowances = (gradeId, allowancesArray) => {
+	return Grade.findByPk(gradeId).then((grade) => {
+		console.log('grade found', grade)
+		if (!grade) {
+			console.log('grade not exist')
+			return null
+		}
+		for (let key in grade) {
+			if (typeof grade[key] === 'function') {
+				console.log('key', key)
+			}
+		}
+		grade.setAllowances(allowancesArray);
+		return grade
+	}).catch((err) => {
+		console.log(">> Error while adding alloeances to grade: ", err);
+	})
 }

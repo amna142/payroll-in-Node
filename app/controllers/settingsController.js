@@ -131,18 +131,9 @@ exports.postAddGrade = async (req, res) => {
 			temp = selectedAllowances
 		}
 		if (grade) {
-			temp.forEach(allowance_id => {
-				junctionTable = GradeController.addAllowances(grade.id, allowance_id).then(result => {
-					console.log('addes allowance in grade table', grade.id + allowance_id)
-					console.log('resultssssss', result)
-				}).catch(err => {
-					console.log('err', err)
-				})
-			});
-			if (grade.id) {
-				LogsController.insertLogs(AUDIT_LOGS)
-				res.redirect('/settings#grades')
-			}
+			GradeController.addAllowances(grade.id, temp)
+			LogsController.insertLogs(AUDIT_LOGS)
+			res.redirect('/settings#grades')
 		}
 	} else {
 		console.log('grade already exist')
@@ -212,11 +203,30 @@ exports.editAllowance = async (req, res, next) => {
 	}
 }
 
-exports.editGrade = (req, res, next) => {
+exports.editGrade = async (req, res, next) => {
 	console.log('req 123', req.body)
+	let selected_allowances = []
+	if (Array.isArray(req.body.selected_allowances)) {
+		selected_allowances = req.body.selected_allowances
+	} else {
+		selected_allowances.push(req.body.selected_allowances)
+	}
+	let grade_id = req.body.grade_id
 	let params = {
 		grade: req.body.grade_short_form,
 		min_salary: req.body.min_salary,
-		max_salary: req.body.max_salary
+		max_salary: req.body.max_salary,
 	}
+	//see if grade of the given id exist 
+	let grade_exist = await GradeController.findById(grade_id)
+	if (grade_exist) {
+		//now update grade values
+		await GradeController.update(params, grade_id, selected_allowances)
+		GradeController.updateAllowances(grade_id, selected_allowances)
+		res.redirect('/settings#grades')
+	} else {
+		console.log('grade doesnt exist')
+	}
+
+	console.log('oarams', params)
 }

@@ -56,9 +56,9 @@
 	<div class="row" style="margin-left: 16%;">
 		<div class="col s12">
 			<ul class="tabs">
-				<li class="tab col s3"><a class="active" href="#grades">Grades</a></li>
-				<li class="tab col s3"><a href="#allowances">Allowance</a></li>
-				<li class="tab col s3 disabled"><a href="#test3">Disabled Tab</a></li>
+				<li class="tab col s4"><a class="active" href="#grades">Grades</a></li>
+				<li class="tab col s4"><a href="#allowances">Allowance</a></li>
+				<li class="tab col s4 disabled"><a href="#test3">Disabled Tab</a></li>
 			</ul>
 
 		</div>
@@ -86,19 +86,9 @@
 				</div>
 			</div>
 		</div>
-<<<<<<< HEAD
 
 	</div>
-	<div class="col-12" style="margin-left: 16%;">
-		<%- include('../audit-logs/logs', {data: logsData}); %>
-=======
-	
->>>>>>> a40dbf3e1cab105bd696ec451da39aff34d3946e
-	</div>
-
-	<div class="col-12" style="margin-left: 5%;">
-			<%- include('../audit-logs/logs', {data: logsData}); %>
-		</div>
-
+	<div style="margin-left: 16%;">
+	<%- include('../audit-logs/logs', {data: logsData}); %></div>
 
 	<%- include('../includes/footer'); %>

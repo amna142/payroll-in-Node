@@ -79,17 +79,21 @@
 	<script>
 		var editor;
 		$(document).ready(function () {
+			$(".chosen-select").chosen({
+				no_results_text: "Oops, nothing found!",
+				width: "95%",
+				search: true
+			})
 			var elems = document.querySelectorAll('.modal');
-
 			var instances = M.Modal.init(elems, {
 				dismissible: true,
 				outDuration: 300
 			});
 			var dataSet = '<%- d %>'
 			console.log('dataSet', dataSet)
-
 			var table = $('#grades_table').DataTable({
 				data: JSON.parse(dataSet),
+				select: true,
 				"columns": [{
 						"className": 'details-control',
 						"orderable": true,
@@ -150,14 +154,15 @@
 					`<a href="/settings/grade/delete/${row.data().id}" class="modal-close waves-effect waves-green btn-flat" id='${row.data().id}'>Agree</a>`;
 			})
 			$('#grades_table tbody').on('click', '#grade-modal', function () {
-				var td = $(this).parents('tr').find('td:lt(6)');
-				console.log('td', td)
-				$('#grade_short_form').val($(td[2]).text());
-				$('#min_salary').val($(td[3]).text());
-				$('#max_salary').val($(td[4]).text())
+				var rowData = table.row($(this).closest('tr')).data()
+				$('#grade_short_form').val(rowData.grade)
+				$('#max_salary').val(rowData.max_salary)
+				$('#min_salary').val(rowData.min_salary)
+				$('#grade_id').val(rowData.id)
+				console.log('grade', rowData.allowances)
+				$('#selected_allowances option:selected').val()
 			})
 		})
-
 
 		/* Formatting function for row details - modify as you need */
 		function format(d) {

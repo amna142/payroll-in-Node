@@ -41,5 +41,6 @@ select * from employee_grades
 
 select * from EmpGrade_Allowances
 delete    from employee_grades
+delete from audit_logs
 
 INSERT INTO employee_grades(grade, min_salary, max_salary, createdAt, updatedAt) VALUES ('OG3', 40000, 60000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
