@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({
 	extended: false
 }))
 app.use('/', serveStatic(path.join(__dirname, 'app/assets')))
-
+app.use('/', serveStatic(path.join(__dirname, 'public')))
 var store = new SequelizeStore({
   db: db.sequelize,
 });

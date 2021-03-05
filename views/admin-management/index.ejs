@@ -1,63 +1,50 @@
 <%- include('../includes/header'); %>
-<style>
-	footer {
-		padding-left: 240px
-	}
-
-	@media only screen and (max-width: 992px) {
-		footer {
-			padding-left: 0;
-		}
-
-	}
-
-	.footer-copyright .container,
-	.footer-copyright .container a {
-		color: #BCC2E2;
-	}
-</style>
+<link rel="stylesheet" href="/css/home.css">
+<link rel="stylesheet" href="/css/logs.css">
 </head>
 
 <body>
 	<%- include('../admin/partials/side-nav'); %>
 
 	<%- include('../admin/partials/nav-bar.ejs'); %>
-
-	<div class="container" style="padding-left: 5%;">
-		<% if(!isEmployee) { %>
-		<a class="btn blue lighten-2" style="margin-top: 10px;" href="/employee/add" class="btn btn-secondary">New
-			Admin</a>
-		<% } %>
-		<table class="striped responsive-table">
-			<thead>
-				<tr>
-					<th>Admin ID</th>
-					<th>Name</th>
-					<th>Email</th>
-					<th>Role</th>
-				</tr>
-			</thead>
-			<tbody>
-				<% if(data.length){
+	<main>
+		<div style="padding-left: 1%;">
+			<% if(!isEmployee) { %>
+			<a class="btn blue lighten-2" style="margin-top: 10px;" href="/employee/add" class="btn btn-secondary">New
+				Admin</a>
+			<% } %>
+			<table class="striped responsive-table">
+				<thead>
+					<tr>
+						<th>Admin ID</th>
+						<th>Name</th>
+						<th>Email</th>
+						<th>Role</th>
+					</tr>
+				</thead>
+				<tbody>
+					<% if(data.length){
 
   for(var i = 0; i< data.length; i++) {%>
-				<tr>
-					<th><%= data[i].id %></th>
-					<td><%= data[i].name%></td>
-					<td><%= data[i].email%></td>
-					<td><%= data[i].roles.title%></td>
-				</tr>
-				<% }
+					<tr>
+						<th><%= data[i].id %></th>
+						<td><%= data[i].name%></td>
+						<td><%= data[i].email%></td>
+						<td><%= data[i].roles.title%></td>
+					</tr>
+					<% }
 
    }else{ %>
-				<tr>
-					<td colspan="3">No user</td>
-				</tr>
-				<% } %>
-			</tbody>
-		</table>
+					<tr>
+						<td colspan="3">No user</td>
+					</tr>
+					<% } %>
+				</tbody>
+			</table>
+		</div>
+		<%- include('../audit-logs/logs.ejs', {data: []}); %>
+	</main>
 
-	</div>
 
 
 	<%- include('../includes/footer'); %>

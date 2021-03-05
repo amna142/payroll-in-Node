@@ -1,21 +1,6 @@
 <%- include('../includes/header'); %>
-<style>
-	footer {
-		padding-left: 240px
-	}
-
-	@media only screen and (max-width: 992px) {
-		footer {
-			padding-left: 0;
-		}
-
-	}
-
-	.footer-copyright .container,
-	.footer-copyright .container a {
-		color: #BCC2E2;
-	}
-</style>
+<link rel="stylesheet" href="/css/home.css">
+<link rel="stylesheet" href="/css/logs.css">
 </head>
 
 <body>
@@ -36,11 +21,13 @@
 	<div class="col s8 user-message user-message--error"><%= errorMessage %>
 	</div>
 	<% } %>
-	<div style="padding-left: 17%;">
+	<main>
+	<div style="padding-left: 1%;">
 		<% if(!isEmployee) { %>
 		<a class="btn blue lighten-2" style="margin-top: 10px;" href="/employee/add" class="btn btn-secondary">New
 			Employee</a>
 		<% } %>
+		
 		<table class="striped responsive-table" id="employee_table">
 			<thead>
 				<tr>
@@ -70,12 +57,12 @@
 					<td><%= data[i].designation%></td>
 					<td><%= data[i].employee_type%></td>
 
-					<td>	
-						<a class="btn-floating waves-effect waves-light modal-trigger edit" href="../employee/edit/<%=data[i].id%>"><i
-								class="material-icons">edit</i></a>
+					<td>
+						<a class="btn-floating waves-effect waves-light modal-trigger edit"
+							href="../employee/edit/<%=data[i].id%>"><i class="material-icons">edit</i></a>
 						<% if(!isEmployee) { %>
-							<a class="btn-floating delete modal-trigger waves-effect waves-light red accent-3" href="#delete_employee"><i
-								class="material-icons">delete</i></a>
+						<a class="btn-floating delete modal-trigger waves-effect waves-light red accent-3"
+							href="#delete_employee"><i class="material-icons">delete</i></a>
 						<!-- <a class="btn delete modal-trigger red accent-3" href="#delete_employee">Delete</a> -->
 						<% } %>
 					</td>
@@ -89,15 +76,12 @@
 				<% } %>
 			</tbody>
 		</table>
-		</br>
-		</br>
-		</br>
-		</br>
-		<%- include('../audit-logs/logs', {data: logsData}); %>
-
 	</div>
-
-
+	
+	<%- include('../audit-logs/logs', {data: logsData}); %>
+	</main>
+	
+	
 	<%- include('../includes/footer'); %>
 
 

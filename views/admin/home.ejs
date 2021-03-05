@@ -1,54 +1,5 @@
 <%- include('../includes/header'); %>
-<!-- <link rel="stylesheet" href="../../app/public/css/adminHome.css"> -->
-<script>
-	$(document).ready(function () {
-		$('.button-collapse').sidenav();
-		$('.collapsible').collapsible();
-		$('.collapsible').collapsible({
-			accordion: false // A setting that changes the collapsible behavior to expandable instead of the default accordion style
-		});
-		// $('select').material_select();
-	});
-</script>
-
-<style>
-	header,
-	main,
-	footer {
-		padding-left: 240px;
-	}
-
-	body {
-		background-color: white;
-	}
-
-	@media only screen and (max-width: 992px) {
-
-		header,
-		main,
-		footer {
-			padding-left: 0;
-		}
-	}
-
-	#credits li,
-	#credits li a {
-		color: white;
-	}
-
-	#credits li a {
-		font-weight: bold;
-	}
-
-	.footer-copyright .container,
-	.footer-copyright .container a {
-		color: #BCC2E2;
-	}
-
-	#slide-out li {
-		padding-right: 0px;
-	}
-</style>
+<link rel="stylesheet" href="/css/home.css">
 </head>
 
 <body>
@@ -60,9 +11,20 @@
 
 
 	<%- include('./partials/main-body.ejs'); %>
-	
+
 	<%- include('../audit-logs/logs.ejs', {data: data}); %>
 
 	<% } %>
 
 	<%- include('../includes/footer'); %>
+
+	<script>
+		$(document).ready(function () {
+			$('.button-collapse').sidenav();
+			$('.collapsible').collapsible();
+			$('.collapsible').collapsible({
+				accordion: false // A setting that changes the collapsible behavior to expandable instead of the default accordion style
+			});
+			// $('select').material_select();
+		});
+	</script>

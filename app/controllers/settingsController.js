@@ -18,10 +18,8 @@ exports.getPage = async (req, res, next) => {
 	if (pathArray.includes('grades')) {
 		//get allowancesto show in dropdown
 		allowances = await AllowanceController.findAll()
-		console.log('allowances', allowances)
 	}
 	path = path.replace(path[0], '')
-	console.log('path', path)
 	res.render(path, {
 		allowances: allowances
 	})
@@ -80,7 +78,6 @@ exports.postAddAllowances = async (req, res) => {
 		})
 	}
 	let allowance_found = await AllowanceController.findByName(params.name)
-	console.log('allowance_found', allowance_found)
 	if (!allowance_found) {
 		let allowance = await AllowanceController.create(params)
 		old_allowance_value = params
@@ -95,7 +92,6 @@ exports.postAddAllowances = async (req, res) => {
 }
 
 exports.postAddGrade = async (req, res) => {
-	console.log('i am clicked')
 	let temp = []
 	let params = {
 		grade: req.body.grade_short_form,
@@ -105,7 +101,6 @@ exports.postAddGrade = async (req, res) => {
 	let selectedAllowances = req.body.selected_allowances
 	//check if grade of same name esits
 	let grade_exist = await GradeController.findByName(params.grade)
-	console.log('grade_exist', grade_exist)
 	if (!grade_exist) {
 		let grade = await GradeController.create(params)
 		console.log(">> Created grade: " + JSON.stringify(grade, null, 2))
@@ -144,10 +139,8 @@ exports.postAddGrade = async (req, res) => {
 
 exports.deleteGrade = async (req, res) => {
 	let gradeId = req.params.id
-	console.log('gradeId', gradeId)
 	//call destroy function from database
 	let grade_destroyed = await GradeController.delete(gradeId)
-	console.log('grade_destroyed', grade_destroyed)
 	if (grade_destroyed) {
 		AUDIT_LOGS.push({
 			name: req.session.user.name,
@@ -165,10 +158,8 @@ exports.deleteGrade = async (req, res) => {
 
 exports.deleteAllowance = async (req, res) => {
 	let allowanceId = req.params.id
-	console.log('allowanceId', allowanceId)
 	//call destroy function from database
 	let allowance_destroyed = await AllowanceController.delete(allowanceId)
-	console.log('allowance_destroyed', allowance_destroyed)
 	if (allowance_destroyed) {
 		AUDIT_LOGS.push({
 			name: req.session.user.name,
@@ -195,7 +186,6 @@ exports.editAllowance = async (req, res, next) => {
 	let allowance_exist = await AllowanceController.findByName(params.name)
 	if (!allowance_exist) {
 		let updated_allowance = await AllowanceController.edit(params, id)
-		console.log('updated_allowance', updated_allowance)
 		updated_allowance ? res.redirect('/settings#allowances') : null
 	} else {
 		console.log('already exist with the same name')
@@ -204,29 +194,117 @@ exports.editAllowance = async (req, res, next) => {
 }
 
 exports.editGrade = async (req, res, next) => {
-	console.log('req 123', req.body)
+	let old_record = req.body.oldRecord
 	let selected_allowances = []
 	if (Array.isArray(req.body.selected_allowances)) {
 		selected_allowances = req.body.selected_allowances
 	} else {
 		selected_allowances.push(req.body.selected_allowances)
 	}
-	let grade_id = req.body.grade_id
-	let params = {
+	let new_record = {
+		id: parseInt(req.body.grade_id),
 		grade: req.body.grade_short_form,
-		min_salary: req.body.min_salary,
-		max_salary: req.body.max_salary,
+		min_salary: parseInt(req.body.min_salary),
+		max_salary: parseInt(req.body.max_salary),
+		allowances: selected_allowances
 	}
+	let updated_values = shallowEqual(JSON.parse(old_record), new_record)
+
+	//here adds updated logs
+	// addUpdatedLogs(updated_values, old_record)
+
 	//see if grade of the given id exist 
-	let grade_exist = await GradeController.findById(grade_id)
+	let grade_exist = await GradeController.findById(parseInt(req.body.grade_id))
 	if (grade_exist) {
+		selected_allowances = updated_values.allowances
+		delete updated_values['allowances']
 		//now update grade values
-		await GradeController.update(params, grade_id, selected_allowances)
-		GradeController.updateAllowances(grade_id, selected_allowances)
+		await GradeController.update(updated_values, parseInt(req.body.grade_id))
+		if (selected_allowances.length > 0) {
+			GradeController.updateAllowances(parseInt(req.body.grade_id), selected_allowances)
+		} else {
+			console.log('No allowance has been updated')
+		}
 		res.redirect('/settings#grades')
 	} else {
 		console.log('grade doesnt exist')
 	}
+}
 
-	console.log('oarams', params)
+
+function addUpdatedLogs(updated_values, old_record) {
+	if (Object.keys(updated_values).length === 0) {
+		console.log('You didnt updated anything')
+		req.flash('error', 'You didnt updated anything. please update fields or move back')
+		let message = req.flash('error')
+		message = message.length > 0 ? message : null
+		var user = req.session.user;
+		var isEmployee = false
+		if (user.roleId === null) {
+			isEmployee = true
+		} else {
+			isEmployee = false
+		}
+	} else {
+		Object.keys(updated_values).forEach(function (key) {
+			var value = updated_values[key]
+			AUDIT_LOGS.push({
+				name: req.session.user.name,
+				emp_id: req.session.user.id,
+				date: LogsController.convertDate(new Date()),
+				time: LogsController.getTime(),
+				action: ENUM.UPDATE,
+				record_type: 'Grades',
+				field_id: key,
+				old_value: oldRecord[key],
+				new_value: value
+			})
+		})
+	}
+}
+
+function shallowEqual(oldRecord, newRecord) {
+	var obj = {}
+	delete oldRecord['updatedAt']
+	delete oldRecord['createdAt']
+	let allowance_ids = []
+	//make allowance id array only 
+	oldRecord.allowances.forEach(allowance => {
+		allowance_ids.push(allowance.id)
+	});
+	oldRecord.allowances = allowance_ids
+	const oldRecordKeys = Object.keys(oldRecord);
+	const oldRecordValues = Object.values(oldRecord)
+	const newRecordKeys = Object.keys(newRecord);
+	const newRecordValues = Object.values(newRecord)
+	const newRecordAllowances = Object.values(newRecord.allowances)
+	const oldRecordAllowances = Object.values(oldRecord.allowances)
+	key_value = ''
+	if (oldRecordKeys.length !== newRecordKeys.length) {
+		return false;
+	}
+	let updated_allowances = shallowEqualAllowances(oldRecordAllowances, newRecordAllowances)
+	for (var i = 0; i < oldRecordValues.length; i++) {
+		if (newRecordValues[i] !== undefined) {
+			if (oldRecordValues[i] !== newRecordValues[i]) {
+				key_value = newRecordKeys[i];
+				obj[key_value] = newRecordValues[i]
+			}
+		}
+	}
+	obj.allowances = updated_allowances
+	console.log('updatedFields', obj)
+	return obj
+}
+
+function shallowEqualAllowances(oldAllowances, newAllowances) {
+	let updated_allowance = []
+	for (let i = 0; i < oldAllowances.length; i++) {
+		if (oldAllowances[i] !== undefined && newAllowances[i] !== undefined) {
+			if (parseInt(oldAllowances[i]) !== parseInt(newAllowances[i])) {
+				updated_allowance.push(parseInt(oldAllowances[i]))
+			}
+		}
+	}
+	return updated_allowance;
 }

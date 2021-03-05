@@ -1,0 +1,27 @@
+.navbar-fixed {
+		height: auto !important;
+	}
+
+	nav {
+		height: auto;
+	}
+
+	.mb-0 {
+		margin-bottom: 0px;
+	}
+
+
+	.pt-10 {
+		padding-top: 10em;
+	}
+
+	.tabs .indicator {
+		background-color: white;
+	}
+
+	.header {
+		margin: 1em 0em;
+		font-weight: 600;
+		color: #333;
+		text-transform: uppercase;
+	}

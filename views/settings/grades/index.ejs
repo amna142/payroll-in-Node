@@ -1,47 +1,5 @@
 <%- include('../../includes/header'); %>
-<style>
-	footer {
-		padding-left: 240px
-	}
-
-	@media only screen and (max-width: 992px) {
-		footer {
-			padding-left: 0;
-		}
-
-	}
-
-	.footer-copyright .container,
-	.footer-copyright .container a {
-		color: #BCC2E2;
-	}
-
-	td.details-control {
-		background: url('/details_open.png') no-repeat center center;
-		cursor: pointer;
-	}
-
-	tr.shown td.details-control {
-		background: url('/details_close.png') no-repeat center center;
-	}
-
-	.modal-body div {
-		float: left;
-		width: 100%
-	}
-
-	.modal-body div p {
-		float: left;
-		width: 20%;
-		font-weight: 600;
-	}
-
-	.modal-body div span {
-		float: left;
-		width: 80%
-	}
-</style>
-
+<link rel="stylesheet" href="/css/buttons.css">
 </head>
 
 <body>
@@ -159,7 +117,8 @@
 				$('#max_salary').val(rowData.max_salary)
 				$('#min_salary').val(rowData.min_salary)
 				$('#grade_id').val(rowData.id)
-				console.log('grade', rowData.allowances)
+				console.log('grade', rowData)
+				$('#oldRecord').val(JSON.stringify(rowData))
 				$('#selected_allowances option:selected').val()
 			})
 		})

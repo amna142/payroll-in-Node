@@ -114,7 +114,7 @@ exports.findByName = (name) => {
 
 
 
-exports.update = (params, id, allowances) => {
+exports.update = (params, id) => {
 	return Grade.update(params, {
 		where: {
 			id: id
