@@ -48,7 +48,8 @@ exports.getSettings = async (req, res) => {
 	res.render('settings', {
 		allowances: allowances,
 		grades: grades,
-		logsData: logsArray
+		logsData: logsArray,
+		errorMessage: req.flash('error').length>0 ? req.flash('error')[0] : null
 	})
 }
 
@@ -87,6 +88,7 @@ exports.postAddAllowances = async (req, res) => {
 		}
 	} else {
 		console.log('duplicate allowance isnt allowed')
+		req.flash('error', 'Duplicate Allowance isnt Allowed')
 		res.redirect('/settings/allowances/add')
 	}
 }
@@ -95,10 +97,15 @@ exports.postAddGrade = async (req, res) => {
 	let temp = []
 	let params = {
 		grade: req.body.grade_short_form,
-		min_salary: req.body.min_salary,
-		max_salary: req.body.max_salary
+		min_salary:  parseInt(req.body.min_salary),
+		max_salary: parseInt(req.body.max_salary)
 	}
 	let selectedAllowances = req.body.selected_allowances
+
+	if(params.min_salary >= params.max_salary){
+		req.flash('error', 'Maximum Salary must be greater than Minimum Salary')
+	}
+
 	//check if grade of same name esits
 	let grade_exist = await GradeController.findByName(params.grade)
 	if (!grade_exist) {
@@ -132,6 +139,7 @@ exports.postAddGrade = async (req, res) => {
 		}
 	} else {
 		console.log('grade already exist')
+		req.flash('error', 'Grade Already Exist')
 		res.redirect('/settings#grades')
 	}
 }
@@ -189,6 +197,7 @@ exports.editAllowance = async (req, res, next) => {
 		updated_allowance ? res.redirect('/settings#allowances') : null
 	} else {
 		console.log('already exist with the same name')
+		req.flash('error', 'already exist with the same name')
 		res.redirect('/settings#allowances')
 	}
 }
@@ -223,6 +232,7 @@ exports.editGrade = async (req, res, next) => {
 		if (selected_allowances.length > 0) {
 			GradeController.updateAllowances(parseInt(req.body.grade_id), selected_allowances)
 		} else {
+			req.flash('error', 'No allowance has been updated')
 			console.log('No allowance has been updated')
 		}
 		res.redirect('/settings#grades')

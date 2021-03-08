@@ -1,51 +1,29 @@
 <%- include('../../includes/header'); %>
-
+<link rel="stylesheet" href="/css/home.css">
 <script>
 	$(document).ready(function () {
+		$('#add-grade-form #min_salary').keyup(validateMinMaxSalary)
+		$('#add-grade-form #max_salary').keyup(validateMinMaxSalary)
 		$(".chosen-select").chosen({
 			no_results_text: "Oops, nothing found!",
 			width: "100%",
 			search: true,
 			placeholder_text_multiple: 'Choose Allowances'
 		})
-		$('#min_salary').change(function () {
-			var min_salary = document.getElementById('min_salary').value
-			console.log('min_salary', min_salary)
-		})
 	});
-	document.addEventListener("DOMContentLoaded", function (event) {
-		var slider = document.getElementById('slider');
-		noUiSlider.create(slider, {
-			start: [20, 80],
-			tooltips: true,
-			orientation: 'horizontal',
-			connect: true,
-			step: 1,
-			range: {
-				'min': 1,
-				'max': 100000
-			}
-		});
-	});
-</script>
 
-<style>
-	footer {
-		padding-left: 240px
-	}
-
-	@media only screen and (max-width: 992px) {
-		footer {
-			padding-left: 0;
+	function validateMinMaxSalary(e) {
+		const minSal = $('#add-grade-form #min_salary').val();
+		const maxSal = $('#add-grade-form #max_salary').val();
+		if (+maxSal > 0 && +minSal > 0 && +minSal >= +maxSal) {
+			M.toast({
+				html: 'Max Salary must be greater than Min Salary!'
+			})
 		}
-
+		const allowances = $('#add-grade-form #selected_allowances').val()
+		console.log('allowances', allowances)
 	}
-
-	.footer-copyright .container,
-	.footer-copyright .container a {
-		color: #BCC2E2;
-	}
-</style>
+</script>
 </head>
 
 <body>
@@ -54,7 +32,7 @@
 	<div class="container" style="padding-top: 3%; padding-left: 5%;">
 		<div class="row">
 			<div class="row">
-				<form class="col s12" action="/settings/grades/add" method="POST" name="form1">
+				<form class="col s12" action="/settings/grades/add" method="POST" name="form1" id="add-grade-form">
 					<h5><b style="color: coral;">Grade Details</b></h5>
 					<div class="divider"></div>
 					<br />
@@ -62,15 +40,15 @@
 					<div class="row">
 						<div class="input-field col s6">
 							<i class="material-icons prefix">check_box_outline_blank</i>
-							<input id="icon_prefix" type="text" class="validate" required="" aria-required="true"
-								class="form-control" name="grade_name" id="grade_name" value="">
-							<label for="icon_prefix">Grade Name</label>
+							<input type="text" class="validate" required="" aria-required="true" class="form-control"
+								name="grade_name" id="grade_name" value="">
+							<label for="grade_name">Grade Name</label>
 						</div>
 						<div class="input-field col s6">
 							<i class="material-icons prefix">grade</i>
-							<input id="icon_email" type="text" name="grade_short_form" id="grade_short_form"
+							<input type="text" name="grade_short_form" id="grade_short_form"
 								aria-describedby="emailHelp" value="" required="" aria-required="true">
-							<label for="icon_email">Grade Short Form</label>
+							<label for="grade_short_form">Grade Short Form</label>
 						</div>
 					</div>
 					<div class="row">
@@ -84,37 +62,27 @@
 							<i class="material-icons prefix">short_text</i>
 						</div>
 						<div class="input-field col s5">
-							<select multiple class="chosen-select" name="selected_allowances">
+							<select multiple class="chosen-select" name="selected_allowances" id="selected_allowances">
 								<option value=""></option>
 								<% if(allowances.length) { 
 										for(var i = 0; i< allowances.length; i++) { %>
 								<option value="<%=allowances[i].id %>"><%=allowances[i].name%></option>
 								<%} } %>
-
 							</select>
-
 						</div>
-
 					</div>
 					<div class=" row">
 						<div class="input-field col s6">
 							<i class="material-icons prefix">money</i>
-							<input id="icon_prefix" type="number" class="validate" required="" aria-required="true"
-								class="form-control" name="min_salary" id="min_salary" value="">
-							<label for="icon_prefix">Minimum Salary</label>
+							<input type="number" class="validate" aria-required="true" class="form-control"
+								name="min_salary" id="min_salary" value="" min="1" required>
+							<label for="min_salary">Minimum Salary</label>
 						</div>
 						<div class="input-field col s6">
 							<i class="material-icons prefix">money</i>
-							<input id="icon_prefix" type="number" class="validate" required="" aria-required="true"
-								class="form-control" name="max_salary" id="max_salary" value="">
-							<label for="icon_prefix">Maximum Salary</label>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col s12">
-							<div id="slider"></div>
-							<label>Salary Range</label>
-
+							<input type="number" class="validate" required="" aria-required="true" class="form-control"
+								name="max_salary" id="max_salary" value="">
+							<label for="max_salary">Maximum Salary</label>
 						</div>
 					</div>
 					<div class="row right">
@@ -125,7 +93,6 @@
 							<a class="btn waves-effect waves-light" href="/settings#grades">
 								<i class="material-icons right">close</i>Cancel</a>
 						</div>
-
 					</div>
 				</form>
 			</div>
