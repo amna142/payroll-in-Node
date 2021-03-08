@@ -1,0 +1,58 @@
+
+<%- include('../../includes/header'); %>
+</head>
+
+<body>
+	<%- include('../../admin/partials/side-nav'); %>
+
+
+	<div class="container" style="padding-top: 3%; padding-left: 5%;">
+		<div class="row">
+			<form class="col s12" action="/settings/funds/add" method="POST" name="form1">
+				<h5><b style="color: coral;">Funds Details</b></h5>
+				<div class="divider"></div>
+				<br />
+				<blockquote>
+					<div class="row">
+
+						<div class="input-field col s6">
+							<i class="material-icons prefix">check_box_outline_blank</i>
+							<input  type="text" class="validate" required="" aria-required="true"
+								class="form-control" name="fund_name" id="fund_name" value="">
+							<label for="fund_name">Fund Name</label>
+						</div>
+
+					</div>
+				</blockquote>
+				<blockquote>
+					<div class="row">
+						<div class="input-field col s6">
+							<i class="material-icons prefix">short_text</i>
+							<textarea class="materialize-textarea" class="validate" class="form-control"
+								name="fund_description" id="fund_description" value=""></textarea>
+							<label for="fund_description">Fund Description</label>
+						</div>
+					</div>
+				</blockquote>
+				<blockquote>
+					<div class="row">
+						<div class="input-field col s6">
+							<i class="material-icons prefix">money</i>
+							<input type="number" class="validate" required="" aria-required="true" class="form-control"
+								name="fund_amount" id="fund_amount" value="">
+							<label for="fund_amount">Fund Amount</label>
+						</div>
+					</div>
+				</blockquote>
+				<div class="row left">
+					<div class="input-field col s12">
+						<button class="btn waves-effect waves-light" type="submit" value="Add">Submit
+							<i class="material-icons right">done</i>
+						</button>
+						<a class="btn waves-effect waves-light" href="/settings#funds">
+							<i class="material-icons right">close</i>Cancel</a>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>

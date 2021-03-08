@@ -37,6 +37,9 @@ db.logs = require('../models/auditLogs.js')(sequelize, Sequelize)
 db.employee_grade = require('../models/employeeGrade.js')(sequelize, Sequelize)
 db.salaries = require('../models/salaries.js')(sequelize, Sequelize)
 db.allowances = require('../models/allowances.js')(sequelize, Sequelize)
+db.employee_allowances = require('../models/employeeAllowances.js')(sequelize, Sequelize)
+db.employee_funds = require('../models/employeeFunds.js')(sequelize, Sequelize)
+db.company_funds = require('../models/funds.js')(sequelize, Sequelize)
 //1 employee can have many roles
 //1 role can be assigend to many employees (1(role) -> many(employees))
 
@@ -102,7 +105,7 @@ db.salaries.belongsTo(db.employee, {
 })
 
 
-//employee grade with alloeances -- many-to-many relation
+//employee grade with allowances -- many-to-many relation
 db.allowances.belongsToMany(db.employee_grade, {
 	through: 'EmpGrade_Allowances',
 	as: 'grades',
@@ -114,9 +117,44 @@ db.employee_grade.belongsToMany(db.allowances, {
 	foreignKey: 'grade_id'
 })
 
+//basic salaries with EmployeeAllownces and EmployeeFunds
+//one-to-many for salary with employee Allowances
+
+db.salaries.hasMany(db.employee_allowances, {
+	foreignKey: {
+		allowNull: true
+	}
+})
+db.employee_allowances.belongsTo(db.salaries, {
+	constraints: false,
+	onDelete: null,
+	onUpdate: 'CASCADE'
+})
+
+//one-to-many for salary with employee Funds
+db.salaries.hasMany(db.employee_funds, {
+	foreignKey:{
+		allowNull: true
+	}
+})
+
+db.employee_funds.belongsTo(db.salaries, {
+	constraints: false,
+	onDelete: null,
+	onUpdate: 'CASCADE'
+})
 
 
-
-
+//employee grade with funds -- many-to-many relation
+db.company_funds.belongsToMany(db.employee_grade, {
+	through: 'EmpGrade_Funds',
+	as: 'grades',
+	foreignKey: "fund_id"
+})
+db.employee_grade.belongsToMany(db.company_funds, {
+	through: 'EmpGrade_Funds',
+	as: 'funds',
+	foreignKey: 'grade_id'
+})
 
 module.exports = db;

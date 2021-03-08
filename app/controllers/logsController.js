@@ -6,7 +6,7 @@ exports.insertLogs = (AUDIT_LOGS) => {
 	console.log('AUDIT_LOGS', AUDIT_LOGS)
 	AUDIT_LOGS.forEach(logObj => {
 		db.logs.create(logObj).then(result => {
-			console.log('result', result)
+			// console.log('result', result)
 		}).catch(err => {
 			console.log('err', err)
 		})

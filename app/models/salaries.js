@@ -13,7 +13,6 @@ module.exports = (sequelize, Sequelize) => {
 			required: true,
 			allowNull: false
 		},
-
 	});
 	return Salaries
 }

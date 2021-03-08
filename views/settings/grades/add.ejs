@@ -7,8 +7,7 @@
 		$(".chosen-select").chosen({
 			no_results_text: "Oops, nothing found!",
 			width: "100%",
-			search: true,
-			placeholder_text_multiple: 'Choose Allowances'
+			search: true
 		})
 	});
 
@@ -62,7 +61,8 @@
 							<i class="material-icons prefix">short_text</i>
 						</div>
 						<div class="input-field col s5">
-							<select multiple class="chosen-select" name="selected_allowances" id="selected_allowances">
+							<select multiple  class="chosen-select" name="selected_allowances"
+							 id="selected_allowances">
 								<option value=""></option>
 								<% if(allowances.length) { 
 										for(var i = 0; i< allowances.length; i++) { %>
@@ -83,6 +83,17 @@
 							<input type="number" class="validate" required="" aria-required="true" class="form-control"
 								name="max_salary" id="max_salary" value="">
 							<label for="max_salary">Maximum Salary</label>
+						</div>
+					</div>
+					<div class="row">
+						<div class="input-field col s6">
+							<select multiple class="chosen-select" name="selected_funds" id="selected_funds">
+								<option value="Choose Funds"></option>
+								<% if(funds.length) { 
+										for(var i = 0; i< funds.length; i++) { %>
+								<option value="<%=funds[i].id %>"><%=funds[i].name%></option>
+								<%} } %>
+							</select>
 						</div>
 					</div>
 					<div class="row right">

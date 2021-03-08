@@ -1,0 +1,72 @@
+</head>
+
+<body>
+	<!-- Modal Structure -->
+	<div id="del-grade-modal" class="modal">
+		<div class="modal-content">
+			<h4>Confirmation</h4>
+			<p>Are you sure?</p>
+		</div>
+		<div class="modal-footer" id="del-confirm-fund-modal">
+
+		</div>
+	</div>
+	<%- include('../../admin/partials/side-nav'); %>
+	<div style="padding-left: 1%;">
+		<a class="btn-floating btn-large  waves-effect waves-light indigo-text text-lighten-1"
+			href="/settings/funds/add"><i class="material-icons">add</i></a>
+				<table class="striped responsive-table" id="fund_table">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Name</th>
+					<th>Description</th>
+					<th>Amount</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% if(funds.length){
+  					for(var i = 0; i< funds.length; i++) {%>
+				<tr>
+					<td id="fund_id"><%= funds[i].id%></td>
+					<td><%= funds[i].name%></td>
+					<td><%= funds[i].description%></td>
+					<td><%= funds[i].amount%></td>
+					<td>
+						<a class="modal-trigger" href="#allowance-edit-modal" id="edit-modal"><i
+								class="indigo-text text-lighten-1 material-icons">edit</i></a>
+						<a href="#del-grade-modal" class="modal-trigger"><i
+								class="red-text text-lighten-1 material-icons">delete</i></a>
+					</td>
+				</tr>
+				<% }
+
+  					}else{ %>
+				<tr>
+					<td colspan="3">No Funds</td>
+				</tr>
+				<% } %>
+			</tbody>
+		</table>
+			<br>
+			<br>
+	</div>
+
+	<script>
+		$(document).ready(function () {
+			var elems = document.querySelectorAll('.modal');
+			var instances = M.Modal.init(elems, {
+				dismissible: true
+			});
+
+			$('#fund_table tbody').on('click', 'a.modal-trigger', function () {
+				var $row = $(this).closest("tr"); // Find the row
+				var $fundId = $row.find("#fund_id").text();
+				console.log('fundId', $fundId)
+				// modal population.
+				document.querySelector('#del-confirm-fund-modal').innerHTML =
+					`<a href="/settings/fund/delete/${$fundId}" class="modal-close waves-effect waves-green btn-flat" id='${$fundId}'>Agree</a>`;
+			})
+		})
+	</script>

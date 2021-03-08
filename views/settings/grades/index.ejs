@@ -48,7 +48,7 @@
 				outDuration: 300
 			});
 			var dataSet = '<%- d %>'
-			console.log('dataSet', dataSet)
+			console.log('dataSet for grades', dataSet)
 			var table = $('#grades_table').DataTable({
 				data: JSON.parse(dataSet),
 				select: true,
@@ -113,24 +113,38 @@
 			})
 			$('#grades_table tbody').on('click', '#grade-modal', function () {
 				var rowData = table.row($(this).closest('tr')).data()
+				console.log('rowData', rowData)
 				$('#grade_short_form').val(rowData.grade)
 				$('#max_salary').val(rowData.max_salary)
 				$('#min_salary').val(rowData.min_salary)
 				$('#grade_id').val(rowData.id)
 				$('#oldRecord').val(JSON.stringify(rowData))
-				$('#selected_allowances option:selected').val()
+				$('#selected_allowances').val(rowData.allowances.map(key => key.id)).trigger('chosen:updated');
+				$('#selected_funds_edit').val(rowData.funds.map(key => key.id)).trigger('chosen:updated');
 			})
 		})
 
 		/* Formatting function for row details - modify as you need */
 		function format(d) {
 			console.log('d', d)
-			let str = '<table cellpadding="5" cellspacing="0" border="0"">'
+			let str = '<h5><b>Allowances</b></h5><table cellpadding="5" cellspacing="0" border="0"">'
 			str = str + '<tr>'
 			str = str + '<th> Name </th>'
 			str = str + '<th> Amount </th>'
 			str = str + '</tr>'
 			d.allowances.forEach(element => {
+				str = str + '<tr>'
+				str = str + '<td>' + element.name + '</td>'
+				str = str + '<td>' + element.amount + '</td>'
+				str = str + '</tr>'
+			});
+			str = str + '</table>'
+			str = str + '<h5><b>Funds</b></h5><table cellpadding="5" cellspacing="0" border="0"">'
+			str = str + '<tr>'
+			str = str + '<th> Name </th>'
+			str = str + '<th> Amount </th>'
+			str = str + '</tr>'
+			d.funds.forEach(element => {
 				str = str + '<tr>'
 				str = str + '<td>' + element.name + '</td>'
 				str = str + '<td>' + element.amount + '</td>'

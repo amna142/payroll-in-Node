@@ -15,6 +15,13 @@ let employeeByEmail = function (email) {
 		}
 		
 	})
+
+	//utility funcstion
+		for (let key in grade) {
+			if (typeof grade[key] === 'function') {
+				console.log('key', key)
+			}
+		}
 }
 
 module.exports = {

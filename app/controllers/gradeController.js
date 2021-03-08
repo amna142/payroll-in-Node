@@ -1,6 +1,7 @@
 const db = require('../util/database')
 const Grade = db.employee_grade
 const Allowance = db.allowances
+const Fund = db.company_funds
 
 exports.create = (params) => {
 	console.log('params', params)
@@ -20,6 +21,13 @@ exports.findAll = () => {
 		include: [{
 			model: Allowance,
 			as: 'allowances',
+			attributes: ['id', 'name', 'description', 'amount'],
+			through: {
+				attributes: []
+			}
+		},{
+			model: Fund,
+			as: 'funds',
 			attributes: ['id', 'name', 'description', 'amount'],
 			through: {
 				attributes: []
@@ -45,7 +53,10 @@ exports.findById = (id) => {
 			include: [{
 				model: Allowance,
 				as: 'allowances'
-			}, ],
+			}, {
+				model: Fund,
+				as: 'funds'
+			},],
 		})
 		.then((grade) => {
 			return grade;
@@ -70,6 +81,23 @@ exports.addAllowances = (gradeId, allowances) => {
 		})
 		.catch((err) => {
 			console.log(">> Error while adding alloeances to grade: ", err);
+		});
+};
+
+
+exports.addFunds = (gradeId, funds) => {
+	return Grade.findByPk(gradeId)
+		.then((grade) => {
+			if (!grade) {
+				console.log("grade not found!");
+				return null;
+			}
+			grade.addFunds(funds);
+			console.log(`>> added allowance id=${fund.id} to grade id=${grade.id}`);
+			return grade;
+		})
+		.catch((err) => {
+			console.log(">> Error while adding funds to grade: ", err);
 		});
 };
 
@@ -121,33 +149,39 @@ exports.update = (params, id) => {
 		}
 	}).then(result => {
 		if (result) {
-			console.log('result', result)
-
 			// return result
 		} else {
 			console.log('no rsult found to update')
 		}
-
 	}).catch(err => {
 		console.log('err in updating grade', err)
 	})
 }
 
 exports.updateAllowances = (gradeId, allowancesArray) => {
+	console.log('allowancesArray', allowancesArray)
 	return Grade.findByPk(gradeId).then((grade) => {
-		console.log('grade found', grade)
 		if (!grade) {
 			console.log('grade not exist')
 			return null
 		}
-		for (let key in grade) {
-			if (typeof grade[key] === 'function') {
-				console.log('key', key)
-			}
-		}
 		grade.setAllowances(allowancesArray);
 		return grade
 	}).catch((err) => {
-		console.log(">> Error while adding alloeances to grade: ", err);
+		console.log(">> Error while updating alloeances to grade: ", err);
+	})
+}
+
+exports.updateFunds = (gradeId, fundsArray) => {
+	console.log('fundsArray', fundsArray)
+	return Grade.findByPk(gradeId).then((grade) => {
+		if (!grade) {
+			console.log('grade not exist')
+			return null
+		}
+		grade.setFunds(fundsArray);
+		return grade
+	}).catch((err) => {
+		console.log(">> Error while updating funds to grade: ", err);
 	})
 }
