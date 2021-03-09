@@ -256,7 +256,7 @@ exports.editGrade = async (req, res, next) => {
 			req.flash('error', 'No allowance has been updated')
 			console.log('No allowance has been updated')
 		}
-		if (selected_funds.length > 0) {
+		if (selected_funds.length > 0 && selected_allowances !== undefined) {
 			GradeController.updateFunds(parseInt(req.body.grade_id), selected_funds)
 		} else {
 			req.flash('error', 'No funds has been updated')
@@ -266,6 +266,32 @@ exports.editGrade = async (req, res, next) => {
 		res.redirect('/settings#grades')
 	} else {
 		console.log('grade doesnt exist')
+	}
+}
+
+exports.editFund = async (req, res) => {
+	console.log('req.body', req.body)
+	let id = req.body.fund_id_edit;
+	let newRecord = {
+		id: parseInt(id),
+		name: req.body.fund_name_edit,
+		description: req.body.fund_description_edit,
+		amount: req.body.fund_amount_edit
+	}
+	let oldRecord = JSON.parse(req.body.oldRecord)
+	let updated_fund_record = shallowEqualFunds(oldRecord, newRecord)
+	console.log('updated_fund_record', updated_fund_record)
+	if (Object.keys(updated_fund_record).length > 0) {
+		let fund_update = await FundController.edit({
+			name: req.body.fund_name_edit,
+			description: req.body.fund_description_edit,
+			amount: req.body.fund_amount_edit
+		}, parseInt(id))
+		if (fund_update) {
+			res.redirect('/settings#funds')
+		}
+	} else {
+		console.log('nothing has been changed')
 	}
 }
 
@@ -326,6 +352,40 @@ exports.deleteFund = async (req, res) => {
 	}
 }
 
+function shallowEqual(oldRecord, newRecord) {
+	var obj = {}
+	delete oldRecord['updatedAt']
+	delete oldRecord['createdAt']
+	let allowance_ids = [],
+		funds_ids = []
+	//make allowance id array only 
+	oldRecord.allowances.forEach(allowance => {
+		allowance_ids.push(allowance.id)
+	});
+	oldRecord.funds.forEach(fund => {
+		funds_ids.push(fund.id)
+	});
+	oldRecord.allowances = allowance_ids
+	oldRecord.funds = funds_ids
+	const oldRecordKeys = Object.keys(oldRecord);
+	const oldRecordValues = Object.values(oldRecord)
+	const newRecordKeys = Object.keys(newRecord);
+	const newRecordValues = Object.values(newRecord)
+	key_value = ''
+	if (oldRecordKeys.length !== newRecordKeys.length) {
+		return false;
+	}
+	for (var i = 0; i < oldRecordValues.length; i++) {
+		if (newRecordValues[i] !== undefined) {
+			if (oldRecordValues[i] !== newRecordValues[i]) {
+				key_value = newRecordKeys[i];
+				obj[key_value] = newRecordValues[i]
+			}
+		}
+	}
+	console.log('updatedFields', obj)
+	return obj
+}
 
 function addUpdatedLogs(updated_values, old_record) {
 	if (Object.keys(updated_values).length === 0) {
@@ -358,38 +418,18 @@ function addUpdatedLogs(updated_values, old_record) {
 	}
 }
 
-function shallowEqual(oldRecord, newRecord) {
-
+function shallowEqualFunds(oldRecord, newRecord) {
 	var obj = {}
-	delete oldRecord['updatedAt']
-	delete oldRecord['createdAt']
-	let allowance_ids = [],
-		funds_ids = []
-	//make allowance id array only 
-	oldRecord.allowances.forEach(allowance => {
-		allowance_ids.push(allowance.id)
-	});
-	oldRecord.funds.forEach(fund => {
-		funds_ids.push(fund.id)
-	});
-	oldRecord.allowances = allowance_ids
-	oldRecord.funds = funds_ids
 	console.log('oldRecord', oldRecord)
 	console.log('newRecord', newRecord)
 	const oldRecordKeys = Object.keys(oldRecord);
 	const oldRecordValues = Object.values(oldRecord)
 	const newRecordKeys = Object.keys(newRecord);
 	const newRecordValues = Object.values(newRecord)
-	const newRecordAllowances = Object.values(newRecord.allowances)
-	const oldRecordAllowances = Object.values(oldRecord.allowances)
 	key_value = ''
 	if (oldRecordKeys.length !== newRecordKeys.length) {
 		return false;
 	}
-	let updated_allowances = shallowEqualAllowances(oldRecordAllowances, newRecordAllowances)
-	console.log('funds', newRecord.funds)
-	let updated_funds = shallowEqualFunds(oldRecord.funds, newRecord.funds)
-	console.log('updated_funds', updated_funds)
 	for (var i = 0; i < oldRecordValues.length; i++) {
 		if (newRecordValues[i] !== undefined) {
 			if (oldRecordValues[i] !== newRecordValues[i]) {
@@ -398,41 +438,6 @@ function shallowEqual(oldRecord, newRecord) {
 			}
 		}
 	}
-	obj.allowances = updated_allowances
-	obj.funds = updated_funds
 	console.log('updatedFields', obj)
 	return obj
-}
-
-function shallowEqualFunds(oldFunds, newFunds) {
-	console.log("oldFunds", oldFunds)
-	console.log('newFunds', newFunds)
-	var temp = [];
-	let array1 = oldFunds.toString().split(',').map(Number);
-	let array2 = newFunds.toString().split(',').map(Number);
-
-	for (var i in array1) {
-		if (array2.indexOf(array1[i]) === -1) temp.push(array1[i]);
-	}
-	for (i in array2) {
-		if (array1.indexOf(array2[i]) === -1) temp.push(array2[i]);
-	}
-	console.log('difference', temp.sort((a, b) => a - b));
-	return temp.sort((a, b) => a - b)
-}
-
-function shallowEqualAllowances(oldAllowances, newAllowances) {
-	console.log('oldAllowances', oldAllowances)
-	console.log('newAllowances', newAllowances)
-	let updated_allowance = []
-	for (let i = 0; i < oldAllowances.length; i++) {
-		if (oldAllowances[i] !== undefined && newAllowances[i] !== undefined) {
-			if (parseInt(oldAllowances[i]) !== parseInt(newAllowances[i])) {
-				updated_allowance.push(parseInt(newAllowances[i]))
-			}
-		}
-	}
-	console.log('updated_allowance', updated_allowance)
-
-	return updated_allowance;
 }

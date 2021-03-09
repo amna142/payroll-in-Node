@@ -1,7 +1,7 @@
 module.exports = {
 	SERVER: 'DSC-LAPTOP-011',
 	USER: 'amna',
-	PASSWORD: 'SuperHero@2020',
+	PASSWORD: 'amna',
 	DB: 'Dynasoft Payroll',
 	DRIVER: "msnodesqlv8",
 	PORT: 1433,

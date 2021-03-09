@@ -63,16 +63,17 @@ exports.findByName = (name) => {
 //Get the allowance for a given allowance id
 
 exports.findById = (id) => {
-	return Allowance.findByPk(id, {
+	return Fund.findByPk(id, {
 			include: [{
-				model: Grade
+				model: Grade,
+				as: 'grades'
 			}, ],
 		})
-		.then((allowance) => {
-			return allowance;
+		.then((fund) => {
+			return fund.dataValues;
 		})
 		.catch((err) => {
-			console.log(">> Error while finding allowances: ", err);
+			console.log(">> Error while finding fund: ", err);
 		});
 };
 
@@ -96,7 +97,7 @@ exports.delete = (fundId) => {
 exports.edit = (params, id) => {
 	console.log('params', params)
 	console.log('id', parseInt(id))
-	return Allowance.update(params, {
+	return Fund.update(params, {
 		where: {
 			id: parseInt(id)
 		}
@@ -105,7 +106,6 @@ exports.edit = (params, id) => {
 			console.log('updated', result)
 			return result
 		} else {
-			req.flash('error', 'Employee is Not Updated')
 			console.log('not updated')
 		}
 	}).catch(err => {

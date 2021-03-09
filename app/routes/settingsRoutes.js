@@ -25,5 +25,6 @@ router.get('/settings/grade/delete/(:id)', isAuth, settingsController.deleteGrad
 router.get('/settings/funds/add', isAuth, settingsController.getPage)
 router.post('/settings/funds/add', isAuth, settingsController.postFund)
 router.get('/settings/fund/delete/(:id)', isAuth, settingsController.deleteFund)
+router.post('/settings/fund/edit/', isAuth, settingsController.editFund)
 
 module.exports = router

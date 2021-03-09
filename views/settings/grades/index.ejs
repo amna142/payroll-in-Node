@@ -1,5 +1,6 @@
 <%- include('../../includes/header'); %>
 <link rel="stylesheet" href="/css/buttons.css">
+<link rel="stylesheet" href="/css/chosen-required.css">
 </head>
 
 <body>
@@ -119,7 +120,8 @@
 				$('#min_salary').val(rowData.min_salary)
 				$('#grade_id').val(rowData.id)
 				$('#oldRecord').val(JSON.stringify(rowData))
-				$('#selected_allowances').val(rowData.allowances.map(key => key.id)).trigger('chosen:updated');
+				$('#selected_allowances').val(rowData.allowances.map(key => key.id)).trigger(
+					'chosen:updated');
 				$('#selected_funds_edit').val(rowData.funds.map(key => key.id)).trigger('chosen:updated');
 			})
 		})

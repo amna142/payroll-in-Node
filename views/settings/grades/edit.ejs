@@ -15,7 +15,7 @@
 						<label for="grade_short_form">Grade Short Form</label>
 					</div>
 					<div class="input-field col s6">
-						<select data-placeholder="Choose Allowances..." multiple class="chosen-select"
+						<select required="required" data-placeholder="Choose Allowances..." multiple class="chosen-select"
 							name="selected_allowances" id="selected_allowances">
 							<option value=""></option>
 							<% if(allowances.length) { 
@@ -43,7 +43,7 @@
 				</div>
 				<div class="row">
 					<div class="input-field col s6">
-						<select data-placeholder="Choose Funds" multiple class="chosen-select"
+						<select required="required" data-placeholder="Choose Funds" multiple class="chosen-select"
 							name="selected_funds" id="selected_funds_edit">
 							<option value=""></option>
 							<% if(funds.length) { 

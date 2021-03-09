@@ -314,15 +314,15 @@ exports.postAddEmployee = async (req, res) => {
 			//before employee creation, the create employee salary record
 			salariesController.createSalary(empId, req.body.salary)
 			logsController.insertLogs(AUDIT_LOGS)
-			res.redirect('/employees')
-			return transporter.sendMail({
-				to: email,
-				from: email.FROM,
-				subject: 'Employee Created',
-				html: `
-				<p>You Account has been Created</p>
-				<p>Click this <a href="http://localhost:3000/login">link</a> to get Into the System</p>	`
-			})
+			// res.redirect('/employees')
+			// return transporter.sendMail({
+			// 	to: email,
+			// 	from: email.FROM,
+			// 	subject: 'Employee Created',
+			// 	html: `
+			// 	<p>You Account has been Created</p>
+			// 	<p>Click this <a href="http://localhost:3000/login">link</a> to get Into the System</p>	`
+			// })
 		})
 	} else {
 		console.log('employee already exist')

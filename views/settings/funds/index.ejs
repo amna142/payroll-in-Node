@@ -15,7 +15,7 @@
 	<div style="padding-left: 1%;">
 		<a class="btn-floating btn-large  waves-effect waves-light indigo-text text-lighten-1"
 			href="/settings/funds/add"><i class="material-icons">add</i></a>
-				<table class="striped responsive-table" id="fund_table">
+		<table class="striped responsive-table" id="fund_table">
 			<thead>
 				<tr>
 					<th>ID</th>
@@ -34,8 +34,9 @@
 					<td><%= funds[i].description%></td>
 					<td><%= funds[i].amount%></td>
 					<td>
-						<a class="modal-trigger" href="#allowance-edit-modal" id="edit-modal"><i
+						<a class="modal-trigger" href="#funds-edit-modal" id="edit-modal"><i
 								class="indigo-text text-lighten-1 material-icons">edit</i></a>
+						<%- include('./edit.ejs', {id: funds[i].id}); %>
 						<a href="#del-grade-modal" class="modal-trigger"><i
 								class="red-text text-lighten-1 material-icons">delete</i></a>
 					</td>
@@ -49,8 +50,8 @@
 				<% } %>
 			</tbody>
 		</table>
-			<br>
-			<br>
+		<br>
+		<br>
 	</div>
 
 	<script>
@@ -67,6 +68,20 @@
 				// modal population.
 				document.querySelector('#del-confirm-fund-modal').innerHTML =
 					`<a href="/settings/fund/delete/${$fundId}" class="modal-close waves-effect waves-green btn-flat" id='${$fundId}'>Agree</a>`;
+			})
+			$('#fund_table tbody').on('click', '#edit-modal', function () {
+				var td = $(this).parents('tr').find('td:lt(4)');
+				var $row = $(this).closest("tr"); // Find the row
+				var $id = $row.find("#fund_id").text();
+				$('#fund_name_edit').val($(td[1]).text());
+				$('#fund_description_edit').val($(td[2]).text());
+				$('#fund_amount_edit').val($(td[3]).text());
+				$('#old_record_edit').val(JSON.stringify({
+					id: parseInt($id),
+					name: $(td[1]).text(),
+					description: $(td[2]).text(),
+					amount: $(td[3]).text()
+				}))
 			})
 		})
 	</script>

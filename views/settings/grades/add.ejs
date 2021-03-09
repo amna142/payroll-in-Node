@@ -1,5 +1,6 @@
 <%- include('../../includes/header'); %>
 <link rel="stylesheet" href="/css/home.css">
+<link rel="stylesheet" href="/css/chosen-required.css"/>
 <script>
 	$(document).ready(function () {
 		$('#add-grade-form #min_salary').keyup(validateMinMaxSalary)
@@ -61,7 +62,7 @@
 							<i class="material-icons prefix">short_text</i>
 						</div>
 						<div class="input-field col s5">
-							<select multiple  class="chosen-select" name="selected_allowances"
+							<select multiple required="required" class="chosen-select" name="selected_allowances"
 							 id="selected_allowances">
 								<option value=""></option>
 								<% if(allowances.length) { 
@@ -87,7 +88,7 @@
 					</div>
 					<div class="row">
 						<div class="input-field col s6">
-							<select multiple class="chosen-select" name="selected_funds" id="selected_funds">
+							<select multiple required="required" class="chosen-select" name="selected_funds" id="selected_funds">
 								<option value="Choose Funds"></option>
 								<% if(funds.length) { 
 										for(var i = 0; i< funds.length; i++) { %>

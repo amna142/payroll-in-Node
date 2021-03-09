@@ -1,49 +1,45 @@
 <!-- Modal Structure -->
 
 
-<form class="col s12" name="form1" method="POST" action="/settings/allowance/edit/">
+<form class="col s12" name="form1" method="POST" action="/settings/fund/edit/">
 	<div class="row">
-
-
-		<div id="allowance-edit-modal" class="modal modal-fixed-footer">
+		<div id="funds-edit-modal" class="modal modal-fixed-footer">
 
 			<div class="modal-content">
 				<h4>Edit Record</h4>
 				<div class="row">
-					<input type="hidden" name="allowance_id" value="<%= id %>" />
-
+					<input type="hidden" name="fund_id_edit" value="<%= id %>" />
+					<input type="hidden" name="oldRecord" id="old_record_edit" value="" />
 					<div class="input-field col s6">
 						<i class="material-icons prefix">check_box_outline_blank</i>
-						<input id="allowance_name" type="text" class="validate form-control" required=""
-							aria-required="true" placeholder="Allowance Name" name="allowance_name" value="">
-						<label for="allowance_name">Allowance Name</label>
+						<input id="fund_name_edit" type="text" class="validate form-control" required=""
+							aria-required="true" placeholder="Fund Name" name="fund_name_edit" value="">
+						<label for="fund_name_edit">Fund Name</label>
 					</div>
 				</div>
 				<div class="row">
 					<div class="input-field col s6">
 						<i class="material-icons prefix">short_text</i>
 						<textarea class="materialize-textarea" class="validate form-control"
-							placeholder="Allowance Description" name="allowance_description" id="allowance_description"
+							placeholder="Fund Description" name="fund_description_edit" id="fund_description_edit"
 							value=""></textarea>
-						<label for="allowance_description">Allowance Description</label>
+						<label for="fund_description_edit">Fund Description</label>
 					</div>
 				</div>
 				<div class="row">
 					<div class="input-field col s6">
 						<i class="material-icons prefix">money</i>
 						<input type="number" class="validate form-control" required="" aria-required="true"
-							placeholder="Allowance Amount" name="allowance_amount" id="allowance_amount" value="">
-						<label for="allowance_amount">Allowance Amount</label>
+							placeholder="Fund Amount" name="fund_amount_edit" id="fund_amount_edit" value="">
+						<label for="fund_amount_edit">Fund Amount</label>
 					</div>
 				</div>
 				<div class="row">
 					<div class="modal-footer">
 						<button class="waves-effect modal-close waves-red btn-flat">Cancel</button>
 						<button type="submit" class="waves-effect waves-green btn-flat" value="Add">Update</button>
-
 					</div>
 				</div>
-
 </form>
 </div>
 </div>
