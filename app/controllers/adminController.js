@@ -113,7 +113,8 @@ let findAllEmployees = (req, res) => {
 	let empArray = []
 	return db.employee.findAll({
 		where: {
-			roleId: null
+			roleId: null,
+			isInactive: false
 		}
 	}).then(employees => {
 
@@ -155,7 +156,9 @@ let designation = function (id) {
 exports.getDeleteEmployee = (req, res) => {
 	var emplId = req.params.id
 	console.log('empId', emplId)
-	db.employee.destroy({
+	db.employee.update({
+		isInactive: true,
+	}, {
 		where: {
 			id: emplId
 		}

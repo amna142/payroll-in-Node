@@ -55,6 +55,13 @@ module.exports = (sequelize, Sequelize) => {
 			required: true,
 			notEmpty: false
 		},
+		isInactive: {
+			type: Sequelize.BOOLEAN,
+			required: true,
+			allowNull: false,
+			notEmpty: true,
+			defaultValue: false
+		},
 		resetToken: {
 			type: Sequelize.STRING
 		},
