@@ -25,6 +25,13 @@ module.exports = (sequelize, Sequelize) => {
 			required: true,
 			allowNull: false
 		},
+		isInactive: {
+			type: Sequelize.BOOLEAN,
+			notEmpty: true,
+			defaultValue: false,
+			allowNull: false,
+			required: true
+		}
 
 	});
 	return EmployeeGrade

@@ -1,4 +1,3 @@
-
 const db = require('../util/database')
 const Grade = db.employee_grade
 const Allowance = db.allowances
@@ -19,7 +18,11 @@ exports.create = (params) => {
 
 exports.findAll = () => {
 	let arr = []
-	return Allowance.findAll()
+	return Allowance.findAll({
+			where: {
+				isInactive: false
+			}
+		})
 		.then((allowances) => {
 			if (allowances.length > 0) {
 				allowances.forEach(element => {
@@ -45,9 +48,9 @@ exports.findByName = (name) => {
 			}, ],
 		})
 		.then((allowance) => {
-			if(allowance){
+			if (allowance) {
 				return allowance.dataValues
-			}else {
+			} else {
 				console.log('no Allowance found')
 			}
 			return allowance;
@@ -75,7 +78,9 @@ exports.findById = (id) => {
 
 
 exports.delete = (allowanceId) => {
-	return Allowance.destroy({
+	return Allowance.update({
+		isInactive: true
+	}, {
 		where: {
 			id: allowanceId
 		}

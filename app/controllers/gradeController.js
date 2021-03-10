@@ -25,14 +25,17 @@ exports.findAll = () => {
 			through: {
 				attributes: []
 			}
-		},{
+		}, {
 			model: Fund,
 			as: 'funds',
 			attributes: ['id', 'name', 'description', 'amount'],
 			through: {
 				attributes: []
 			}
-		}]
+		}],
+		where: {
+			isInactive: false
+		}
 	}).then(results => {
 		// console.log(">> Created grade: " + JSON.stringify(results, null, 2))
 		if (results.length > 0) {
@@ -56,7 +59,7 @@ exports.findById = (id) => {
 			}, {
 				model: Fund,
 				as: 'funds'
-			},],
+			}, ],
 		})
 		.then((grade) => {
 			return grade.dataValues;
@@ -103,7 +106,9 @@ exports.addFunds = (gradeId, funds) => {
 
 
 exports.delete = (gradeId) => {
-	return Grade.destroy({
+	return Grade.update({
+		isInactive: true
+	}, {
 		where: {
 			id: gradeId
 		}

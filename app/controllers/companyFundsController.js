@@ -1,7 +1,3 @@
-
-
-
-
 const db = require('../util/database')
 const Grade = db.employee_grade
 const Fund = db.company_funds
@@ -22,7 +18,11 @@ exports.create = (params) => {
 
 exports.findAll = () => {
 	let arr = []
-	return Fund.findAll()
+	return Fund.findAll({
+			where: {
+				isInactive: false
+			}
+		})
 		.then((funds) => {
 			if (funds.length > 0) {
 				funds.forEach(element => {
@@ -48,9 +48,9 @@ exports.findByName = (name) => {
 			}, ],
 		})
 		.then((fund) => {
-			if(fund){
+			if (fund) {
 				return fund.dataValues
-			}else {
+			} else {
 				console.log('no fund found')
 			}
 			return fund;
@@ -79,7 +79,9 @@ exports.findById = (id) => {
 
 
 exports.delete = (fundId) => {
-	return Fund.destroy({
+	return Fund.update({
+		isInactive: true
+	}, {
 		where: {
 			id: fundId
 		}

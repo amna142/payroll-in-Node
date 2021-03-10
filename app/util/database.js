@@ -1,11 +1,23 @@
 const dbConfig = require('../config/db.config')
 const Sequelize = require('sequelize')
 
-const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
-	host: dbConfig.SERVER,
-	dialect: dbConfig.DIALECT,
-	port: dbConfig.PORT,
-	storage: dbConfig.STORAGE,
+const DB = process.env.DB;
+const USER = process.env.USER
+const PASSWORD = process.env.PASSWORD
+const SERVER = process.env.SERVER
+const DIALECT = process.env.DIALECT
+const PORT = process.env.PORT
+const STORAGE = process.env.STORAGE
+const INSTANCENAME = process.env.INSTANCENAME
+
+console.log(DB);
+console.log(USER);
+
+const sequelize = new Sequelize(DB, USER, PASSWORD, {
+	host: SERVER,
+	dialect: DIALECT,
+	port: PORT,
+	storage: STORAGE,
 	pool: {
 		min: 0,
 		max: 5,
@@ -13,7 +25,7 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 		acquire: 30000
 	},
 	dialectOptions: {
-		instanceName: dbConfig.INSTANCENAME
+		instanceName: INSTANCENAME
 	}
 })
 //test connection 

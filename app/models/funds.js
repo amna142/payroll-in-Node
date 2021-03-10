@@ -21,6 +21,13 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.INTEGER,
 			allowNull: false,
 			required: true
+		},
+		isInactive: {
+			type: Sequelize.BOOLEAN,
+			notEmpty: true,
+			defaultValue: false,
+			allowNull: false,
+			required: true
 		}
 	});
 	return CompanyFunds
