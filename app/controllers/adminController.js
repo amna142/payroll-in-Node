@@ -10,6 +10,9 @@ var oldRecord;
 var AUDIT_LOGS = []
 const employeeController = require('./employeeController')
 const salariesController = require('./employeeSalaries')
+const {
+	employee
+} = require('../util/database')
 exports.adminHome = async (req, res) => {
 	//get Cookie
 	let logsArray = []
@@ -273,6 +276,7 @@ function findById(empId) {
 exports.postAddEmployee = async (req, res) => {
 
 	console.log('params', req.body)
+	let gradeId = parseInt(req.body.employee_grade)
 	var hashedPassword = bcrypt.hashSync(req.body.password, 8);
 	console.log('hashedPassword', hashedPassword)
 	var params = {
@@ -286,7 +290,7 @@ exports.postAddEmployee = async (req, res) => {
 		resume: req.body.filePath,
 		employeeTypeId: parseInt(req.body.employee_type),
 		employeeDesignationId: parseInt(req.body.designation),
-		employeeGradeId: req.body.employee_grade
+		employeeGradeId: gradeId
 	}
 	if (Object.keys(params).length > 0) {
 		Object.keys(params).forEach(function (key) {
@@ -312,17 +316,17 @@ exports.postAddEmployee = async (req, res) => {
 			console.log('employee created', employee)
 			let empId = employee.dataValues.id
 			//before employee creation, the create employee salary record
-			salariesController.createSalary(empId, req.body.salary)
+			salariesController.createSalary(empId, req.body.salary, gradeId)
 			logsController.insertLogs(AUDIT_LOGS)
-			// res.redirect('/employees')
-			// return transporter.sendMail({
-			// 	to: email,
-			// 	from: email.FROM,
-			// 	subject: 'Employee Created',
-			// 	html: `
-			// 	<p>You Account has been Created</p>
-			// 	<p>Click this <a href="http://localhost:3000/login">link</a> to get Into the System</p>	`
-			// })
+			res.redirect('/employees')
+			return transporter.sendMail({
+				to: email,
+				from: email.FROM,
+				subject: 'Employee Created',
+				html: `
+				<p>You Account has been Created</p>
+				<p>Click this <a href="http://localhost:3000/login">link</a> to get Into the System</p>	`
+			})
 		})
 	} else {
 		console.log('employee already exist')
@@ -570,5 +574,20 @@ exports.getAdminIndexPage = (req, res, next) => {
 		}
 	}).finally(() => {
 		db.sequelize.close
+	})
+}
+
+
+exports.viewEmployee = async (req, res) => {
+	let employeeId = req.params.id
+	console.log('employeeId', employeeId)
+	//fetch employeeData against this Id
+	let employee = await employeeController.findEmployeeById(employeeId)
+	employee = JSON.parse(employee)
+	console.log('employee', employee)
+	employee.starting_date = logsController.convertDate(employee.starting_date)
+	employee.dob = logsController.convertDate(employee.dob)
+	res.render('employee-management/view', {
+		employee: employee
 	})
 }

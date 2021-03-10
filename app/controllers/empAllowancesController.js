@@ -4,10 +4,13 @@ const EmployeeFunds = db.employee_funds
 
 
 
-exports.createEmpAllowances = (params, id) =>{
-	return EmployeeAllownces.create().then(result=>{
-		console.log('result', result)
-	}).then(err=>{
-		console.log('err in createEmpAllowances')
+exports.createEmpAllowances = (allowances) => {
+	let arr = []
+	return EmployeeAllownces.bulkCreate(allowances, {
+		returning: true
+	}).then((allowances) => {
+		console.log('allowances in bulk', JSON.stringify(allowances))
+	}).catch(err => {
+		console.log('err in createEmpAllowances', err)
 	})
 }

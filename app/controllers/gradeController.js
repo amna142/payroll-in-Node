@@ -59,7 +59,7 @@ exports.findById = (id) => {
 			},],
 		})
 		.then((grade) => {
-			return grade;
+			return grade.dataValues;
 		})
 		.catch((err) => {
 			console.log(">> Error while finding Tag: ", err);

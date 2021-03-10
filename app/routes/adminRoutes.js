@@ -19,7 +19,7 @@ router.get('/employee/delete/(:id)', isAuth, adminController.getDeleteEmployee)
 //edit requests
 router.get('/employee/edit/(:id)', isAuth,  adminController.getEditEmployee)
 router.post('/employee/edit/(:id)', isAuth, adminController.postEditEmployee)
-
+router.get('/employee/view/(:id)', isAuth, adminController.viewEmployee)
 
 //admin CRUD
 router.get('/admins', adminController.getAdminIndexPage)

@@ -1,0 +1,78 @@
+<%- include('../includes/header'); %>
+<link rel="stylesheet" href="/css/home.css">
+<link rel="stylesheet" href="/css/logs.css">
+</head>
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		var elems = document.querySelectorAll('.collapsible');
+		var instances = M.Collapsible.init(elems);
+	});
+</script>
+
+<body>
+	<%- include('../admin/partials/side-nav'); %>
+
+	<%- include('../admin/partials/nav-bar.ejs'); %>
+	<main>
+		<div class="container" style="padding-top: 3%;">
+
+			<ul class="collapsible">
+				<li class="active">
+					<div class="collapsible-header"><i class="material-icons">person</i>Personal History</div>
+					<div class="collapsible-body">
+						<ul class="collection center-align">
+							<li class="collection-item"><b>Name:</b> <span> <%= employee.name %></span></li>
+							<li class="collection-item"><b>Email:</b> <span> <%= employee.email %></span></li>
+							<li class="collection-item"><b>Phone:</b> <span> <%= employee.phone %></span></li>
+							<li class="collection-item"><b>Address:</b> <span> <%= employee.address %></span></li>
+							<li class="collection-item"><b>DOB:</b> <span class="chip"> <%= employee.dob %></span></li>
+						</ul>
+
+					</div>
+				</li>
+				<li>
+					<div class="collapsible-header"><i class="material-icons">business_center</i>Employment History
+					</div>
+					<div class="collapsible-body">
+
+						<ul class="collection center-align">
+							<li class="collection-item"><b>Employee Type:</b> <span>
+									<%= employee.employee_type.employee_type %></span></li>
+							<li class="collection-item"><b>Designation:</b> <span>
+									<%= employee.employee_designation.designation_type %></span></li>
+							<li class="collection-item"><b>Hiring Date:</b> <span class="chip">
+									<%= employee.starting_date %></span></li>
+							<li class="collection-item"><b>Resume:</b> <span> <%= employee.resume %></span></li>
+						</ul>
+					</div>
+				</li>
+				<li>
+					<div class="collapsible-header"><i class="material-icons">attach_money</i>Salary History</div>
+					<div class="collapsible-body">
+						<ul class="collection center-align">
+							<li class="collection-item"><b>Employee Grade:</b> <span>
+									<%= employee.employee_grade.grade %></span></li>
+							<li class="collection-item"><b>Employee Salary:</b> <span>
+									$<%=  employee.salary.amount %></span></li>
+							<li class="collection-item"><b>Employee Allowances:</b> <% if(employee.salary.employee_allowances.length) { 
+										for(var i = 0; i< employee.salary.employee_allowances.length; i++) { %>
+								<div class="col s3 chip" value="<%=employee.salary.employee_allowances[i].id%>">
+									<%= employee.salary.employee_allowances[i].name %>
+								</div>
+								<% } } %>
+							</li>
+							<li class="collection-item"><b>Employee Funds:</b> <% if(employee.salary.employee_funds.length) { 
+										for(var i = 0; i< employee.salary.employee_funds.length; i++) { %>
+								<div class="col s3 chip" value="<%=employee.salary.employee_funds[i].id%>">
+									<%= employee.salary.employee_funds[i].name %>
+								</div>
+								<% } } %>
+							</li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</main>
+
+	<%- include('../includes/footer'); %>

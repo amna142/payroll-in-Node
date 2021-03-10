@@ -44,7 +44,7 @@
 		<select name="employee_grade" id='grade' required="" aria-required="true">
 			<option value="" disabled selected>Choose Employee Grade</option>
 			<% if(grades.length) { 
-										for(var i = 0; i< grades.length; i++) { %>
+				for(var i = 0; i< grades.length; i++) { %>
 			<option value="<%=grades[i].id %>"><%= grades[i].grade %> (><%= grades[i].min_salary %>,
 				<<%= grades[i].max_salary %>) </option> <% } } %> </select> </div> <div class="input-field col s6">
 					<i class="material-icons prefix">attach_money</i>
@@ -54,5 +54,4 @@
 					<span class="helper-text" id="msg" data-error="" data-success="">Choose Money in between
 						Range</span>
 	</div>
-
 </div>

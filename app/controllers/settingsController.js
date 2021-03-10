@@ -8,10 +8,6 @@ const FundController = require('../controllers/companyFundsController')
 var AUDIT_LOGS = []
 var old_allowance_value = {},
 	old_fund_value = {}
-const {
-	Op
-} = require("sequelize");
-
 
 exports.getPage = async (req, res, next) => {
 	let path = req.path;
