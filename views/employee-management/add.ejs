@@ -18,7 +18,7 @@
 
 		<div class="row">
 			<div class="row">
-				<form class="col s12" action="/employee/add" method="POST" name="form1">
+				<form class="col s12" action="/employee/add" method="POST" name="form1" enctype="multipart/form-data">
 					<h5><b style="color: coral;">Personal History</b></h5>
 					<div class="divider"></div>
 					<br />
@@ -57,8 +57,8 @@
 						</div>
 						<div class="input-field col s3">
 							<i class="material-icons prefix">date_range</i>
-							<input type="date" name="dob" id="dob" value="" required=""
-								aria-required="true" placeholder="DOB">
+							<input type="date" name="dob" id="dob" value="" required="" aria-required="true"
+								placeholder="DOB">
 							<label for="dob">DOB</label>
 						</div>
 					</div>
@@ -91,19 +91,20 @@
 					<div class="row">
 						<div class="input-field col s4">
 							<i class="material-icons prefix">date_range</i>
-							<input type="date"  name="starting_date" value="" id="starting_date"
-								required="" aria-required="true" placeholder="Starting Date">
+							<input type="date" name="starting_date" value="" id="starting_date" required=""
+								aria-required="true" placeholder="Starting Date">
 							<label for="starting_date">Starting Date</label>
 						</div>
 
 						<div class="row">
+							<!-- <input type="file" name="resume" id="resume"> -->
 							<div class="file-field input-field col s6">
 								<div class="btn">
 									<span>Upload Resume</span>
-									<input type="file">
+									<input type="file" id="resume" name="resume">
 								</div>
 								<div class="file-path-wrapper">
-									<input class="file-path validate" type="text" name="filePath" value="" required=""
+									<input class="file-path validate" type="text"  value="" required=""
 										aria-required="true">
 								</div>
 							</div>

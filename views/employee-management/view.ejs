@@ -42,7 +42,7 @@
 									<%= employee.employee_designation.designation_type %></span></li>
 							<li class="collection-item"><b>Hiring Date:</b> <span class="chip">
 									<%= employee.starting_date %></span></li>
-							<li class="collection-item"><b>Resume:</b> <span> <%= employee.resume %></span></li>
+							<li class="collection-item"><b>Resume:</b> <a href="/employee/resume/<%= employee.id %>"><span>Employee Resume</span></a> </li>
 						</ul>
 					</div>
 				</li>

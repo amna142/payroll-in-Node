@@ -5,6 +5,8 @@ const app = express()
 const session = require('express-session')
 const bodyParser = require('body-parser')
 const serveStatic = require('serve-static')
+const multer = require('multer')
+
 var SequelizeStore = require('connect-session-sequelize')(session.Store)
 const db = require('./app/util/database')
 const path = require('path')
@@ -14,17 +16,19 @@ const adminRoutes = require('./app/routes/adminRoutes')
 const logsRoutes = require('./app/routes/logsRoutes')
 const settingsRoutes = require('./app/routes/settingsRoutes')
 const flash = require('connect-flash')
-const secretKey = require('./app/config/secret') 
+const secretKey = require('./app/config/secret')
+const {fileStorage, fileFilter} = require('./app/middlewares/multer-file')
 
 app.set('view engine', 'ejs')
 app.set('views', 'views')
 app.use(bodyParser.urlencoded({
 	extended: false
 }))
+
 app.use('/', serveStatic(path.join(__dirname, 'app/assets')))
 app.use('/', serveStatic(path.join(__dirname, 'public')))
 var store = new SequelizeStore({
-  db: db.sequelize,
+	db: db.sequelize,
 });
 app.use(session({
 	secret: secretKey.key,
@@ -44,6 +48,7 @@ const PORT = process.env.PORT || 3000
 
 //{force: true}
 db.sequelize.sync().then(result => {
+	
 	app.listen(3000, () => {
 		// console.log(result)
 		console.log(`Server is running on port ${PORT}`)

@@ -78,3 +78,14 @@ exports.findEmployeeById = (id) => {
 		console.log('errpr while finding employee', err)
 	})
 }
+
+
+
+exports.EmployeeResumeName = (id) => {
+	return Employee.findByPk(id).then(result => {
+		console.log('result.dataValues.resume', result.dataValues.resume)
+		return result.dataValues.resume
+	}).catch(err => {
+		console.log('err in EmployeeResumeName', err)
+	})
+}

@@ -2,6 +2,8 @@ const db = require('../util/database')
 const bcrypt = require('bcrypt')
 const constants = require('../util/constants')
 const email = require('../util/constants')
+const fs = require('fs')
+const path = require('path')
 const {
 	transporter
 } = require('../config/email.config')
@@ -13,6 +15,7 @@ const salariesController = require('./employeeSalaries')
 const {
 	employee
 } = require('../util/database')
+const { fileStorage } = require('../middlewares/multer-file')
 exports.adminHome = async (req, res) => {
 	//get Cookie
 	let logsArray = []
@@ -278,10 +281,11 @@ function findById(empId) {
 
 exports.postAddEmployee = async (req, res) => {
 
-	console.log('params', req.body)
+	console.log('file params', req.file)
+	let file = req.file
+	let fileURL = file.path
 	let gradeId = parseInt(req.body.employee_grade)
 	var hashedPassword = bcrypt.hashSync(req.body.password, 8);
-	console.log('hashedPassword', hashedPassword)
 	var params = {
 		email: req.body.email,
 		name: req.body.name,
@@ -290,7 +294,7 @@ exports.postAddEmployee = async (req, res) => {
 		address: req.body.Address,
 		phone: req.body.phone,
 		starting_date: req.body.starting_date,
-		resume: req.body.filePath,
+		resume: fileURL,
 		employeeTypeId: parseInt(req.body.employee_type),
 		employeeDesignationId: parseInt(req.body.designation),
 		employeeGradeId: gradeId
@@ -593,4 +597,13 @@ exports.viewEmployee = async (req, res) => {
 	res.render('employee-management/view', {
 		employee: employee
 	})
+}
+
+
+exports.getEmployeeResume = async (req, res, next) => {
+	console.log('req.file', req.file)
+	let empId = parseInt(req.params.id)
+	let resumePath = await employeeController.EmployeeResumeName(empId)
+	resumePath = resumePath
+	console.log('resumePath', resumePath)
 }
