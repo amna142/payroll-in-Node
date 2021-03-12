@@ -70,9 +70,7 @@
 					`<a href="/settings/fund/delete/${$fundId}" class="modal-close waves-effect waves-green btn-flat" id='${$fundId}'>Agree</a>`;
 			})
 			$('#fund_table tbody').on('click', '#edit-modal', function () {
-				var td = $(this).parents('tr').find('td:lt(4)');
 				var $row = $(this).closest("tr"); // Find the row
-				var $id = $row.find("#fund_id").text();
 				console.log($row);
 				const id = $row.attr('data-fund-id');
 				const name = $row.attr('data-fund-name');

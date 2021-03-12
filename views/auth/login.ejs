@@ -36,10 +36,8 @@
 									<i class="material-icons right">send</i>
 								</button>
 							</div>
-
 						</form>
 					</div>
-
 				</div>
 				<div class="col s8">
 					<a href="/reset" class="center" style="margin-left: 85%;">Reset Password</a>
@@ -49,7 +47,7 @@
 
 	</div>
 	<% } else { %>
-	<%- include('../404/Error404', {data: url}); %>
+	<%- include('../Error/Error404', {data: url}); %>
 	<%} %>
 
 </body>

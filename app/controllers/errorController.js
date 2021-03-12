@@ -6,7 +6,7 @@ exports.get404 = (req, res) => {
 	} else {
 		url = '/login'
 	}
-	res.render('404/Error404', {
+	res.render('Error/Error404', {
 		url: url
 	})
 }

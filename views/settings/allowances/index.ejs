@@ -11,9 +11,13 @@
 		</div>
 	</div>
 
-
 	<%- include('../../admin/partials/side-nav'); %>
 	<div style="padding-left: 1%;">
+		<% if(errorMessage) { %>
+
+		<div class="col s8 user-message user-message--error"><%= errorMessage %>
+		</div>
+		<% } %>
 		<a class="btn-floating btn-large  waves-effect waves-light indigo-text text-lighten-1"
 			href="/settings/allowances/add"><i class="material-icons">add</i></a>
 		<table class="striped responsive-table" id="allowance_table">
@@ -29,8 +33,10 @@
 			<tbody>
 				<% if(allowances.length){
   					for(var i = 0; i< allowances.length; i++) {%>
-				<tr>
-					<td id="allowance_id"><%= allowances[i].id%></td>
+				<tr id="allowance_id_<%=allowances[i].id %>" data-allowance-id="<%=allowances[i].id %>"
+					data-allowance-name="<%= allowances[i].name%>" data-allowance-desc="<%= allowances[i].description%>"
+					data-allowance-amount="<%= allowances[i].amount%>">
+					<td><%= allowances[i].id%></td>
 					<td><%= allowances[i].name%></td>
 					<td><%= allowances[i].description%></td>
 					<td><%= allowances[i].amount%></td>
@@ -41,6 +47,7 @@
 						<a href="#modal2" class="modal-trigger"><i
 								class="red-text text-lighten-1 material-icons">delete</i></a>
 					</td>
+
 				</tr>
 				<% }
 
@@ -73,13 +80,22 @@
 					`<a href="/settings/allowance/delete/${$text}" class="modal-close waves-effect waves-green btn-flat" id='${$text}'>Agree</a>`;
 			})
 			$('#allowance_table tbody').on('click', '#edit-modal', function () {
-				var td = $(this).parents('tr').find('td:lt(4)');
-				var $row = $(this).closest("tr"); // Find the row
-				var $id = $row.find("#allowance_id").text();
-				$('#allowance_name').val($(td[1]).text());
-				$('#allowance_description').val($(td[2]).text());
-				$('#allowance_amount').val($(td[3]).text());
+				let $row = $(this).closest("tr"); // Find the row
+				console.log($row);
+				const id = $row.attr('data-allowance-id');
+				const name = $row.attr('data-allowance-name');
+				const desc = $row.attr('data-allowance-desc');
+				const amount = $row.attr('data-allowance-amount');
+				$('#allowance_id').val(id);
+				$('#allowance_name').val(name);
+				$('#allowance_description').val(desc);
+				$('#allowance_amount').val(amount);
+				$('#edit_old_allowance_record').val(JSON.stringify({
+					id: parseInt(id),
+					name,
+					description: desc,
+					amount: parseInt(amount)
+				}))
 			})
-
 		})
 	</script>

@@ -19,7 +19,7 @@ INSERT INTO roles(title, createdAt, updatedAt) VALUES ('admin',CURRENT_TIMESTAMP
 
 delete from employees where id=13
 
-
+delete from company_funds
 
 INSERT INTO employee_types(employee_type, createdAt, updatedAt) VALUES ('Permanent', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 

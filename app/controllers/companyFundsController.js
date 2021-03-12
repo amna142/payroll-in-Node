@@ -40,7 +40,8 @@ exports.findAll = () => {
 exports.findByName = (name) => {
 	return Fund.findOne({
 			where: {
-				name: name
+				name: name,
+				isInactive: false
 			},
 			include: [{
 				model: Grade,

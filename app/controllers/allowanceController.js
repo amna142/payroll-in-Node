@@ -40,7 +40,8 @@ exports.findAll = () => {
 exports.findByName = (name) => {
 	return Allowance.findOne({
 			where: {
-				name: name
+				name: name,
+				isInactive: false
 			},
 			include: [{
 				model: Grade,
@@ -53,7 +54,6 @@ exports.findByName = (name) => {
 			} else {
 				console.log('no Allowance found')
 			}
-			return allowance;
 		})
 		.catch((err) => {
 			console.log(">> Error while finding allowances: ", err);

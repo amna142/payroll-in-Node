@@ -60,3 +60,4 @@ exports.getTime = () => {
 	var seconds = d.getSeconds()
 	return (hours + ':' + minutes + ':' + seconds)
 }
+

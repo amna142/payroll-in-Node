@@ -44,6 +44,8 @@ app.use(adminRoutes)
 app.use(settingsRoutes)
 app.use(logsRoutes)
 app.use(errorRoutes)
+
+
 const PORT = process.env.PORT || 3000
 
 //{force: true}

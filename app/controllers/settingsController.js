@@ -6,8 +6,6 @@ const GradeController = require('./gradeController')
 const LogsController = require('../controllers/logsController')
 const FundController = require('../controllers/companyFundsController')
 var AUDIT_LOGS = []
-var old_allowance_value = {},
-	old_fund_value = {}
 
 exports.getPage = async (req, res, next) => {
 	let path = req.path;
@@ -23,7 +21,6 @@ exports.getPage = async (req, res, next) => {
 	res.render(path, {
 		allowances: allowances,
 		funds: funds
-
 	})
 }
 
@@ -37,7 +34,7 @@ exports.getSettings = async (req, res) => {
 	let user = req.session.user;
 
 	let logsArray = []
-	let isEmployee = false
+	var isEmployee;
 	if (user.roleId === null) {
 		logsArray = await LogsController.employeeLogs(req.session.user.id)
 		isEmployee = true
@@ -192,22 +189,44 @@ exports.deleteAllowance = async (req, res) => {
 }
 
 exports.editAllowance = async (req, res, next) => {
-	let id = req.body.allowance_id
-	let params = {
+	console.log('req.body', req.body)
+	let allowance_update;
+	const id = parseInt(req.body.allowance_id)
+	const newRecord = {
+		id: id,
 		name: req.body.allowance_name,
 		description: req.body.allowance_description,
-		amount: req.body.allowance_amount
+		amount: parseInt(req.body.allowance_amount)
 	}
-	// check if an allowance of same name exist
-	// findByName
-	let allowance_exist = await AllowanceController.findByName(params.name)
-	if (!allowance_exist) {
-		let updated_allowance = await AllowanceController.edit(params, id)
-		updated_allowance ? res.redirect('/settings#allowances') : null
+	const oldRecord = JSON.parse(req.body.edit_old_allowance_record)
+	let updated_allowance_fields = FieldsDifference(oldRecord, newRecord)
+
+	//find by allowance name
+	let allowance_exist = await AllowanceController.findByName(newRecord.name)
+	if (Object.keys(updated_allowance_fields).length > 0) {
+		if (allowance_exist) {
+			if (allowance_exist.id === newRecord.id) {
+
+				//update allowance record in database
+				allowance_update = await AllowanceController.edit(updated_allowance_fields, id)
+				if (allowance_update) {
+					res.redirect('/settings#allowances')
+				}
+			} else {
+				req.flash('error', 'allowance with the same name exist')
+				console.log('allowance with the same name exist')
+				res.redirect('/settings#allowances')
+			}
+		} else {
+			allowance_update = await AllowanceController.edit(updated_allowance_fields, id)
+			if (allowance_update) {
+				this.getSettings(req, res)
+			}
+		}
 	} else {
-		console.log('already exist with the same name')
-		req.flash('error', 'already exist with the same name')
-		res.redirect('/settings#allowances')
+		req.flash('error', 'nothing has been changed. please change any field')
+		console.log('nothing has been changed. please change any field')
+		this.getSettings(req, res)
 	}
 }
 
@@ -276,7 +295,7 @@ exports.editFund = async (req, res) => {
 	let oldRecord = JSON.parse(req.body.oldRecord)
 	console.log('oldRecord', oldRecord)
 	console.log('newRecord', newRecord)
-	let updated_fund_record = shallowEqualFunds(oldRecord, newRecord)
+	let updated_fund_record = FieldsDifference(oldRecord, newRecord)
 	console.log('updated_fund_record', updated_fund_record)
 	//find by fund name
 	let fund_exist = await FundController.findByName(newRecord.name)
@@ -291,7 +310,7 @@ exports.editFund = async (req, res) => {
 			console.log('nothing has been changed')
 			res.redirect('/settings#funds')
 		}
-	}else {
+	} else {
 		console.log('fund with the same name exist')
 		res.redirect('/settings#funds')
 	}
@@ -420,7 +439,7 @@ function addUpdatedLogs(updated_values, old_record) {
 	}
 }
 
-function shallowEqualFunds(oldRecord, newRecord) {
+function FieldsDifference(oldRecord, newRecord) {
 	var obj = {}
 	console.log('oldRecord', oldRecord)
 	console.log('newRecord', newRecord)
