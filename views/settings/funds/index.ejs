@@ -28,8 +28,8 @@
 			<tbody>
 				<% if(funds.length){
   					for(var i = 0; i< funds.length; i++) {%>
-				<tr>
-					<td id="fund_id"><%= funds[i].id%></td>
+				<tr id="fund_id_<%=funds[i].id %>" data-fund-id="<%=funds[i].id %>" data-fund-name="<%= funds[i].name%>" data-fund-desc="<%= funds[i].description%>" data-fund-amount="<%= funds[i].amount%>">
+					<td><%= funds[i].id%></td>
 					<td><%= funds[i].name%></td>
 					<td><%= funds[i].description%></td>
 					<td><%= funds[i].amount%></td>
@@ -73,14 +73,20 @@
 				var td = $(this).parents('tr').find('td:lt(4)');
 				var $row = $(this).closest("tr"); // Find the row
 				var $id = $row.find("#fund_id").text();
-				$('#fund_name_edit').val($(td[1]).text());
-				$('#fund_description_edit').val($(td[2]).text());
-				$('#fund_amount_edit').val($(td[3]).text());
+				console.log($row);
+				const id = $row.attr('data-fund-id');
+				const name = $row.attr('data-fund-name');
+				const desc = $row.attr('data-fund-desc');
+				const amount = $row.attr('data-fund-amount');
+				$('#fund_id_edit').val(id);
+				$('#fund_name_edit').val(name);
+				$('#fund_description_edit').val(desc);
+				$('#fund_amount_edit').val(amount);
 				$('#old_record_edit').val(JSON.stringify({
-					id: parseInt($id),
-					name: $(td[1]).text(),
-					description: $(td[2]).text(),
-					amount: $(td[3]).text()
+					id: parseInt(id),
+					name,
+					description: desc,
+					amount
 				}))
 			})
 		})

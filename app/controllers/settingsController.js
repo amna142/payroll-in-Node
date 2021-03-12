@@ -266,7 +266,6 @@ exports.editGrade = async (req, res, next) => {
 }
 
 exports.editFund = async (req, res) => {
-	console.log('req.body', req.body)
 	let id = req.body.fund_id_edit;
 	let newRecord = {
 		id: parseInt(id),
@@ -275,19 +274,26 @@ exports.editFund = async (req, res) => {
 		amount: req.body.fund_amount_edit
 	}
 	let oldRecord = JSON.parse(req.body.oldRecord)
+	console.log('oldRecord', oldRecord)
+	console.log('newRecord', newRecord)
 	let updated_fund_record = shallowEqualFunds(oldRecord, newRecord)
 	console.log('updated_fund_record', updated_fund_record)
-	if (Object.keys(updated_fund_record).length > 0) {
-		let fund_update = await FundController.edit({
-			name: req.body.fund_name_edit,
-			description: req.body.fund_description_edit,
-			amount: req.body.fund_amount_edit
-		}, parseInt(id))
-		if (fund_update) {
+	//find by fund name
+	let fund_exist = await FundController.findByName(newRecord.name)
+	console.log('fund_exist', fund_exist)
+	if (fund_exist.id === newRecord.id) {
+		if (Object.keys(updated_fund_record).length > 0) {
+			let fund_update = await FundController.edit(updated_fund_record, parseInt(id))
+			if (fund_update) {
+				res.redirect('/settings#funds')
+			}
+		} else {
+			console.log('nothing has been changed')
 			res.redirect('/settings#funds')
 		}
-	} else {
-		console.log('nothing has been changed')
+	}else {
+		console.log('fund with the same name exist')
+		res.redirect('/settings#funds')
 	}
 }
 

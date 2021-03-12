@@ -3,9 +3,6 @@
 
 const db = require("../util/database")
 const EmployeeFunds = db.employee_funds
-
-
-
 exports.createEmpFunds = (funds) => {
 	let arr = []
 	return EmployeeFunds.bulkCreate(funds, {

@@ -10,12 +10,14 @@ VALUES ('amna_ali','amna@dummy.com', '123', '1 May 1997', 'abc address', '0305-6
 
 
 UPDATE employees
-SET email='amna@gmail.com' WHERE id=2;
+SET email='amna@gmail.com' WHERE id=7;
 
+
+UPDATE company_funds SET name='umar' where id=1
 
 INSERT INTO roles(title, createdAt, updatedAt) VALUES ('admin',CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-delete from employees where id=5
+delete from employees where id=13
 
 
 
@@ -44,3 +46,6 @@ delete    from employee_grades
 delete from audit_logs
 
 INSERT INTO employee_grades(grade, min_salary, max_salary, createdAt, updatedAt) VALUES ('OG3', 40000, 60000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+
+
+
