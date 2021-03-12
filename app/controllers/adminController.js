@@ -2,7 +2,7 @@ const db = require('../util/database')
 const bcrypt = require('bcrypt')
 const constants = require('../util/constants')
 const email = require('../util/constants')
-const fs = require('fs')
+const fs = require('fs');
 const path = require('path')
 const {
 	transporter
@@ -15,7 +15,9 @@ const salariesController = require('./employeeSalaries')
 const {
 	employee
 } = require('../util/database')
-const { fileStorage } = require('../middlewares/multer-file')
+const {
+	fileStorage
+} = require('../middlewares/multer-file')
 exports.adminHome = async (req, res) => {
 	//get Cookie
 	let logsArray = []
@@ -283,7 +285,7 @@ exports.postAddEmployee = async (req, res) => {
 
 	console.log('file params', req.file)
 	let file = req.file
-	let fileURL = file.path
+	var fileURL = file.path
 	let gradeId = parseInt(req.body.employee_grade)
 	var hashedPassword = bcrypt.hashSync(req.body.password, 8);
 	var params = {
@@ -598,12 +600,19 @@ exports.viewEmployee = async (req, res) => {
 		employee: employee
 	})
 }
-
-
 exports.getEmployeeResume = async (req, res, next) => {
-	console.log('req.file', req.file)
 	let empId = parseInt(req.params.id)
 	let resumePath = await employeeController.EmployeeResumeName(empId)
-	resumePath = resumePath
 	console.log('resumePath', resumePath)
+	let readStream = fs.createReadStream(resumePath);
+
+	readStream.on('open', function () {
+		// This just pipes the read stream to the response object (which goes to the client)
+		readStream.pipe(res);
+	});
+
+	// This catches any errors that happen while creating the readable stream (usually invalid names)
+	readStream.on('error', function (err) {
+		res.end(err);
+	});
 }

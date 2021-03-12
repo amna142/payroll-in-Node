@@ -15,7 +15,7 @@ SET email='amna@gmail.com' WHERE id=2;
 
 INSERT INTO roles(title, createdAt, updatedAt) VALUES ('admin',CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-delete from employees where id=3
+delete from employees where id=5
 
 
 

@@ -4,6 +4,25 @@
 		$('select').formSelect();
 		var elems = document.querySelectorAll('.datepicker');
 		var instances = M.Datepicker.init(elems);
+		document.getElementById("resume").addEventListener("change", validateFile)
+
+		function validateFile() {
+			const allowedExtensions = ['pdf'],
+				sizeLimit = 1000000
+			const {
+				name: fileName,
+				size: fileSize
+			} = this.files[0];
+			const fileExtension = fileName.split(".").pop();
+			console.log('fileExtension', fileExtension)
+			if (!allowedExtensions.includes(fileExtension)) {
+				alert("File Type not allowed. Please Upload PDF file");
+				this.value = null;
+			} else if (fileSize > sizeLimit) {
+				alert("file size too large")
+				this.value = null;
+			}
+		}
 	});
 </script>
 <link rel="stylesheet" href="/css/home.css">
@@ -37,7 +56,7 @@
 						</div>
 						<div class="input-field col s4">
 							<i class="material-icons prefix">phone</i>
-							<input id="icon_telephone" type="tel" name="phone" id="phone" value="" required=""
+							<input id="icon_telephone" type="tel" name="phone" id="phone" value=""
 								aria-required="true" class="validate">
 							<label for="icon_telephone">Telephone</label>
 						</div>
@@ -45,8 +64,8 @@
 					<div class="row">
 						<div class="input-field col s6">
 							<i class="material-icons prefix">home</i>
-							<textarea class="materialize-textarea" class="validate" class="form-control" name="Address"
-								id="Address" value=""></textarea>
+							<input  class="validate" class="form-control"  name="Address"
+								id="Address" type="text" aria-required="true" value="">
 							<label for="Address">Address</label>
 						</div>
 						<div class="input-field col s3">
@@ -101,10 +120,10 @@
 							<div class="file-field input-field col s6">
 								<div class="btn">
 									<span>Upload Resume</span>
-									<input type="file" id="resume" name="resume">
+									<input type="file" id="resume" accept=".pdf" name="resume">
 								</div>
 								<div class="file-path-wrapper">
-									<input class="file-path validate" type="text"  value="" required=""
+									<input class="file-path validate" type="text" value="" required=""
 										aria-required="true">
 								</div>
 							</div>

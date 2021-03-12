@@ -1,10 +1,8 @@
-
-
 const express = require('express')
 const router = express.Router()
 const adminController = require('../controllers/adminController')
 const isAuth = require('../middlewares/is-auth')
-const uplaod = require('../middlewares/multer-file')
+const upload = require('../middlewares/multer-file').single('resume')
 //login -> Admin Request
 router.get('/', isAuth, adminController.adminHome)
 router.get('/employees', isAuth, adminController.employeesIndexPage)
@@ -12,20 +10,19 @@ router.get('/employees', isAuth, adminController.employeesIndexPage)
 //add requests
 
 router.get('/employee/add', isAuth, adminController.getAddEmployee)
-router.post('/employee/add', isAuth, adminController.postAddEmployee)
+router.post('/employee/add', isAuth, upload, adminController.postAddEmployee)
 
 
 router.get('/employee/delete/(:id)', isAuth, adminController.getDeleteEmployee)
 
 //edit requests
-router.get('/employee/edit/(:id)', isAuth,  adminController.getEditEmployee)
+router.get('/employee/edit/(:id)', isAuth, adminController.getEditEmployee)
 router.post('/employee/edit/(:id)', isAuth, adminController.postEditEmployee)
 router.get('/employee/view/(:id)', isAuth, adminController.viewEmployee)
 
 //admin CRUD
 router.get('/admins', adminController.getAdminIndexPage)
 
-router.get('/employee/resume/(:id)', isAuth, uplaod.single('resume'),adminController.getEmployeeResume)
+router.get('/employee/resume/(:id)', isAuth, adminController.getEmployeeResume)
 
 module.exports = router
-
