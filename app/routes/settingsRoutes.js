@@ -1,10 +1,10 @@
 const express = require('express')
 const router = express.Router()
-
+const upload = require('../middlewares/multer-file').single('attendance_file')
 var settingsController = require('../controllers/settingsController')
 const isAuth = require('../middlewares/is-auth')
 
-
+const AttendanceController = require('../controllers/attendanceController')
 
 
 // router.get('/settings', isAuth, settingsController.getPage)
@@ -26,5 +26,7 @@ router.get('/settings/funds/add', isAuth, settingsController.getPage)
 router.post('/settings/funds/add', isAuth, settingsController.postFund)
 router.get('/settings/fund/delete/(:id)', isAuth, settingsController.deleteFund)
 router.post('/settings/fund/edit/', isAuth, settingsController.editFund)
+
+router.post('/settings/attendance', isAuth, upload, AttendanceController.getAttendanceFile)
 
 module.exports = router

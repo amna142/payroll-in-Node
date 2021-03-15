@@ -1,0 +1,48 @@
+<script>
+	$(document).ready(function () {
+		document.getElementById("attendance_file").addEventListener("change", validateFile)
+
+		function validateFile() {
+			const allowedExtensions = ['csv'],
+				sizeLimit = 1000000
+			const {
+				name: fileName,
+				size: fileSize
+			} = this.files[0];
+			const fileExtension = fileName.split(".").pop();
+			console.log('fileExtension', fileExtension)
+			if (!allowedExtensions.includes(fileExtension)) {
+				alert("File Type not allowed. Please Upload PDF file");
+				this.value = null;
+			} else if (fileSize > sizeLimit) {
+				alert("file size too large")
+				this.value = null;
+			}
+		}
+	});
+</script>
+</head>
+
+<body>
+	<%- include('../../admin/partials/side-nav'); %>
+	<div style="padding-left: 1%;">
+		<form action="/settings/attendance" method="POST" name="attendance_form" enctype="multipart/form-data">
+			<div class="file-field input-field">
+				<div class="btn">
+					<span>Upload File</span>
+					<input type="file" id="attendance_file" accept=".csv" name="attendance_file">
+				</div>
+				<div class="file-path-wrapper">
+					<input class="file-path validate" type="text" placeholder="Upload attendance file"
+						aria-required="true" value="" required="">
+				</div>
+			</div>
+			<button class="btn waves-effect waves-light right" type="submit" name="add">Submit
+				<i class="material-icons right">send</i>
+			</button>
+		</form>
+		</br>
+		</br>
+		</br>
+		</br>
+	</div>

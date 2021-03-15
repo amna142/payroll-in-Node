@@ -13,16 +13,16 @@ const storage = multer.diskStorage({
 })
 
 
-const error = (req, res, next) =>{
-	if(err){
-		console.log('err', err)
-		req.flash('error', 'error while uploading file')
-		return next(err)
-	}
-}	
+// const error = (req, res, next) =>{
+// 	if(err){
+// 		console.log('err', err)
+// 		req.flash('error', 'error while uploading file')
+// 		return next(err)
+// 	}
+// }	
 
 const fileFilter = (req, file, cb) => {
-	if (file.mimetype === 'application/pdf') {
+	if (file.mimetype === 'application/pdf' || file.mimetype === 'application/octet-stream') {
 		cb(null, true)
 	} else {
 		req.flash('error', 'file type is not supported')
@@ -32,7 +32,7 @@ const fileFilter = (req, file, cb) => {
 
 var uplaod = multer({
 	storage: storage,
-	onError: error, 
+	// onError: error,
 	fileFilter: fileFilter
 	
 })

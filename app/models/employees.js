@@ -67,6 +67,11 @@ module.exports = (sequelize, Sequelize) => {
 		},
 		resetTokenExpiration: {
 			type: Sequelize.DATE
+		},
+		attendMachineId: {
+			type: Sequelize.STRING,
+			required: true,
+			allowNull: false
 		}
 	});
 	return Employee

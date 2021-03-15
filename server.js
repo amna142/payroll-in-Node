@@ -5,19 +5,19 @@ const app = express()
 const session = require('express-session')
 const bodyParser = require('body-parser')
 const serveStatic = require('serve-static')
-const multer = require('multer')
 
 var SequelizeStore = require('connect-session-sequelize')(session.Store)
 const db = require('./app/util/database')
 const path = require('path')
 const accountRoutes = require('./app/routes/authRoutes')
-const errorRoutes = require('./app/routes/errorRoutes')
 const adminRoutes = require('./app/routes/adminRoutes')
 const logsRoutes = require('./app/routes/logsRoutes')
 const settingsRoutes = require('./app/routes/settingsRoutes')
+const errorRoutes = require('./app/routes/errorRoutes')
+
+
 const flash = require('connect-flash')
 const secretKey = require('./app/config/secret')
-const {fileStorage, fileFilter} = require('./app/middlewares/multer-file')
 
 app.set('view engine', 'ejs')
 app.set('views', 'views')

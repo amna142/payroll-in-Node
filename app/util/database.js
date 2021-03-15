@@ -52,6 +52,8 @@ db.allowances = require('../models/allowances.js')(sequelize, Sequelize)
 db.employee_allowances = require('../models/employeeAllowances.js')(sequelize, Sequelize)
 db.employee_funds = require('../models/employeeFunds.js')(sequelize, Sequelize)
 db.company_funds = require('../models/funds.js')(sequelize, Sequelize)
+db.attendance = require('../models/attendance.js')(sequelize, Sequelize)
+db.time_entries = require('../models/timeEntries.js')(sequelize, Sequelize)
 //1 employee can have many roles
 //1 role can be assigend to many employees (1(role) -> many(employees))
 
@@ -145,7 +147,7 @@ db.employee_allowances.belongsTo(db.salaries, {
 
 //one-to-many for salary with employee Funds
 db.salaries.hasMany(db.employee_funds, {
-	foreignKey:{
+	foreignKey: {
 		allowNull: true
 	}
 })
@@ -168,5 +170,19 @@ db.employee_grade.belongsToMany(db.company_funds, {
 	as: 'funds',
 	foreignKey: 'grade_id'
 })
+
+//one-to-many relationship between attendance and time netries
+db.attendance.hasMany(db.time_entries, {
+	constraints: false,
+	onDelete: null,
+	onUpdate: 'CASCADE'
+})
+
+db.time_entries.belongsTo(db.attendance, {
+	constraints: false,
+	onDelete: null,
+	onUpdate: 'CASCADE'
+})
+
 
 module.exports = db;

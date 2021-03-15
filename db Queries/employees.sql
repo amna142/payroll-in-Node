@@ -5,8 +5,8 @@ select * from employees
 
 select * from audit_logs
 
-INSERT INTO employees(name, email, password, dob, address, phone, starting_date, resume, createdAt, updatedAt, roleId, employeeTypeId, employeeDesignationId, employeeGradeId) 
-VALUES ('amna_ali','amna@dummy.com', '123', '1 May 1997', 'abc address', '0305-6230474', '2/19/2020', 'resume.pdf', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1 , 1, NULL);
+INSERT INTO employees(name, email, password, dob, address, phone, starting_date, resume, attendMachineId, createdAt, updatedAt, roleId, employeeTypeId, employeeDesignationId, employeeGradeId) 
+VALUES ('amna_ali','amna@dummy.com', '123', '1 May 1997', 'abc address', '0305-6230474', '2/19/2020', 'resume.pdf', 'DSC-011', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1 , 1, NULL);
 
 
 UPDATE employees
