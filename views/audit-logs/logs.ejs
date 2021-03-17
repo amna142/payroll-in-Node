@@ -1,32 +1,43 @@
-<link rel="stylesheet" href="/css/logs.css">
+<!-- <link rel="stylesheet" href="/css/logs.css"> -->
 </head>
 
 <body>
-	<div class="tab col s12">
-		<button class="tablinks" onclick="openLogs(event, 'logs')">System Logs</button>
-	</div>
-	<% var d = JSON.stringify(data) %>
-	<div id="logs" class="tabcontent">
-		<table id="logs_table" class="display" width="100%">
-			<thead>
-				<tr>
-					<th>EMP ID</th>
-					<th>ACTION</th>
-					<th>RECORD TYPE</th>
-					<th>FIELD ID</th>
-					<th>OLD VALUE</th>
-					<th>NEW VALUE</th>
-					<th>DATE</th>
-					<th>EMP NAME</th>
-				</tr>
-			</thead>
-		</table>
-	</div>
+		<div class="col s12">
+			<ul class="collapsible popout">
+				<li>
+					<div class="collapsible-header"><i class="material-icons">settings_system_daydream</i>System Logs</div>
+
+					<div class="collapsible-body">
+						<% var d = JSON.stringify(data) %>
+						<div id="logs">
+							<table id="logs_table" class="display" width="100%">
+								<thead>
+									<tr>
+										<th>EMP ID</th>
+										<th>ACTION</th>
+										<th>RECORD TYPE</th>
+										<th>FIELD ID</th>
+										<th>OLD VALUE</th>
+										<th>NEW VALUE</th>
+										<th>DATE</th>
+										<th>EMP NAME</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</li>
+			</ul>
+			<!-- <button class="tablinks" onclick="openLogs(event, 'logs')">System Logs</button> -->
+		</div>
+
 
 	<script>
 		var dataSet = '<%- d; %>'
 		console.log('dataSet', JSON.parse(dataSet))
+
 		$(document).ready(function () {
+			$('.collapsible').collapsible();
 			$('#logs_table').DataTable({
 				data: JSON.parse(dataSet),
 				columns: [{
@@ -55,19 +66,19 @@
 			});
 		});
 
-		function openLogs(evt, logName) {
-			var i, tabcontent, tablinks;
-			tabcontent = document.getElementsByClassName("tabcontent");
-			for (i = 0; i < tabcontent.length; i++) {
-				tabcontent[i].style.display = "none";
-			}
-			tablinks = document.getElementsByClassName("tablinks");
-			for (i = 0; i < tablinks.length; i++) {
-				tablinks[i].className = tablinks[i].className.replace(" active", "");
-			}
-			document.getElementById(logName).style.display = "block";
-			evt.currentTarget.className += " active";
-		}
+		// function openLogs(evt, logName) {
+		// 	var i, tabcontent, tablinks;
+		// 	tabcontent = document.getElementsByClassName("tabcontent");
+		// 	for (i = 0; i < tabcontent.length; i++) {
+		// 		tabcontent[i].style.display = "none";
+		// 	}
+		// 	tablinks = document.getElementsByClassName("tablinks");
+		// 	for (i = 0; i < tablinks.length; i++) {
+		// 		tablinks[i].className = tablinks[i].className.replace(" active", "");
+		// 	}
+		// 	document.getElementById(logName).style.display = "block";
+		// 	evt.currentTarget.className += " active";
+		// }
 	</script>
 
 

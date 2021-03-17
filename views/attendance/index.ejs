@@ -1,0 +1,71 @@
+<%- include('../includes/header'); %>
+<link rel="stylesheet" href="/css/home.css">
+<link rel="stylesheet" href="/css/buttons.css">
+</head>
+
+<body>
+	<%- include('../admin/partials/side-nav'); %>
+	<!-- Modal Structure -->
+	<main>
+	<div style="padding-left: 1%;">
+		<% var d = JSON.stringify(attendance) %>
+		<table id="attendance_table" class="display" style="width:100%">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Date</th>
+					<th>Employee</th>
+					<th>Duration</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	</main>
+
+	<script>
+		var editor;
+		$(document).ready(function () {
+			var dataSet = '<%- d %>'
+			console.log('dataSet for attendance', dataSet)
+			var table = $('#attendance_table').DataTable({
+				data: JSON.parse(dataSet),
+				select: true,
+				"columns": [{
+						"className": 'details-control',
+						"orderable": true,
+						"search": true,
+						"data": null,
+						"defaultContent": ''
+					},
+					{
+						data: "id"
+					},
+					{
+						data: "Date"
+					},
+					{
+						data: "Employee",
+						// render: $.fn.dataTable.render.number(',', '.', 0, '$')
+					},
+					{
+						data: "Duration"
+						// render: $.fn.dataTable.render.number(',', '.', 0, '$')
+					},
+					{
+						data: null,
+						className: "center",
+						render: function (data, type, row) {
+							return `<a class="btn-floating waves-effect waves-light modal-trigger" id="grade-modal" href="#grade-edit-modal"><i
+								class="material-icons">edit</i></a>
+								<a class="btn-floating waves-effect waves-light red modal-trigger" href="#modal1"><i
+								class="material-icons">delete</i></a>`
+						}
+					}
+				],
+				"order": [
+					[1, 'asc']
+				]
+			});
+		})
+	</script>

@@ -17,7 +17,7 @@ UPDATE company_funds SET name='umar' where id=1
 
 INSERT INTO roles(title, createdAt, updatedAt) VALUES ('admin',CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-delete from employees where id=13
+delete from employees where id=1
 
 delete from company_funds
 
