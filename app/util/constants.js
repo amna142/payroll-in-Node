@@ -4,7 +4,13 @@ module.exports = {
 	DELETE: 'inactive',
 	UPDATE: 'update',
 	READ: 'login',
-	SET: 'SET'
+	SET: 'SET',
+	home: 'Dashboard',
+	admin: 'Admins',
+	employee: 'Employees',
+	setting: 'Settings',
+	attendance: 'Attendance',
+	add: 'Add'
 }
 
 

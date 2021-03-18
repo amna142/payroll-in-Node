@@ -2,70 +2,67 @@
 <link rel="stylesheet" href="/css/home.css">
 <link rel="stylesheet" href="/css/buttons.css">
 </head>
+<style>
+	thead input {
+		width: 100%;
+	}
+</style>
 
 <body>
 	<%- include('../admin/partials/side-nav'); %>
+	<%- include('../admin/partials/nav-bar.ejs', {data: navigation}); %>
 	<!-- Modal Structure -->
 	<main>
-	<div style="padding-left: 1%;">
-		<% var d = JSON.stringify(attendance) %>
-		<table id="attendance_table" class="display" style="width:100%">
-			<thead>
-				<tr>
-					<th>ID</th>
-					<th>Date</th>
-					<th>Employee</th>
-					<th>Duration</th>
-					<th>Actions</th>
-				</tr>
-			</thead>
-		</table>
-	</div>
+
+		<div style="padding-left: 1%; padding-top: 2%;">
+			<% var d = JSON.stringify(attendance) %>
+			<table id="attendance_table" class="display" style="width:100%">
+				<thead>
+					<tr>
+						<th>Employee</th>
+						<th>Date</th>
+						<th>Check IN</th>
+						<th>Check Out</th>
+						<th>Working Hours</th>
+					</tr>
+				</thead>
+				<tbody>
+
+				</tbody>
+
+			</table>
+		</div>
 	</main>
 
 	<script>
 		var editor;
 		$(document).ready(function () {
 			var dataSet = '<%- d %>'
-			console.log('dataSet for attendance', dataSet)
+			console.log('dataSet for attendance', JSON.parse(dataSet))
 			var table = $('#attendance_table').DataTable({
+				dom: 'Bfrtip',
 				data: JSON.parse(dataSet),
 				select: true,
+				pageLength: 25,
 				"columns": [{
-						"className": 'details-control',
-						"orderable": true,
-						"search": true,
-						"data": null,
-						"defaultContent": ''
+						data: "machine_attendance_id",
 					},
 					{
-						data: "id"
-					},
-					{
-						data: "Date"
-					},
-					{
-						data: "Employee",
-						// render: $.fn.dataTable.render.number(',', '.', 0, '$')
-					},
-					{
-						data: "Duration"
-						// render: $.fn.dataTable.render.number(',', '.', 0, '$')
-					},
-					{
-						data: null,
-						className: "center",
-						render: function (data, type, row) {
-							return `<a class="btn-floating waves-effect waves-light modal-trigger" id="grade-modal" href="#grade-edit-modal"><i
-								class="material-icons">edit</i></a>
-								<a class="btn-floating waves-effect waves-light red modal-trigger" href="#modal1"><i
-								class="material-icons">delete</i></a>`
-						}
+						data: "date"
+					}, {
+						data: 'check In'
+					}, {
+						data: 'check Out'
+					}, {
+						data: 'work Time'
 					}
 				],
-				"order": [
-					[1, 'asc']
+				buttons: [
+					'csv', 'excel', 'pdf'
 				]
+
 			});
+			table.buttons().container()
+				.appendTo('#example_wrapper .col-sm-6:eq(0)');
 		})
 	</script>

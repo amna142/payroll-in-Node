@@ -2,7 +2,10 @@ const fs = require('fs')
 const csv = require('csv-parser');
 const db = require('../util/database');
 const timeEntries = require('../models/timeEntries');
+const dateParser = require('node-date-parser');
+const loadingSpinner = require('loading-spinner')
 const Attendance = db.attendance
+const constants = require('../util/constants')
 const TimeEntries = db.time_entries
 
 exports.getAttendanceFile = (req, res, next) => {
@@ -16,6 +19,9 @@ exports.getAttendanceFile = (req, res, next) => {
 	fs.createReadStream(filePath)
 		.pipe(csv())
 		.on('data', (row) => {
+			loadingSpinner.start(100, {
+				clearChar: true
+			});
 			entries.push(row)
 		})
 		.on('end', () => {
@@ -100,7 +106,7 @@ exports.getAttendanceFile = (req, res, next) => {
 
 			// console.log('attendance_record', JSON.stringify(attendance_record))
 			// console.log('time_entries', JSON.stringify(time_entries))
-			getAttendance()
+			// getAttendance()
 			let attendance = getAttendanceRecords(time_entries)
 			attendanceEntries(attendance.tempAttendance, attendance.checkingTimes, res)
 			//create bulk entries in attendnace table
@@ -153,9 +159,7 @@ let attendanceEntries = (attendance, times, res) => {
 				let hoursSum = 0;
 				let timeEntries = times[i].timeEntries
 				for (let j = 0; j < timeEntries.length; j++) {
-
 					let splitcolon = times[i].working_hours[j].split(":");
-
 					let hours = parseFloat(splitcolon[0]);
 					let minutes = splitcolon[1];
 					minutes = parseFloat(minutes) / 60;
@@ -190,26 +194,54 @@ let attendanceEntries = (attendance, times, res) => {
 }
 
 
-exports.getAttendance = (req, res) =>{
+exports.getAttendance = async (req, res) => {
 	//
-	let entries = getAllAttendanceEntries()
-	if(entries){
-		res.render('attendance',{
-			attendance: entries
+	let entries = await getAllAttendanceEntries()
+	var user = req.session.user;
+	var isEmployee = false
+	if (user.roleId === null) {
+		isEmployee = true
+	} else {
+		isEmployee = false
+	}
+	console.log('entries', JSON.stringify(entries))
+	if (entries.length > 0) {
+
+		res.render('attendance', {
+			attendance: entries,
+			navigation: {
+				role: isEmployee ? 'Employee' : 'Admin',
+				pageName: constants.attendance
+			},
 		})
+		loadingSpinner.stop()
 	}
 }
 
-
-
 let getAllAttendanceEntries = () => {
+	let tempArr = []
 	return Attendance.findAll({
+		attributes: ['id', 'date', 'machine_attendance_id'],
 		include: [{
-			model: TimeEntries
+			model: TimeEntries,
+			attributes: ['id', 'check_out', 'check_in', 'attendanceId', 'work_time']
 		}]
 	}).then(result => {
-		console.log('result', JSON.stringify(result))
-		return result
+		if (result) {
+			result.forEach(element => {
+				let entries = element.dataValues.time_entries
+				entries.forEach(timeEntry => {
+					element.dataValues['check In'] = timeEntry.check_in
+					element.dataValues['check Out'] = timeEntry.check_out
+					element.dataValues['work Time'] = timeEntry.work_time
+				});
+				element.dataValues.date = dateParser.parse('Y-m-d', element.dataValues.date)
+				delete element.dataValues.time_entries
+				tempArr.push(element.dataValues)
+			});
+		}
+		// console.log('result', JSON.stringify(tempArr))
+		return tempArr
 	}).catch(err => {
 		console.log('err', err)
 	})

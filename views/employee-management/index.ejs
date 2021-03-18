@@ -6,7 +6,7 @@
 <body>
 	<%- include('../admin/partials/side-nav'); %>
 
-	<%- include('../admin/partials/nav-bar.ejs'); %>
+	<%- include('../admin/partials/nav-bar.ejs', {data: navigation}); %>
 	<div id="delete_employee" class="modal">
 		<div class="modal-content">
 			<h4>Delete Employee</h4>
@@ -44,9 +44,10 @@
 			</thead>
 			<tbody>
 				<% if(data.length){
-
+					
   for(var i = 0; i< data.length; i++) {%>
 				<tr>
+
 					<td hidden id="employee_id"><%= data[i].id%></td>
 					<td><%= data[i].name%></td>
 					<td><%= data[i].email%></td>

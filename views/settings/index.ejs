@@ -8,7 +8,7 @@
 
 	<%- include('../admin/partials/side-nav'); %>
 
-	<%- include('../admin/partials/nav-bar.ejs'); %>
+	<%- include('../admin/partials/nav-bar.ejs',{data: navigation}); %>
 	<main>
 		<% if(errorMessage) { %>
 		<div class="col s8 user-message user-message--error"><%= errorMessage %>

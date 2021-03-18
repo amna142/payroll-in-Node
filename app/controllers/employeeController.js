@@ -89,3 +89,18 @@ exports.EmployeeResumeName = (id) => {
 		console.log('err in EmployeeResumeName', err)
 	})
 }
+
+
+exports.isEmployee = (req) =>{
+	let user = req.session.user;
+	let role;
+	let isEmployee = false
+	if (user.roleId === null) {
+		isEmployee = true
+		role = 'Employee'
+	} else {
+		isEmployee = false
+		role = 'Admin'
+	}
+	return role
+}

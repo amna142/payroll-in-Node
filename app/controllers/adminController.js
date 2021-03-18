@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 const constants = require('../util/constants')
 const email = require('../util/constants')
 const fs = require('fs');
+const nodeParser = require('node-date-parser')
 const path = require('path')
 const {
 	transporter
@@ -34,6 +35,7 @@ exports.adminHome = async (req, res) => {
 	res.render('admin/home', {
 		isEmployee: isEmployee,
 		isAuthenticated: req.session.isLoggedIn,
+		navigation: {role: isEmployee ? 'Employee' :'Admin', pageName: constants.home},
 		name: req.session.user.title,
 		data: logsArray,
 		errorMessage: req.flash('error')
@@ -91,6 +93,7 @@ exports.employeesIndexPage = async (req, res) => {
 			data: employeesArray,
 			pageTitle: 'Employees',
 			isEmployee: isEmployee,
+			navigation: {role: isEmployee ? 'Employee' :'Admin', pageName: constants.employee},
 			name: req.session.user.name,
 			logsData: logsArray,
 			errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null
@@ -101,6 +104,7 @@ exports.employeesIndexPage = async (req, res) => {
 			pageTitle: 'Employees',
 			isEmployee: isEmployee,
 			name: req.session.user.name,
+			navigation: {role: isEmployee ? 'Employee' :'Admin', pageName: constants.employee},
 			logsData: logsArray,
 			errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null
 		})
@@ -189,10 +193,12 @@ exports.getAddEmployee = async (req, res) => {
 	//fetch employee type from DB
 	let employeeDesignations = await employeeDesignation()
 	let employeeTypes = await typesOfEmployeee();
+	let user_role = employeeController.isEmployee(req)
 	res.render('employee-management/add', {
 		employeeTypes: employeeTypes,
 		employeeDesignations: employeeDesignations,
-		grades: grades
+		grades: grades,
+		navigation: {role: user_role, pageName: constants.employee, pageExtension: constants.add},
 	})
 }
 
@@ -576,7 +582,8 @@ exports.getAdminIndexPage = (req, res, next) => {
 					data: arr,
 					pageTitle: 'Admins',
 					isEmployee: userRole,
-					name: req.session.user.name
+					name: req.session.user.name,
+					navigation: {role: userRole ? 'Employee' :'Admin', pageName: constants.admin},
 				})
 				// //roles are there but see if there's admin
 			}
@@ -593,11 +600,13 @@ exports.viewEmployee = async (req, res) => {
 	//fetch employeeData against this Id
 	let employee = await employeeController.findEmployeeById(employeeId)
 	employee = JSON.parse(employee)
-	console.log('employee', employee)
+
 	employee.starting_date = logsController.convertDate(employee.starting_date)
 	employee.dob = logsController.convertDate(employee.dob)
+	let user_role = employeeController.isEmployee(req)
 	res.render('employee-management/view', {
-		employee: employee
+		employee: employee,
+		navigation: {role: user_role, pageName: constants.employee, pageExtension: employee.name},
 	})
 }
 exports.getEmployeeResume = async (req, res, next) => {

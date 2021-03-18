@@ -3,12 +3,20 @@ const AllowanceController = require('./allowanceController')
 const GradeController = require('./gradeController')
 const LogsController = require('../controllers/logsController')
 const FundController = require('../controllers/companyFundsController')
+const constants = require('../util/constants')
 var AUDIT_LOGS = []
 
 exports.getPage = async (req, res, next) => {
 	let path = req.path;
 	let pathArray = path.split('/')
 	let allowances = []
+	var user = req.session.user;
+	var isEmployee = false
+	if (user.roleId === null) {
+		isEmployee = true
+	} else {
+		isEmployee = false
+	}
 	let funds = []
 	if (pathArray.includes('grades')) {
 		//get allowancesto show in dropdown
@@ -18,6 +26,7 @@ exports.getPage = async (req, res, next) => {
 	path = path.replace(path[0], '')
 	res.render(path, {
 		allowances: allowances,
+		navigation: {role: isEmployee ? 'Employee' :'Admin', pageName: constants.setting},
 		funds: funds
 	})
 }
@@ -46,9 +55,10 @@ exports.getSettings = async (req, res) => {
 	res.render('settings', {
 		allowances: allowances,
 		grades: grades,
+		navigation: {role: isEmployee ? 'Employee' :'Admin', pageName: constants.setting},
 		funds: funds,
 		logsData: logsArray,
-		errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null
+		errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null,
 	})
 }
 
