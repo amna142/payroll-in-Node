@@ -4,6 +4,7 @@ const db = require('../util/database');
 const timeEntries = require('../models/timeEntries');
 const dateParser = require('node-date-parser');
 const loadingSpinner = require('loading-spinner')
+const EmployeeController = require('../controllers/employeeController')
 const Attendance = db.attendance
 const constants = require('../util/constants')
 const TimeEntries = db.time_entries
@@ -197,20 +198,14 @@ let attendanceEntries = (attendance, times, res) => {
 exports.getAttendance = async (req, res) => {
 	//
 	let entries = await getAllAttendanceEntries()
-	var user = req.session.user;
-	var isEmployee = false
-	if (user.roleId === null) {
-		isEmployee = true
-	} else {
-		isEmployee = false
-	}
+	let user = EmployeeController.isEmployee(req)
 	console.log('entries', JSON.stringify(entries))
 	if (entries.length > 0) {
 
 		res.render('attendance', {
 			attendance: entries,
 			navigation: {
-				role: isEmployee ? 'Employee' : 'Admin',
+				role: user.role,
 				pageName: constants.attendance
 			},
 		})

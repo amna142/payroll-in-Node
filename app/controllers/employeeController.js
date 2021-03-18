@@ -102,5 +102,6 @@ exports.isEmployee = (req) =>{
 		isEmployee = false
 		role = 'Admin'
 	}
-	return role
+	return {role: role,
+	isEmployee: isEmployee}
 }

@@ -58,7 +58,6 @@ exports.postLogin = (req, res) => {
 		} else {
 			if (employee) {
 				if (employee.roleId !== null) {
-					console.log('employee.role', employee.role.dataValues.title)
 					let title = employee.role.dataValues.title
 					if (title === 'admin') {
 						console.log('outside')

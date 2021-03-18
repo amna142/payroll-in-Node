@@ -23,19 +23,16 @@ exports.adminHome = async (req, res) => {
 	//get Cookie
 	let logsArray = []
 	console.log('isLoggedIn', req.session.isLoggedIn)
-	var user = req.session.user;
-	var isEmployee = false
-	if (user.roleId === null) {
+	let isUser = employeeController.isEmployee(req)
+	if (isUser.role === 'Employee') {
 		logsArray = await logsController.employeeLogs(req.session.user.id)
-		isEmployee = true
 	} else {
 		logsArray = await getLogs()
-		isEmployee = false
 	}
 	res.render('admin/home', {
-		isEmployee: isEmployee,
+		isEmployee: isUser.isEmployee,
 		isAuthenticated: req.session.isLoggedIn,
-		navigation: {role: isEmployee ? 'Employee' :'Admin', pageName: constants.home},
+		navigation: {role: isUser.role, pageName: constants.home},
 		name: req.session.user.title,
 		data: logsArray,
 		errorMessage: req.flash('error')
@@ -58,15 +55,8 @@ exports.employeesIndexPage = async (req, res) => {
 	let emp = await findAllEmployees()
 	let employeesArray = []
 	//get role of user to restrict access
-	var user = req.session.user;
-	var isEmployee = false
-	if (user.roleId === null) {
-		logsArray = await logsController.employeeLogs(req.session.user.id)
-		isEmployee = true
-	} else {
-		logsArray = await logsController.getLogs()
-		isEmployee = false
-	}
+	let isUser = employeeController.isEmployee(req)
+	isUser.role  === 'Employee' ? logsArray = await logsController.employeeLogs(req.session.user.id) : logsArray = await logsController.getLogs()
 	if (emp.length > 0) {
 		let employee_designation, employee_type;
 		for (var i = 0; i < emp.length; i++) {
@@ -75,16 +65,14 @@ exports.employeesIndexPage = async (req, res) => {
 			employee_designation = await designation(unitEmployee.employeeDesignationId)
 			employee_type = await type(unitEmployee.employeeDesignationId)
 			//convert date 
-			let convertedDOB = convertDate(unitEmployee.dob)
-			let convertedHiringDate = convertDate(unitEmployee.starting_date)
 			employeesArray.push({
 				id: unitEmployee.id,
 				name: unitEmployee.name,
 				email: unitEmployee.email,
 				phone: unitEmployee.phone,
-				dob: convertedDOB,
+				dob: nodeParser.parse(unitEmployee.dob),
 				address: unitEmployee.address,
-				hiring_date: convertedHiringDate,
+				hiring_date: nodeParser.parse(unitEmployee.starting_date),
 				designation: employee_designation,
 				employee_type: employee_type
 			})
@@ -92,8 +80,8 @@ exports.employeesIndexPage = async (req, res) => {
 		res.render('employee-management', {
 			data: employeesArray,
 			pageTitle: 'Employees',
-			isEmployee: isEmployee,
-			navigation: {role: isEmployee ? 'Employee' :'Admin', pageName: constants.employee},
+			isEmployee: isUser.isEmployee,
+			navigation: {role: isUser.role, pageName: constants.employee},
 			name: req.session.user.name,
 			logsData: logsArray,
 			errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null
@@ -102,21 +90,21 @@ exports.employeesIndexPage = async (req, res) => {
 		res.render('employee-management', {
 			data: employeesArray,
 			pageTitle: 'Employees',
-			isEmployee: isEmployee,
+			isEmployee: isUser.isEmployee,
 			name: req.session.user.name,
-			navigation: {role: isEmployee ? 'Employee' :'Admin', pageName: constants.employee},
+			navigation: {role: isUser.role, pageName: constants.employee},
 			logsData: logsArray,
 			errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null
 		})
 	}
 }
 
-function convertDate(d) {
-	var date = new Date(d),
-		mnth = ("0" + (date.getMonth() + 1)).slice(-2),
-		day = ("0" + date.getDate()).slice(-2);
-	return [date.getFullYear(), mnth, day].join("/");
-}
+// function convertDate(d) {
+// 	var date = new Date(d),
+// 		mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+// 		day = ("0" + date.getDate()).slice(-2);
+// 	return [date.getFullYear(), mnth, day].join("/");
+// }
 
 let findAllEmployees = (req, res) => {
 	let empArray = []
@@ -193,12 +181,12 @@ exports.getAddEmployee = async (req, res) => {
 	//fetch employee type from DB
 	let employeeDesignations = await employeeDesignation()
 	let employeeTypes = await typesOfEmployeee();
-	let user_role = employeeController.isEmployee(req)
+	let user = employeeController.isEmployee(req)
 	res.render('employee-management/add', {
 		employeeTypes: employeeTypes,
 		employeeDesignations: employeeDesignations,
 		grades: grades,
-		navigation: {role: user_role, pageName: constants.employee, pageExtension: constants.add},
+		navigation: {role: user.role, pageName: constants.employee, pageExtension: constants.add},
 	})
 }
 
@@ -314,7 +302,7 @@ exports.postAddEmployee = async (req, res) => {
 			AUDIT_LOGS.push({
 				name: req.session.user.name,
 				emp_id: req.session.user.id,
-				date: convertDate(new Date()),
+				date: nodeParser.parse(new Date()),
 				time: getTime(),
 				action: constants.SET,
 				record_type: 'Employee',
@@ -378,10 +366,10 @@ exports.getEditEmployee = async (req, res) => {
 			id: parseInt(empId),
 			phone: employeeFound.phone,
 			address: employeeFound.address,
-			starting_date: convertDate(employeeFound.starting_date),
+			starting_date: nodeParser.parse(employeeFound.starting_date),
 			file: employeeFound.file,
 			grades: grades,
-			dob: convertDate(employeeFound.dob),
+			dob: nodeParser.parse(employeeFound.dob),
 			employeeTypes: employeeTypes,
 			employeeDesignations: employeeDesignations,
 			type: employee_type,
@@ -398,8 +386,8 @@ exports.postEditEmployee = async (req, res) => {
 	AUDIT_LOGS = []
 	console.log('req.body', req.body)
 	//convert old record date into new record date type
-	oldRecord.dob = convertDate(oldRecord.dob)
-	oldRecord.starting_date = convertDate(oldRecord.starting_date)
+	oldRecord.dob = nodeParser.parse(oldRecord.dob)
+	oldRecord.starting_date = nodeParser.parse(oldRecord.starting_date)
 	console.log('oldRecord', oldRecord)
 	let employeeId = req.params.id;
 	var newRecord = {
@@ -448,7 +436,7 @@ exports.postEditEmployee = async (req, res) => {
 			AUDIT_LOGS.push({
 				name: req.session.user.name,
 				emp_id: req.session.user.id,
-				date: convertDate(new Date()),
+				date: nodeParser.parse(new Date()),
 				time: getTime(),
 				action: constants.UPDATE,
 				record_type: 'Employee',
@@ -564,26 +552,13 @@ exports.getAdminIndexPage = (req, res, next) => {
 						roles: employee[i].dataValues.role.dataValues
 					})
 				}
-				//get role of user to restrict access
-				var user = req.session.user;
-				var userRole = false
-				if (user.roleId === null) {
-					userRole = true
-				} else {
-					console.log('userRole', userRole)
-				}
-				console.log('obj', {
-					data: arr,
-					pageTitle: 'Admins',
-					isEmployee: userRole,
-					name: req.session.user.name
-				})
+				let user = employeeController.isEmployee(req)
 				res.render('admin-management', {
 					data: arr,
 					pageTitle: 'Admins',
-					isEmployee: userRole,
+					isEmployee: user.role,
 					name: req.session.user.name,
-					navigation: {role: userRole ? 'Employee' :'Admin', pageName: constants.admin},
+					navigation: {role: user.role, pageName: constants.admin},
 				})
 				// //roles are there but see if there's admin
 			}
@@ -601,12 +576,12 @@ exports.viewEmployee = async (req, res) => {
 	let employee = await employeeController.findEmployeeById(employeeId)
 	employee = JSON.parse(employee)
 
-	employee.starting_date = logsController.convertDate(employee.starting_date)
-	employee.dob = logsController.convertDate(employee.dob)
+	employee.starting_date = nodeParser.parse(employee.starting_date)
+	employee.dob = nodeParser.parse(employee.dob)
 	let user_role = employeeController.isEmployee(req)
 	res.render('employee-management/view', {
 		employee: employee,
-		navigation: {role: user_role, pageName: constants.employee, pageExtension: employee.name},
+		navigation: {role: user_role.role, pageName: constants.employee, pageExtension: employee.name},
 	})
 }
 exports.getEmployeeResume = async (req, res, next) => {

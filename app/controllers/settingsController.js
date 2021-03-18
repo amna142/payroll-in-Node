@@ -1,22 +1,19 @@
 const ENUM = require('../util/constants')
 const AllowanceController = require('./allowanceController')
 const GradeController = require('./gradeController')
+const EmployeeController = require('./employeeController')
+const nodeParser = require('node-date-parser')
 const LogsController = require('../controllers/logsController')
 const FundController = require('../controllers/companyFundsController')
 const constants = require('../util/constants')
+const nodeDateParser = require('node-date-parser')
 var AUDIT_LOGS = []
 
 exports.getPage = async (req, res, next) => {
 	let path = req.path;
 	let pathArray = path.split('/')
 	let allowances = []
-	var user = req.session.user;
-	var isEmployee = false
-	if (user.roleId === null) {
-		isEmployee = true
-	} else {
-		isEmployee = false
-	}
+	let user = EmployeeController.isEmployee(req)
 	let funds = []
 	if (pathArray.includes('grades')) {
 		//get allowancesto show in dropdown
@@ -26,7 +23,7 @@ exports.getPage = async (req, res, next) => {
 	path = path.replace(path[0], '')
 	res.render(path, {
 		allowances: allowances,
-		navigation: {role: isEmployee ? 'Employee' :'Admin', pageName: constants.setting},
+		navigation: {role: user.role, pageName: constants.setting},
 		funds: funds
 	})
 }
@@ -38,24 +35,21 @@ exports.getSettings = async (req, res) => {
 	let allowances = await AllowanceController.findAll()
 	let grades = await GradeController.findAll()
 	let funds = await FundController.findAll()
-	let user = req.session.user;
-
+	// let user = req.session.user;
 	let logsArray = []
-	var isEmployee;
-	if (user.roleId === null) {
+	let user = EmployeeController.isEmployee(req)
+	if (user.role === 'Employee') {
 		logsArray = await LogsController.employeeLogs(req.session.user.id)
-		isEmployee = true
 	} else {
 		logsArray = await LogsController.getLogs({
 			emp_id: user.id,
 			record_type: 'Allowance'
 		})
-		isEmployee = false
 	}
 	res.render('settings', {
 		allowances: allowances,
 		grades: grades,
-		navigation: {role: isEmployee ? 'Employee' :'Admin', pageName: constants.setting},
+		navigation: {role: user.role, pageName: constants.setting},
 		funds: funds,
 		logsData: logsArray,
 		errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null,
@@ -78,7 +72,7 @@ exports.postAddAllowances = async (req, res) => {
 			AUDIT_LOGS.push({
 				name: req.session.user.name,
 				emp_id: req.session.user.id,
-				date: LogsController.convertDate(new Date()),
+				date:  nodeParser.parse(new Date()),
 				time: LogsController.getTime(),
 				action: ENUM.SET,
 				record_type: 'Allowance',
@@ -130,7 +124,7 @@ exports.postAddGrade = async (req, res) => {
 				AUDIT_LOGS.push({
 					name: req.session.user.name,
 					emp_id: req.session.user.id,
-					date: LogsController.convertDate(new Date()),
+					date: nodeParser.parse(new Date()),
 					time: LogsController.getTime(),
 					action: ENUM.SET,
 					record_type: 'Grade',
@@ -167,7 +161,7 @@ exports.deleteGrade = async (req, res) => {
 		AUDIT_LOGS.push({
 			name: req.session.user.name,
 			emp_id: req.session.user.id,
-			date: LogsController.convertDate(new Date()),
+			date: nodeParser.parse(new Date()),
 			time: LogsController.getTime(),
 			action: ENUM.DELETE,
 			record_type: 'Grade'
@@ -186,7 +180,7 @@ exports.deleteAllowance = async (req, res) => {
 		AUDIT_LOGS.push({
 			name: req.session.user.name,
 			emp_id: req.session.user.id,
-			date: LogsController.convertDate(new Date()),
+			date: nodeParser.parse(new Date()),
 			time: LogsController.getTime(),
 			action: ENUM.DELETE,
 			record_type: 'Allowance'
@@ -338,7 +332,7 @@ exports.postFund = async (req, res, next) => {
 			AUDIT_LOGS.push({
 				name: req.session.user.name,
 				emp_id: req.session.user.id,
-				date: LogsController.convertDate(new Date()),
+				date: nodeParser.parse(new Date()),
 				time: LogsController.getTime(),
 				action: ENUM.SET,
 				record_type: 'Funds',
@@ -371,7 +365,7 @@ exports.deleteFund = async (req, res) => {
 		AUDIT_LOGS.push({
 			name: req.session.user.name,
 			emp_id: req.session.user.id,
-			date: LogsController.convertDate(new Date()),
+			date: nodeParser.parse(new Date()),
 			time: LogsController.getTime(),
 			action: ENUM.DELETE,
 			record_type: 'Funds'
@@ -435,7 +429,7 @@ function addUpdatedLogs(updated_values, old_record) {
 			AUDIT_LOGS.push({
 				name: req.session.user.name,
 				emp_id: req.session.user.id,
-				date: LogsController.convertDate(new Date()),
+				date: nodeParser.parse(new Date()),
 				time: LogsController.getTime(),
 				action: ENUM.UPDATE,
 				record_type: 'Grades',
