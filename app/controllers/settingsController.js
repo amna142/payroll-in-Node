@@ -23,6 +23,7 @@ exports.getPage = async (req, res, next) => {
 	path = path.replace(path[0], '')
 	res.render(path, {
 		allowances: allowances,
+		name: req.session.user.name,
 		navigation: {role: user.role, pageName: constants.setting},
 		funds: funds
 	})
@@ -51,6 +52,7 @@ exports.getSettings = async (req, res) => {
 		grades: grades,
 		navigation: {role: user.role, pageName: constants.setting},
 		funds: funds,
+		name: req.session.user.name,
 		logsData: logsArray,
 		errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null,
 	})

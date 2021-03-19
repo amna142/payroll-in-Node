@@ -4,7 +4,7 @@
 </head>
 
 <body>
-	<%- include('../admin/partials/side-nav'); %>
+	<%- include('../admin/partials/side-nav', {data: name}); %>
 
 	<%- include('../admin/partials/nav-bar.ejs', {data: navigation}); %>
 	<div id="delete_employee" class="modal">

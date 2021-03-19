@@ -204,6 +204,7 @@ exports.getAttendance = async (req, res) => {
 
 		res.render('attendance', {
 			attendance: entries,
+			name: req.session.user.name,
 			navigation: {
 				role: user.role,
 				pageName: constants.attendance

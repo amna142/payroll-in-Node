@@ -13,12 +13,6 @@ var oldRecord;
 var AUDIT_LOGS = []
 const employeeController = require('./employeeController')
 const salariesController = require('./employeeSalaries')
-const {
-	employee
-} = require('../util/database')
-const {
-	fileStorage
-} = require('../middlewares/multer-file')
 exports.adminHome = async (req, res) => {
 	//get Cookie
 	let logsArray = []
@@ -33,7 +27,7 @@ exports.adminHome = async (req, res) => {
 		isEmployee: isUser.isEmployee,
 		isAuthenticated: req.session.isLoggedIn,
 		navigation: {role: isUser.role, pageName: constants.home},
-		name: req.session.user.title,
+		name: req.session.user.name,
 		data: logsArray,
 		errorMessage: req.flash('error')
 	})
@@ -70,9 +64,9 @@ exports.employeesIndexPage = async (req, res) => {
 				name: unitEmployee.name,
 				email: unitEmployee.email,
 				phone: unitEmployee.phone,
-				dob: nodeParser.parse(unitEmployee.dob),
+				dob: convertDate(unitEmployee.dob),
 				address: unitEmployee.address,
-				hiring_date: nodeParser.parse(unitEmployee.starting_date),
+				hiring_date: convertDate(unitEmployee.starting_date),
 				designation: employee_designation,
 				employee_type: employee_type
 			})
@@ -99,12 +93,12 @@ exports.employeesIndexPage = async (req, res) => {
 	}
 }
 
-// function convertDate(d) {
-// 	var date = new Date(d),
-// 		mnth = ("0" + (date.getMonth() + 1)).slice(-2),
-// 		day = ("0" + date.getDate()).slice(-2);
-// 	return [date.getFullYear(), mnth, day].join("/");
-// }
+function convertDate(d) {
+	var date = new Date(d),
+		mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+		day = ("0" + date.getDate()).slice(-2);
+	return [date.getFullYear(), mnth, day].join("/");
+}
 
 let findAllEmployees = (req, res) => {
 	let empArray = []
@@ -186,6 +180,7 @@ exports.getAddEmployee = async (req, res) => {
 		employeeTypes: employeeTypes,
 		employeeDesignations: employeeDesignations,
 		grades: grades,
+		name: req.session.user.name,
 		navigation: {role: user.role, pageName: constants.employee, pageExtension: constants.add},
 	})
 }
@@ -278,6 +273,7 @@ function findById(empId) {
 exports.postAddEmployee = async (req, res) => {
 
 	console.log('file params', req.file)
+	console.log('req.body.machine_attendnace_id', req.body)
 	let file = req.file
 	var fileURL = file.path
 	let gradeId = parseInt(req.body.employee_grade)
@@ -293,7 +289,8 @@ exports.postAddEmployee = async (req, res) => {
 		resume: fileURL,
 		employeeTypeId: parseInt(req.body.employee_type),
 		employeeDesignationId: parseInt(req.body.designation),
-		employeeGradeId: gradeId
+		employeeGradeId: gradeId,
+		attendMachineId: req.body.machine_attendance_id
 	}
 	if (Object.keys(params).length > 0) {
 		Object.keys(params).forEach(function (key) {
@@ -302,7 +299,7 @@ exports.postAddEmployee = async (req, res) => {
 			AUDIT_LOGS.push({
 				name: req.session.user.name,
 				emp_id: req.session.user.id,
-				date: nodeParser.parse(new Date()),
+				date: new Date(),
 				time: getTime(),
 				action: constants.SET,
 				record_type: 'Employee',
@@ -578,9 +575,11 @@ exports.viewEmployee = async (req, res) => {
 
 	employee.starting_date = nodeParser.parse(employee.starting_date)
 	employee.dob = nodeParser.parse(employee.dob)
+	console.log('employee.starting_date', employee.starting_date)
 	let user_role = employeeController.isEmployee(req)
 	res.render('employee-management/view', {
 		employee: employee,
+		name: req.session.user.name,
 		navigation: {role: user_role.role, pageName: constants.employee, pageExtension: employee.name},
 	})
 }
