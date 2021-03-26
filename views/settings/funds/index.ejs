@@ -22,7 +22,10 @@
 					<th>Name</th>
 					<th>Description</th>
 					<th>Amount</th>
+					<% if(navigation.role == 'Admin') {%>
 					<th>Actions</th>
+					<% } %>
+					
 				</tr>
 			</thead>
 			<tbody>
@@ -33,6 +36,7 @@
 					<td><%= funds[i].name%></td>
 					<td><%= funds[i].description%></td>
 					<td><%= funds[i].amount%></td>
+					<% if(navigation.role == 'Admin')  { %>
 					<td>
 						<a class="modal-trigger" href="#funds-edit-modal" id="edit-modal"><i
 								class="indigo-text text-lighten-1 material-icons">edit</i></a>
@@ -40,8 +44,9 @@
 						<a href="#del-grade-modal" class="modal-trigger"><i
 								class="red-text text-lighten-1 material-icons">delete</i></a>
 					</td>
+
 				</tr>
-				<% }
+				<% } }
 
   					}else{ %>
 				<tr>

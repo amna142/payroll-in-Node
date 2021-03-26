@@ -21,9 +21,11 @@ exports.getPage = async (req, res, next) => {
 		funds = await FundController.findAll()
 	}
 	path = path.replace(path[0], '')
+	console.log('errorMessage', req.flash('error').length > 0 ? req.flash('error')[0] : null)
 	res.render(path, {
 		allowances: allowances,
 		name: req.session.user.name,
+		errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null,
 		navigation: {role: user.role, pageName: constants.setting},
 		funds: funds
 	})
@@ -114,7 +116,7 @@ exports.postAddGrade = async (req, res) => {
 		req.flash('error', 'Maximum Salary must be greater than Minimum Salary')
 	}
 
-	//check if grade of same name esits
+	//check if grade of same name exists
 	let grade_exist = await GradeController.findByName(params.grade)
 	if (!grade_exist) {
 		let grade = await GradeController.create(params)
@@ -153,8 +155,6 @@ exports.postAddGrade = async (req, res) => {
 		res.redirect('/settings#grades')
 	}
 }
-
-
 exports.deleteGrade = async (req, res) => {
 	let gradeId = req.params.id
 	//call destroy function from database
@@ -172,8 +172,6 @@ exports.deleteGrade = async (req, res) => {
 		res.redirect('/settings#grades')
 	}
 }
-
-
 exports.deleteAllowance = async (req, res) => {
 	let allowanceId = req.params.id
 	//call destroy function from database

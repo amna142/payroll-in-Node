@@ -14,15 +14,21 @@
 		<div class="col s8 user-message user-message--error"><%= errorMessage %>
 		</div>
 		<% } %>
+		<% var d = 's4' %>
 		<div class="row">
 			<div class="col s12">
 				<ul class="tabs">
+					<% if(navigation.role == 'Admin') { %>
 					<li class="tab col s3"><a class="active" href="#grades">Grades</a></li>
 					<li class="tab col s3"><a href="#allowances">Allowance</a></li>
 					<li class="tab col s3"><a href="#funds">Funds</a></li>
 					<li class="tab col s3"><a href="#attendance">Attendance</a></li>
+					<% } else { %>
+					<li class="tab col s4"><a class="active" href="#grades">Grades</a></li>
+					<li class="tab col s4"><a href="#allowances">Allowance</a></li>
+					<li class="tab col s4"><a href="#funds">Funds</a></li>
+					<% } %>
 				</ul>
-
 			</div>
 		</div>
 		<div class="container pt-11">
@@ -30,7 +36,6 @@
 				<div id="grades" class="col s12">
 					<h3 class='header'>Grades</h3>
 					<%- include('./grades/index', {data: allowances}); %>
-
 				</div>
 				<div id="allowances" class="col s12">
 					<h3 class='header'>Allowances</h3>
@@ -40,12 +45,13 @@
 					<h3 class='header'>Company Funds</h3>
 					<%- include('./funds/index'); %>
 				</div>
+				<% if(navigation.role == 'Admin') {%>
 				<div id="attendance" class="col s12">
 					<h3 class='header'>Attendance</h3>
 					<%- include('./attendance/index'); %>
 				</div>
+				<% } %>
 			</div>
-
 		</div>
 		<%- include('../audit-logs/logs', {data: logsData}); %>
 	</main>

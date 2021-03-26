@@ -74,14 +74,17 @@
 						data: "max_salary"
 						// render: $.fn.dataTable.render.number(',', '.', 0, '$')
 					},
+					
 					{
 						data: null,
 						className: "center",
 						render: function (data, type, row) {
-							return `<a class="btn-floating waves-effect waves-light modal-trigger" id="grade-modal" href="#grade-edit-modal"><i
+							console.log('type:', '<%- navigation.role %>')
+							return '<%- navigation.role %>' === 'Admin' ? `<a class="btn-floating waves-effect waves-light modal-trigger" id="grade-modal" href="#grade-edit-modal"><i
 								class="material-icons">edit</i></a>
 								<a class="btn-floating waves-effect waves-light red modal-trigger" href="#modal1"><i
 								class="material-icons">delete</i></a>`
+								: ''
 						}
 					}
 				],

@@ -26,7 +26,10 @@ exports.adminHome = async (req, res) => {
 	res.render('admin/home', {
 		isEmployee: isUser.isEmployee,
 		isAuthenticated: req.session.isLoggedIn,
-		navigation: {role: isUser.role, pageName: constants.home},
+		navigation: {
+			role: isUser.role,
+			pageName: constants.home
+		},
 		name: req.session.user.name,
 		data: logsArray,
 		errorMessage: req.flash('error')
@@ -50,7 +53,7 @@ exports.employeesIndexPage = async (req, res) => {
 	let employeesArray = []
 	//get role of user to restrict access
 	let isUser = employeeController.isEmployee(req)
-	isUser.role  === 'Employee' ? logsArray = await logsController.employeeLogs(req.session.user.id) : logsArray = await logsController.getLogs()
+	isUser.role === 'Employee' ? logsArray = await logsController.employeeLogs(req.session.user.id) : logsArray = await logsController.getLogs()
 	if (emp.length > 0) {
 		let employee_designation, employee_type;
 		for (var i = 0; i < emp.length; i++) {
@@ -75,7 +78,10 @@ exports.employeesIndexPage = async (req, res) => {
 			data: employeesArray,
 			pageTitle: 'Employees',
 			isEmployee: isUser.isEmployee,
-			navigation: {role: isUser.role, pageName: constants.employee},
+			navigation: {
+				role: isUser.role,
+				pageName: constants.employee
+			},
 			name: req.session.user.name,
 			logsData: logsArray,
 			errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null
@@ -86,7 +92,10 @@ exports.employeesIndexPage = async (req, res) => {
 			pageTitle: 'Employees',
 			isEmployee: isUser.isEmployee,
 			name: req.session.user.name,
-			navigation: {role: isUser.role, pageName: constants.employee},
+			navigation: {
+				role: isUser.role,
+				pageName: constants.employee
+			},
 			logsData: logsArray,
 			errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null
 		})
@@ -181,7 +190,11 @@ exports.getAddEmployee = async (req, res) => {
 		employeeDesignations: employeeDesignations,
 		grades: grades,
 		name: req.session.user.name,
-		navigation: {role: user.role, pageName: constants.employee, pageExtension: constants.add},
+		navigation: {
+			role: user.role,
+			pageName: constants.employee,
+			pageExtension: constants.add
+		},
 	})
 }
 
@@ -335,6 +348,7 @@ exports.postAddEmployee = async (req, res) => {
 	}
 }
 
+
 exports.getEditEmployee = async (req, res) => {
 	var grades = await employeeController.getAllGrades()
 	var empId = req.params.id
@@ -344,33 +358,36 @@ exports.getEditEmployee = async (req, res) => {
 	let employeeTypes = await typesOfEmployeee();
 	let des = await designation(employeeFound.designation)
 	let employee_type = await type(employeeFound.type)
-	var user = req.session.user;
-	var isEmployee = false
-	if (user.roleId === null) {
-		isEmployee = true
+	let isUser = employeeController.isEmployee(req)
+	if (isUser.role === 'Employee') {
+		logsArray = await logsController.employeeLogs(req.session.user.id)
 	} else {
-		isEmployee = false
+		logsArray = await getLogs()
 	}
-	console.log('employeeFound', employeeFound)
 	let GRADE_OBJ = await employeeController.findGradeById(employeeFound.employee_grade_id)
-	console.log('amna', GRADE_OBJ.grade + '(>' + GRADE_OBJ.min_salary + ',<' + GRADE_OBJ.max_salary + ')')
 	if (employeeFound) {
 		res.render('employee-management/edit', {
 			pageTitle: 'Employee Edit Form',
 			name: employeeFound.name,
 			email: employeeFound.email,
-			isEmployee: isEmployee,
+			isEmployee: isUser.isEmployee,
 			id: parseInt(empId),
 			phone: employeeFound.phone,
 			address: employeeFound.address,
-			starting_date: nodeParser.parse(employeeFound.starting_date),
+			starting_date: convertDate(employeeFound.starting_date),
 			file: employeeFound.file,
 			grades: grades,
-			dob: nodeParser.parse(employeeFound.dob),
+			dob: convertDate(employeeFound.dob),
 			employeeTypes: employeeTypes,
 			employeeDesignations: employeeDesignations,
 			type: employee_type,
 			designation: des,
+			navigation: {
+				role: isUser.role,
+				pageName: constants.employee,
+				pageExtension: constants.UPDATE
+			},
+			name: req.session.user.name,
 			employee_grade: GRADE_OBJ.grade,
 			errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null
 		})
@@ -378,7 +395,6 @@ exports.getEditEmployee = async (req, res) => {
 		console.log('No employee Found')
 	}
 }
-
 exports.postEditEmployee = async (req, res) => {
 	AUDIT_LOGS = []
 	console.log('req.body', req.body)
@@ -555,7 +571,10 @@ exports.getAdminIndexPage = (req, res, next) => {
 					pageTitle: 'Admins',
 					isEmployee: user.role,
 					name: req.session.user.name,
-					navigation: {role: user.role, pageName: constants.admin},
+					navigation: {
+						role: user.role,
+						pageName: constants.admin
+					},
 				})
 				// //roles are there but see if there's admin
 			}
@@ -580,7 +599,11 @@ exports.viewEmployee = async (req, res) => {
 	res.render('employee-management/view', {
 		employee: employee,
 		name: req.session.user.name,
-		navigation: {role: user_role.role, pageName: constants.employee, pageExtension: employee.name},
+		navigation: {
+			role: user_role.role,
+			pageName: constants.employee,
+			pageExtension: employee.name
+		},
 	})
 }
 exports.getEmployeeResume = async (req, res, next) => {

@@ -27,7 +27,9 @@
 					<th>Name</th>
 					<th>Description</th>
 					<th>Amount</th>
+					<% if(navigation.role == 'Admin' ) { %>
 					<th>Actions</th>
+					<%  } %>
 				</tr>
 			</thead>
 			<tbody>
@@ -40,6 +42,7 @@
 					<td><%= allowances[i].name%></td>
 					<td><%= allowances[i].description%></td>
 					<td><%= allowances[i].amount%></td>
+					<% if(navigation.role == 'Admin') {%>
 					<td>
 						<a class="modal-trigger" href="#allowance-edit-modal" id="edit-modal"><i
 								class="indigo-text text-lighten-1 material-icons">edit</i></a>
@@ -47,7 +50,7 @@
 						<a href="#modal2" class="modal-trigger"><i
 								class="red-text text-lighten-1 material-icons">delete</i></a>
 					</td>
-
+					<% } %>
 				</tr>
 				<% }
 

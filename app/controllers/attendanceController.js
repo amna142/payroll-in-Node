@@ -197,11 +197,14 @@ let attendanceEntries = (attendance, times, res) => {
 
 exports.getAttendance = async (req, res) => {
 	//
-	let entries = await getAllAttendanceEntries()
+	let entries;
 	let user = EmployeeController.isEmployee(req)
-	console.log('entries', JSON.stringify(entries))
+	if(user.role == 'Admin'){
+		entries = await getAllAttendanceEntries()
+	}else {
+		entries = await getEmployeeAttendance(req.session.user.attendMachineId)
+	}
 	if (entries.length > 0) {
-
 		res.render('attendance', {
 			attendance: entries,
 			name: req.session.user.name,
@@ -210,7 +213,6 @@ exports.getAttendance = async (req, res) => {
 				pageName: constants.attendance
 			},
 		})
-		loadingSpinner.stop()
 	}
 }
 
@@ -218,6 +220,40 @@ let getAllAttendanceEntries = () => {
 	let tempArr = []
 	return Attendance.findAll({
 		attributes: ['id', 'date', 'machine_attendance_id'],
+		include: [{
+			model: TimeEntries,
+			attributes: ['id', 'check_out', 'check_in', 'attendanceId', 'work_time']
+		}]
+	}).then(result => {
+		if (result) {
+			result.forEach(element => {
+				let entries = element.dataValues.time_entries
+				entries.forEach(timeEntry => {
+					element.dataValues['check In'] = timeEntry.check_in
+					element.dataValues['check Out'] = timeEntry.check_out
+					element.dataValues['work Time'] = timeEntry.work_time
+				});
+				element.dataValues.date = dateParser.parse('Y-m-d', element.dataValues.date)
+				delete element.dataValues.time_entries
+				tempArr.push(element.dataValues)
+			});
+		}
+		// console.log('result', JSON.stringify(tempArr))
+		return tempArr
+	}).catch(err => {
+		console.log('err', err)
+	})
+}
+
+
+
+let getEmployeeAttendance = (attendanceId) => {
+	let tempArr = []
+	return Attendance.findAll({
+		attributes: ['id', 'date', 'machine_attendance_id'],
+		where: {
+			machine_attendance_id: attendanceId
+		},
 		include: [{
 			model: TimeEntries,
 			attributes: ['id', 'check_out', 'check_in', 'attendanceId', 'work_time']
