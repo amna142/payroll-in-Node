@@ -67,9 +67,9 @@ exports.employeesIndexPage = async (req, res) => {
 				name: unitEmployee.name,
 				email: unitEmployee.email,
 				phone: unitEmployee.phone,
-				dob: convertDate(unitEmployee.dob),
+				dob: logsController.convertDate(unitEmployee.dob),
 				address: unitEmployee.address,
-				hiring_date: convertDate(unitEmployee.starting_date),
+				hiring_date: logsController.convertDate(unitEmployee.starting_date),
 				designation: employee_designation,
 				employee_type: employee_type
 			})
@@ -102,12 +102,12 @@ exports.employeesIndexPage = async (req, res) => {
 	}
 }
 
-function convertDate(d) {
-	var date = new Date(d),
-		mnth = ("0" + (date.getMonth() + 1)).slice(-2),
-		day = ("0" + date.getDate()).slice(-2);
-	return [date.getFullYear(), mnth, day].join("/");
-}
+// function convertDate(d) {
+// 	var date = new Date(d),
+// 		mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+// 		day = ("0" + date.getDate()).slice(-2);
+// 	return [date.getFullYear(), mnth, day].join("/");
+// }
 
 let findAllEmployees = (req, res) => {
 	let empArray = []
@@ -374,10 +374,10 @@ exports.getEditEmployee = async (req, res) => {
 			id: parseInt(empId),
 			phone: employeeFound.phone,
 			address: employeeFound.address,
-			starting_date: convertDate(employeeFound.starting_date),
+			starting_date: logsController.convertDate(employeeFound.starting_date),
 			file: employeeFound.file,
 			grades: grades,
-			dob: convertDate(employeeFound.dob),
+			dob:  logsController.convertDate(employeeFound.dob),
 			employeeTypes: employeeTypes,
 			employeeDesignations: employeeDesignations,
 			type: employee_type,
@@ -592,8 +592,8 @@ exports.viewEmployee = async (req, res) => {
 	let employee = await employeeController.findEmployeeById(employeeId)
 	employee = JSON.parse(employee)
 
-	employee.starting_date = nodeParser.parse(employee.starting_date)
-	employee.dob = nodeParser.parse(employee.dob)
+	employee.starting_date = logsController.convertDate(employee.starting_date)
+	employee.dob = logsController.convertDate(employee.dob)
 	console.log('employee.starting_date', employee.starting_date)
 	let user_role = employeeController.isEmployee(req)
 	res.render('employee-management/view', {

@@ -35,8 +35,6 @@ sequelize.authenticate().then(() => {
 }).catch(err => {
 	console.log('Unable to connect to database:', err)
 })
-
-
 const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize
@@ -54,6 +52,8 @@ db.employee_funds = require('../models/employeeFunds.js')(sequelize, Sequelize)
 db.company_funds = require('../models/funds.js')(sequelize, Sequelize)
 db.attendance = require('../models/attendance.js')(sequelize, Sequelize)
 db.time_entries = require('../models/timeEntries.js')(sequelize, Sequelize)
+db.leave_types = require('../models/leaveTypes.js')(sequelize, Sequelize)
+db.leave_qouta = require('../models/leaveQouta.js')(sequelize, Sequelize)
 //1 employee can have many roles
 //1 role can be assigend to many employees (1(role) -> many(employees))
 
@@ -184,5 +184,18 @@ db.time_entries.belongsTo(db.attendance, {
 	onUpdate: 'CASCADE'
 })
 
+//leave types with leave Qouta :: 1 leave type have 1 leave qouta
+// 1-to-1 relation
 
+db.leave_types.hasOne(db.leave_qouta, {
+	foreignKey: {
+		allowNull: false
+	}
+})
+
+db.leave_qouta.belongsTo(db.leave_types, {
+	constraints: false,
+	onDelete: null,
+	onUpdate: 'CASCADE'
+})
 module.exports = db;

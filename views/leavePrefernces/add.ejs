@@ -1,0 +1,54 @@
+<%- include('../includes/header'); %>
+<link rel="stylesheet" href="/css/home.css">
+</head>
+
+<script>
+	$(document).ready(function () {
+		$('select').formSelect();
+	});
+</script>
+
+<body>
+	<%- include('../admin/partials/side-nav'); %>
+
+	<%- include('../admin/partials/nav-bar.ejs'); %>
+	<main>
+		<div class="container" style="padding-top: 3%; padding-left: 5%;">
+			<form class="col s12"  action="/leave_prefernce/add" method="POST"
+				name="leave_prefernce_form">
+				<h5><b style="color: coral;">Add Leave Preference</b></h5>
+				<div class="divider"></div>
+				<br />
+
+				<div class="row">
+					<div class="input-field col s6">
+						<select required name="leave_type">
+							<option value="" disabled selected>Choose Leave Type</option>
+							<% if(leave_types.length) { 
+								for(var i=0; i< leave_types.length; i++){ %>
+							<option value="<%=leave_types[i].id %>"><%=leave_types[i].name%></option>
+							<%} } %>
+						</select>
+						<label>Leave Type</label>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="input-field col s6">
+						<input  placeholder="Leave Qouta" id="leave_qouta" type="number" name="leave_qouta" class="validate" required>
+						<label for="leave_qouta">Leave Qouta</label>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col s6">
+						<button class="btn waves-effect waves-light right" type="submit" value="Add">Submit
+							<i class="material-icons right">person</i>
+						</button>
+					</div>
+				</div>
+
+			</form>
+		</div>
+	</main>
+	<%- include('../includes/footer'); %>

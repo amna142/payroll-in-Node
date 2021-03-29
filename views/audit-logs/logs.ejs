@@ -6,7 +6,6 @@
 			<ul class="collapsible popout">
 				<li>
 					<div class="collapsible-header"><i class="material-icons">settings_system_daydream</i>System Logs</div>
-
 					<div class="collapsible-body">
 						<% var d = JSON.stringify(data) %>
 						<div id="logs">
@@ -33,7 +32,7 @@
 
 	<script>
 		var dataSet = '<%- d; %>'
-		console.log('dataSet', JSON.parse(dataSet))
+		console.log('dataSet amna', JSON.parse(dataSet))
 
 		$(document).ready(function () {
 			$('.collapsible').collapsible();

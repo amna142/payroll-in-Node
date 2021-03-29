@@ -13,6 +13,7 @@ const accountRoutes = require('./app/routes/authRoutes')
 const adminRoutes = require('./app/routes/adminRoutes')
 const logsRoutes = require('./app/routes/logsRoutes')
 const settingsRoutes = require('./app/routes/settingsRoutes')
+const leavesPreferncesRoutes = require('./app/routes/leavesPreferncesRoutes')
 const errorRoutes = require('./app/routes/errorRoutes')
 
 
@@ -42,9 +43,9 @@ app.use(flash())
 app.use(accountRoutes)
 app.use(adminRoutes)
 app.use(settingsRoutes)
+app.use(leavesPreferncesRoutes)
 app.use(logsRoutes)
 app.use(errorRoutes)
-
 
 const PORT = process.env.PORT || 3000
 

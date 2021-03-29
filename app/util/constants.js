@@ -10,7 +10,8 @@ module.exports = {
 	employee: 'Employees',
 	setting: 'Settings',
 	attendance: 'Attendance',
-	add: 'Add'
+	add: 'Add',
+	leave_prefernces: 'leave_prefernces' 
 }
 
 

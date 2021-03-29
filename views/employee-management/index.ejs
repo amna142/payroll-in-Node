@@ -22,70 +22,72 @@
 	</div>
 	<% } %>
 	<main>
-	<div style="padding-left: 1%;">
-		<% if(!isEmployee) { %>
-		<a class="btn blue lighten-2" style="margin-top: 10px;" href="/employee/add" class="btn btn-secondary">New
-			Employee</a>
-		<% } %>
-		
-		<table class="striped responsive-table" id="employee_table">
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Email</th>
-					<th>Phone</th>
-					<th>Birth Date</th>
-					<th>Address</th>
-					<th>Hiring Date</th>
-					<th>Designation</th>
-					<th>Type</th>
-					<th>Actions</th>
-				</tr>
-			</thead>
-			<tbody>
-				<% if(data.length){
+		<div style="padding-left: 1%;">
+			<% if(!isEmployee) { %>
+			<a class="btn blue lighten-2" style="margin-top: 10px;" href="/employee/add" class="btn btn-secondary">New
+				Employee</a>
+			<% } %>
+
+			<table class="striped responsive-table" id="employee_table">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Email</th>
+						<th>Phone</th>
+						<th>Birth Date</th>
+						<th>Address</th>
+						<th>Hiring Date</th>
+						<th>Designation</th>
+						<th>Type</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<% if(data.length){
 					
   for(var i = 0; i< data.length; i++) {%>
-				<tr>
+					<tr>
 
-					<td hidden id="employee_id"><%= data[i].id%></td>
-					<td><%= data[i].name%></td>
-					<td><%= data[i].email%></td>
-					<td><%= data[i].phone%></td>
-					<td><%= data[i].dob%></td>
-					<td><%= data[i].address%></td>
-					<td><%= data[i].hiring_date%></td>
-					<td><%= data[i].designation%></td>
-					<td><%= data[i].employee_type%></td>
+						<td hidden id="employee_id"><%= data[i].id%></td>
+						<td><%= data[i].name%></td>
+						<td><%= data[i].email%></td>
+						<td><%= data[i].phone%></td>
+						<td><%= data[i].dob%></td>
+						<td><%= data[i].address%></td>
+						<td><%= data[i].hiring_date%></td>
+						<td><%= data[i].designation%></td>
+						<td><%= data[i].employee_type%></td>
 
-					<td>
-						<a class="btn-floating waves-effect waves-light modal-trigger edit"
-							href="../employee/edit/<%=data[i].id%>"><i class="material-icons">edit</i></a>
-							<a class="btn-floating waves-effect waves-light view" href="../employee/view/<%=data[i].id%>"><i class="material-icons">
-								remove_red_eye
-							</i></a>
-						<% if(!isEmployee) { %>
-						<a class="btn-floating delete modal-trigger waves-effect waves-light red accent-3"
-							href="#delete_employee"><i class="material-icons">delete</i></a>
-						<!-- <a class="btn delete modal-trigger red accent-3" href="#delete_employee">Delete</a> -->
-						<% } %>
-					</td>
-				</tr>
-				<% }
+						<td>
+
+							<a class="btn-floating waves-effect waves-light view"
+								href="../employee/view/<%=data[i].id%>"><i class="material-icons">
+									remove_red_eye
+								</i></a>
+							<% if(!isEmployee) { %>
+							<a class="btn-floating waves-effect waves-light modal-trigger edit"
+								href="../employee/edit/<%=data[i].id%>"><i class="material-icons">edit</i></a>
+							<a class="btn-floating delete modal-trigger waves-effect waves-light red accent-3"
+								href="#delete_employee"><i class="material-icons">delete</i></a>
+							<!-- <a class="btn delete modal-trigger red accent-3" href="#delete_employee">Delete</a> -->
+							<% } %>
+						</td>
+					</tr>
+					<% }
 
    }else{ %>
-				<tr>
-					<td colspan="3">No user</td>
-				</tr>
-				<% } %>
-			</tbody>
-		</table>
-	</div>
-	
-	<%- include('../audit-logs/logs', {data: logsData}); %>
+					<tr>
+						<td colspan="3">No user</td>
+					</tr>
+					<% } %>
+				</tbody>
+			</table>
+		</div>
+
+		<%- include('../audit-logs/logs', {data: logsData}); %>
 	</main>
-	
-	
+
+
 	<%- include('../includes/footer'); %>
 
 
