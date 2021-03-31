@@ -31,51 +31,60 @@
 								<br />
 								<div class="row">
 
-									<form class="col s12">
+									<form class="col s12" method="POST" action="/leaves" name="leave_request_form">
 										<div class="row">
 											<div class="input-field col s4">
 												<i class="material-icons prefix">account_circle</i>
-												<input id="icon_prefix" type="text" class="validate">
+												<input disabled id="icon_prefix" type="text" name="employee_name"
+													class="validate" value="<%= name %>">
 												<label for="icon_prefix">First Name</label>
 											</div>
 											<div class="input-field col s4">
 												<i class="material-icons prefix">phone</i>
-												<input id="icon_telephone" type="tel" class="validate">
+												<input id="icon_telephone" type="tel" name="employee_phone"
+													class="validate" value="<%= phone %>">
 												<label for="icon_telephone">Emergency Telephone</label>
 											</div>
 											<div class="input-field col s4">
 												<i class="material-icons prefix">email</i>
-												<input id="icon_telephone" type="tel" class="validate">
+												<input id="icon_telephone" name="employee_email" disabled type="tel"
+													class="validate" value="<%= email %>">
 												<label for="icon_telephone">Email</label>
 											</div>
 										</div>
 										<div class="row">
 											<div class="input-field col s4">
 												<i class="material-icons prefix">phone</i>
-												<select>
+												<select name="leave_type">
 													<option value="" disabled selected>Choose your option</option>
-													<option value="1">Option 1</option>
-													<option value="2">Option 2</option>
-													<option value="3">Option 3</option>
+													<% if(prefernces.length) {
+													for(var i=0;i< prefernces.length; i++) { %>
+													<%= prefernces[i].dataValues.leave_type.id %>
+													<option value="<%= prefernces[i].dataValues.leave_type.id %>">
+														<%= prefernces[i].dataValues.leave_type.name %></option>
+													<% }
+													} %>
 												</select>
 												<label>Leave Type</label>
 											</div>
-											<div class="input-field col s4">
+											<div class=" input-field col s4">
 
-												<input placeholder="From" id="first_name" type="date" class="validate">
+												<input placeholder="From" id="first_name" name="from_date" type="date"
+													class="validate">
 												<label for="first_name">From</label>
 											</div>
 											<div class="input-field col s4">
 
-												<input placeholder="To" id="first_name" type="date" class="validate">
+												<input placeholder="To" name="to_date" id="first_name" type="date"
+													class="validate">
 												<label for="first_name">To</label>
 											</div>
 										</div>
 										<div class="row">
 											<div class="input-field col s12">
 												<i class="material-icons prefix">mode_edit</i>
-												<textarea id="comments" class="materialize-textarea"
-													data-length="120"></textarea>
+												<textarea id="comments" class="materialize-textarea" data-length="120"
+													name="comments"></textarea>
 												<label for="comments">Comments</label>
 											</div>
 										</div>
@@ -90,7 +99,6 @@
 									</form>
 								</div>
 							</div>
-
 					</li>
 					<li>
 						<div class="collapsible-header"><i class="material-icons">hourglass_empty</i>Leave Status</div>

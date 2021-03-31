@@ -54,6 +54,8 @@ db.attendance = require('../models/attendance.js')(sequelize, Sequelize)
 db.time_entries = require('../models/timeEntries.js')(sequelize, Sequelize)
 db.leave_types = require('../models/leaveTypes.js')(sequelize, Sequelize)
 db.leave_qouta = require('../models/leaveQouta.js')(sequelize, Sequelize)
+db.leaves = require('../models/leaves')(sequelize, Sequelize)
+db.leave_request_status = require('../models/leaveRequestStatus')(sequelize, Sequelize)
 //1 employee can have many roles
 //1 role can be assigend to many employees (1(role) -> many(employees))
 
@@ -117,6 +119,8 @@ db.salaries.belongsTo(db.employee, {
 	onDelete: null,
 	onUpdate: 'CASCADE'
 })
+
+
 
 
 //employee grade with allowances -- many-to-many relation
@@ -198,4 +202,29 @@ db.leave_qouta.belongsTo(db.leave_types, {
 	onDelete: null,
 	onUpdate: 'CASCADE'
 })
+
+db.leave_types.hasOne(db.leaves,{
+	foreignKey: {
+		allowNull: false
+	}
+})
+db.leaves.belongsTo(db.leave_types, {
+	onDelete: null,
+	constraints: false,
+	onUpdate: 'CASCADE'
+})
+
+db.leave_request_status.hasOne(db.leaves, {
+	foreignKey: {
+		allowNull: false
+	}
+})
+
+db.leaves.belongsTo(db.leave_request_status, {
+	onDelete: null,
+	constraints: false,
+	onUpdate: 'CASCADE'
+})
+
+
 module.exports = db;

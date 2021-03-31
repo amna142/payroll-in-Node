@@ -52,3 +52,6 @@ INSERT INTO employee_grades(grade, min_salary, max_salary, createdAt, updatedAt)
 
 
 
+insert into leave_request_statuses(status, createdAt, updatedAt) VALUES ('Rejected by Supervisor', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+
+select * from leave_request_statuses

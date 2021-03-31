@@ -14,7 +14,7 @@ const adminRoutes = require('./app/routes/adminRoutes')
 const logsRoutes = require('./app/routes/logsRoutes')
 const settingsRoutes = require('./app/routes/settingsRoutes')
 const leavesPreferncesRoutes = require('./app/routes/leavesPreferncesRoutes')
-const leavesRoutes = require('./app/routes/leaves')
+const leavesRoutes = require('./app/routes/leaveRoutes')
 const errorRoutes = require('./app/routes/errorRoutes')
 
 

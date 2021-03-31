@@ -32,6 +32,7 @@ let leave_prefernces = () => {
 }
 
 exports.getAddPrefrence = async (req, res, next) => {
+	
 	let user = EmployeeController.isEmployee(req)
 	//get leave types from database
 	let leave_types = await leaveTypes()
