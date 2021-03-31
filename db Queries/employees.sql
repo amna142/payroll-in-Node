@@ -1,6 +1,9 @@
 
 
+insert into leave_types(name, description, createdAt, updatedAt) VALUES ('Casual', 'casual leave includes cusual person condition', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 
+select * from leave_types
+delete from leave_types
 select * from employees
 
 select * from audit_logs

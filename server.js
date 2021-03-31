@@ -14,6 +14,7 @@ const adminRoutes = require('./app/routes/adminRoutes')
 const logsRoutes = require('./app/routes/logsRoutes')
 const settingsRoutes = require('./app/routes/settingsRoutes')
 const leavesPreferncesRoutes = require('./app/routes/leavesPreferncesRoutes')
+const leavesRoutes = require('./app/routes/leaves')
 const errorRoutes = require('./app/routes/errorRoutes')
 
 
@@ -44,6 +45,7 @@ app.use(accountRoutes)
 app.use(adminRoutes)
 app.use(settingsRoutes)
 app.use(leavesPreferncesRoutes)
+app.use(leavesRoutes)
 app.use(logsRoutes)
 app.use(errorRoutes)
 
