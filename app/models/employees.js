@@ -72,6 +72,13 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.STRING,
 			required: true,
 			allowNull: false
+		},
+		supervisor_email: {
+			type: Sequelize.STRING,
+			allowNull: true,
+			required: true,
+			isEmail: true,
+			notEmpty: true
 		}
 	});
 	return Employee

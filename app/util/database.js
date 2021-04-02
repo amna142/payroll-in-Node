@@ -226,5 +226,20 @@ db.leaves.belongsTo(db.leave_request_status, {
 	onUpdate: 'CASCADE'
 })
 
+//leaves with employee -- 1-to-many relation
+
+db.employee.hasMany(db.leaves, {
+	constraints: true,
+	onDelete: null,
+	foreignKey: {
+		allowNull: false
+	},
+	onUpdate: 'CASCADE'
+})
+db.leaves.belongsTo(db.employee, {
+	constraints: true,
+	onDelete: null,
+	onUpdate: 'CASCADE'
+})
 
 module.exports = db;

@@ -17,7 +17,6 @@ const leavesPreferncesRoutes = require('./app/routes/leavesPreferncesRoutes')
 const leavesRoutes = require('./app/routes/leaveRoutes')
 const errorRoutes = require('./app/routes/errorRoutes')
 
-
 const flash = require('connect-flash')
 const secretKey = require('./app/config/secret')
 

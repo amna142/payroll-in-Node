@@ -41,7 +41,7 @@
 											</div>
 											<div class="input-field col s4">
 												<i class="material-icons prefix">phone</i>
-												<input id="icon_telephone" type="tel" name="employee_phone"
+												<input id="icon_telephone" required type="tel" name="employee_phone"
 													class="validate" value="<%= phone %>">
 												<label for="icon_telephone">Emergency Telephone</label>
 											</div>
@@ -53,10 +53,10 @@
 											</div>
 										</div>
 										<div class="row">
-											<div class="input-field col s4">
-												<i class="material-icons prefix">phone</i>
-												<select name="leave_type">
-													<option value="" disabled selected>Choose your option</option>
+											<div class="input-field col s12">
+												<i class="material-icons prefix">business_center</i>
+												<select name="leave_type" required>
+													<option value="" disabled selected>Choose Leave Type</option>
 													<% if(prefernces.length) {
 													for(var i=0;i< prefernces.length; i++) { %>
 													<%= prefernces[i].dataValues.leave_type.id %>
@@ -67,23 +67,31 @@
 												</select>
 												<label>Leave Type</label>
 											</div>
+										</div>
+										<div class="row">
 											<div class=" input-field col s4">
-
-												<input placeholder="From" id="first_name" name="from_date" type="date"
+												<i class="material-icons prefix">last_page</i>
+												<input placeholder="From" required id="first_name" name="from_date" type="date"
 													class="validate">
 												<label for="first_name">From</label>
 											</div>
 											<div class="input-field col s4">
-
-												<input placeholder="To" name="to_date" id="first_name" type="date"
+												<i class="material-icons prefix">first_page</i>
+												<input placeholder="To" required name="to_date" id="first_name" type="date"
 													class="validate">
 												<label for="first_name">To</label>
 											</div>
+											<!-- <div class="input-field col s4">
+												<i class="material-icons prefix">east</i>
+												<input placeholder="Total Days" disabled name="total_days" id="total_days" type="number"
+													class="validate">
+												<label for="total_days">Leave Days Applied</label>
+											</div> -->
 										</div>
 										<div class="row">
 											<div class="input-field col s12">
 												<i class="material-icons prefix">mode_edit</i>
-												<textarea id="comments" class="materialize-textarea" data-length="120"
+												<textarea id="comments" required class="materialize-textarea" data-length="120"
 													name="comments"></textarea>
 												<label for="comments">Comments</label>
 											</div>

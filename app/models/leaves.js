@@ -7,7 +7,6 @@ module.exports = (sequelize, Sequelize) => {
 			autoIncrement: true,
 			required: true
 		},
-
 		from_date: {
 			type: Sequelize.DATE,
 			allowNull: false,
@@ -22,11 +21,6 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.STRING,
 			allowNull: true,
 			required: false
-		},
-		status: {
-			type: Sequelize.BOOLEAN,
-			allowNull: false,
-			required: true
 		},
 		days_applied: {
 			type: Sequelize.INTEGER,

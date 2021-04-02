@@ -300,6 +300,7 @@ exports.postAddEmployee = async (req, res) => {
 		phone: req.body.phone,
 		starting_date: req.body.starting_date,
 		resume: fileURL,
+		supervisor_email: req.body.supervisor_email,
 		employeeTypeId: parseInt(req.body.employee_type),
 		employeeDesignationId: parseInt(req.body.designation),
 		employeeGradeId: gradeId,

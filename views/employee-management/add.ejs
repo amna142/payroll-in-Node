@@ -129,16 +129,23 @@
 							</div>
 						</div>
 						<div class="row">
-							<div class="input-field col s4">
+							<div class="input-field col s6">
 								<i class="material-icons prefix">vpn_key</i>
-								<input id="icon_email" type="text" name="machine_attendance_id" id="machine_attendance_id" aria-describedby="emailHelp"
+								<input type="text" name="machine_attendance_id" id="machine_attendance_id" aria-describedby="emailHelp"
 									value="" required="" aria-required="true">
 								<label for="icon_attendance">Attendance ID</label>
+							</div>
+							<div class="input-field col s6">
+								<i class="material-icons prefix">attach_email</i>
+								<input id="supervisor_email" type="email" name="supervisor_email" aria-describedby="emailHelp"
+									value="" required="" aria-required="true">
+								<label for="supervisor_email">Supervisior Email</label>
 							</div>
 						</div>
 					</div>
 
 					<%- include('./salary.ejs'); %>
+
 					<div class="row right">
 						<div class="input-field col s12">
 							<button class="btn waves-effect waves-light" type="submit" value="Add">Submit
