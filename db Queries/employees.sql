@@ -1,9 +1,9 @@
 
-
+                    
 insert into leave_types(name, description, createdAt, updatedAt) VALUES ('Casual', 'casual leave includes cusual person condition', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 
 select * from leave_types
-delete from leave_types
+
 select * from employees
 
 select * from audit_logs
@@ -13,7 +13,7 @@ VALUES ('amna_ali','amna@dummy.com', '123', '1 May 1997', 'abc address', '0305-6
 
 
 UPDATE employees
-SET email='amna@gmail.com' WHERE id=7;
+SET isInactive=0 WHERE id=2;
 
 
 UPDATE company_funds SET name='umar' where id=1
@@ -22,7 +22,7 @@ INSERT INTO roles(title, createdAt, updatedAt) VALUES ('admin',CURRENT_TIMESTAMP
 
 delete from employees where id=1
 
-delete from company_funds
+delete from leaves
 
 INSERT INTO employee_types(employee_type, createdAt, updatedAt) VALUES ('Permanent', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 
@@ -46,12 +46,12 @@ select * from employee_grades
 
 select * from EmpGrade_Allowances
 delete    from employee_grades
-delete from audit_logs
+delete from employee_grades
 
 INSERT INTO employee_grades(grade, min_salary, max_salary, createdAt, updatedAt) VALUES ('OG3', 40000, 60000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 
 
 
-insert into leave_request_statuses(status, createdAt, updatedAt) VALUES ('Rejected by Supervisor', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+insert into leave_request_statuses(status, createdAt, updatedAt) VALUES ('Rejected', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 
 select * from leave_request_statuses

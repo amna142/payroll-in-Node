@@ -1,4 +1,7 @@
+const { template } = require('handlebars')
+const Sequelize = require('sequelize')
 const db = require("../util/database")
+const Op = Sequelize.Op
 const Allowance = db.allowances
 const Fund = db.company_funds
 const Employee = db.employee
@@ -83,7 +86,6 @@ exports.findEmployeeById = (id) => {
 
 exports.EmployeeResumeName = (id) => {
 	return Employee.findByPk(id).then(result => {
-		console.log('result.dataValues.resume', result.dataValues.resume)
 		return result.dataValues.resume
 	}).catch(err => {
 		console.log('err in EmployeeResumeName', err)
@@ -91,7 +93,7 @@ exports.EmployeeResumeName = (id) => {
 }
 
 
-exports.isEmployee = (req) =>{
+exports.isEmployee = (req) => {
 	let user = req.session.user;
 	let role;
 	let isEmployee = false
@@ -102,6 +104,33 @@ exports.isEmployee = (req) =>{
 		isEmployee = false
 		role = 'Admin'
 	}
-	return {role: role,
-	isEmployee: isEmployee}
+	return {
+		role: role,
+		isEmployee: isEmployee
+	}
+}
+
+
+//employee having supervisors 
+exports.employeeWithSupervisor = () => {
+	let temp = []
+	return Employee.findAll({
+		where: {
+			supervisor_email: {
+				[Op.ne]: ""
+			}
+		},
+		attributes: [
+			[
+				Sequelize.fn('DISTINCT', Sequelize.col('supervisor_email')), 'supervisor_email'
+			]
+		]
+	}).then(result => {
+		result.forEach(element => {
+			temp.push(element.supervisor_email)
+		});
+		return temp
+	}).catch(err => {
+		console.log('err', err)
+	})
 }

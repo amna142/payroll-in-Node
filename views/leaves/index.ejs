@@ -71,28 +71,36 @@
 										<div class="row">
 											<div class=" input-field col s4">
 												<i class="material-icons prefix">last_page</i>
-												<input placeholder="From" required id="first_name" name="from_date" type="date"
-													class="validate">
+												<input placeholder="From" required id="first_name" name="from_date"
+													type="date" class="validate">
 												<label for="first_name">From</label>
 											</div>
 											<div class="input-field col s4">
 												<i class="material-icons prefix">first_page</i>
-												<input placeholder="To" required name="to_date" id="first_name" type="date"
-													class="validate">
+												<input placeholder="To" required name="to_date" id="first_name"
+													type="date" class="validate">
 												<label for="first_name">To</label>
 											</div>
-											<!-- <div class="input-field col s4">
-												<i class="material-icons prefix">east</i>
-												<input placeholder="Total Days" disabled name="total_days" id="total_days" type="number"
-													class="validate">
-												<label for="total_days">Leave Days Applied</label>
-											</div> -->
+											<div class="input-field col s4">
+												<i class="material-icons prefix">email_attach</i>
+												<select>
+													<option value="" disabled selected>Choose your option</option>
+													<% if(supervisors.length> 0){
+													for(var i=0; i< supervisors.length; i++){ %>
+													<option value=<%= supervisors[i] %>> <%= supervisors[i] %></option>
+													<% }
+												} %>
+													<label for="supervisor_email">Supervisor</label>
+												</select>
+
+
+											</div>
 										</div>
 										<div class="row">
 											<div class="input-field col s12">
 												<i class="material-icons prefix">mode_edit</i>
-												<textarea id="comments" required class="materialize-textarea" data-length="120"
-													name="comments"></textarea>
+												<textarea id="comments" required class="materialize-textarea"
+													data-length="120" name="comments"></textarea>
 												<label for="comments">Comments</label>
 											</div>
 										</div>

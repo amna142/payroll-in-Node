@@ -76,9 +76,9 @@ module.exports = (sequelize, Sequelize) => {
 		supervisor_email: {
 			type: Sequelize.STRING,
 			allowNull: true,
-			required: true,
+			required: false,
 			isEmail: true,
-			notEmpty: true
+			notEmpty: false
 		}
 	});
 	return Employee

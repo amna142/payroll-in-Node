@@ -8,8 +8,18 @@ const transporter = nodeMailer.createTransport(sendMailerTransporter({
 	}
 }))
 
+const send_email = (email_to, email_from, email_subject, email_body) => {
+	console.log('email_body', email_body)
+	return transporter.sendMail({
+		to: email_to,
+		from: email_from,
+		subject: email_subject,
+		html: email_body
+	})
+}
 
 
 module.exports = {
+	send_email: send_email,
 	transporter: transporter
 }

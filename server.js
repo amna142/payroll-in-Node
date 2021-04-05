@@ -28,6 +28,7 @@ app.use(bodyParser.urlencoded({
 
 app.use('/', serveStatic(path.join(__dirname, 'app/assets')))
 app.use('/', serveStatic(path.join(__dirname, 'public')))
+app.use('/', serveStatic(path.join(__dirname, 'public/templates/images')))
 var store = new SequelizeStore({
 	db: db.sequelize,
 });
