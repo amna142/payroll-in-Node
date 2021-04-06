@@ -14,17 +14,77 @@
 
 	<%- include('../admin/partials/side-nav', {data: name}); %>
 	<%- include('../admin/partials/nav-bar.ejs',{data: navigation}); %>
+
+
 	<main>
+		<!-- Modal Structure for Acceptance-->
+		<div id="accept_leave" class="modal">
+			<div class="modal-content">
+				<h4>Leave Acceptance Confirmation</h4>
+				<p>Do you want to accept leave of the employee?</p>
+			</div>
+			<div class="modal-footer">
+				<a href="#!" class="modal-close waves-effect waves-green btn-flat">Disagree</a>
+				<a href="#!" class="modal-close waves-effect waves-green btn-flat">Agree</a>
+			</div>
+		</div>
+
+		<!-- Modal Structure for Rejection -->
+		<div id="reject_leave" class="modal">
+			<div class="modal-content">
+				<h4>Leave Rejection Confirmation</h4>
+				<p>Are you sure to reject leave of the employee?</p>
+			</div>
+			<div class="modal-footer">
+					<a href="#!" class="modal-close waves-effect waves-green btn-flat">Disagree</a>
+				<a href="#!" class="modal-close waves-effect waves-green btn-flat">Agree</a>
+			</div>
+		</div>
 		<div class="row">
 			<div id="leaves" class="col s12">
 
 				<ul class="collapsible">
-					<li>
-						<div class="collapsible-header"><i class="material-icons">details</i>Leaves</div>
-						<div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
+					<li class="active">
+						<div class="collapsible-header"><i class="material-icons">details</i>Leaves Requests</div>
+
+						<div class="collapsible-body">
+							<div class="container" id="leave_request">
+								<h5>Employee Leaves Requests</h5>
+								<br />
+								<ul class="collection">
+									<% if(leave_requests.length){
+					
+  									for(var i = 0; i< leave_requests.length; i++) {  
+										  for(var j=0; j< leave_requests[i].leaves.length; j++) {  %>
+
+									<li class="collection-item avatar" id=<%= leave_requests[i].id %>>
+										<img src="/default-user.jpg" alt="" class="circle">
+										<span class="title"><b><%= leave_requests[i].name %></b> <br>
+											<%= leave_requests[i].email %></span>
+										<p><b>Dates:</b> <%= leave_requests[i].leaves[j].from_date %> to
+											<%= leave_requests[i].leaves[j].to_date %> <br>
+											<b>Reason:</b> <%= leave_requests[i].leaves[j].comments %> <br>
+											**I don't understand this situation, so I am refering it to high
+											authorituies.** <br>
+											<a class="waves-effect waves-light btn"><i
+													class="material-icons right">near_me</i>Refer</a>
+										</p>
+										<div class="secondary-content" id=<%= leave_requests[i].leaves[j].id %>>
+											<a class="waves-effect waves-light btn red modal-trigger" href="#reject_leave" ><i
+													class="material-icons left">cancel</i>Reject</a>
+											<a class="waves-effect waves-light btn modal-trigger" href="#accept_leave"
+												id=<%= leave_requests[i].leaves[j].id %>> <i
+													class="material-icons right">check</i>Accept</a>
+										</div>
+									</li>
+									<% } } } %>
+
+								</ul>
+							</div>
+						</div>
 					</li>
 					<li class="active">
-						<div class="collapsible-header"><i class="material-icons">forum</i>Leave Request</div>
+						<div class="collapsible-header"><i class="material-icons">forum</i>Request A Leave</div>
 						<div class="collapsible-body">
 							<div class="container" id="leave_request">
 								<h5>Request a Leave</h5>
@@ -83,16 +143,10 @@
 											</div>
 											<div class="input-field col s4">
 												<i class="material-icons prefix">email_attach</i>
-												<select>
-													<option value="" disabled selected>Choose your option</option>
-													<% if(supervisors.length> 0){
-													for(var i=0; i< supervisors.length; i++){ %>
-													<option value=<%= supervisors[i] %>> <%= supervisors[i] %></option>
-													<% }
-												} %>
-													<label for="supervisor_email">Supervisor</label>
-												</select>
-
+												<input disabled id="supervisor_email" type="text"
+													name="supervisor_email" class="validate"
+													value="<%= supervisor_email %>">
+												<label for="supervisor_email">supervisor_email</label>
 
 											</div>
 										</div>
@@ -140,5 +194,12 @@
 			$('#textarea1').val('New Text');
 			$('input#input_text, textarea#comments').characterCounter();
 			M.textareaAutoResize($('#textarea1'));
+			var elems = document.querySelectorAll('.modal');
+			var instances = M.Modal.init(elems, {
+				dismissible: true,
+				outDuration: 300,
+				startingTop: '30%',
+				endingTop: '20%'
+			});
 		});
 	</script>

@@ -1,4 +1,6 @@
-const { template } = require('handlebars')
+const {
+	template
+} = require('handlebars')
 const Sequelize = require('sequelize')
 const db = require("../util/database")
 const Op = Sequelize.Op
@@ -11,6 +13,7 @@ const EmployeeDesignation = db.employee_designation
 const EmployeeGrade = db.employee_grade
 const EmployeeAllowances = db.employee_allowances
 const EmployeeFunds = db.employee_funds
+const Leaves = db.leaves
 const EmployeeSalary = db.salaries
 exports.getAllGrades = () => {
 	let employee_grades = []
@@ -132,5 +135,66 @@ exports.employeeWithSupervisor = () => {
 		return temp
 	}).catch(err => {
 		console.log('err', err)
+	})
+}
+
+
+exports.employeesUnderSupervisor = (supervisors) => {
+	let temp = []
+	Employee.findAll({
+		where: {
+			supervisor_email: supervisors
+		},
+		include: [{
+			model: Leaves,
+			where: {
+				leaveRequestStatusId: 3
+			}
+		}]
+	}).then(employeeWithLeaves => {
+		console.log('result', JSON.stringify(employeeWithLeaves))
+		//see which employee has requested a leave
+		// employeeWithLeaves.forEach(employeeLeaves => {
+		// 	let supervisor_mail = employeeLeaves.supervisor_email
+		// 	let obj = {
+		// 		supervisor_mail
+		// 	}
+		// 	temp.push(obj)
+
+		// });
+		// console.log('temp', temp)
+	}).catch(err => {
+		console.log('err in employeesUnderSupervisor', err)
+	})
+}
+
+
+exports.isSupervisor = (email_id) => {
+	let temp = []
+	let obj = {}
+	return Employee.findAll({
+		attributes: ['id', 'name', 'email'],
+		where: {
+			supervisor_email: {
+				[Op.ne]: ""
+			},
+			supervisor_email: email_id,
+		},
+		include: [{
+			model: Leaves,
+			where: {
+				leaveRequestStatusId: 3,
+
+			},
+			attributes: ['id', 'from_date', 'to_date', 'comments', 'days_applied', 'leaveTypeId', 'leaveRequestStatusId']
+		}]
+
+	}).then(result => {
+		if (result.length > 0) {
+			obj[email_id] = result
+			return obj
+		}
+	}).catch(err => {
+		console.log('err in isSupervisor', err)
 	})
 }

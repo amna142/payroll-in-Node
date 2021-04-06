@@ -11,18 +11,31 @@ const LeaveTypes = db.leave_types
 const LeaveRequest = db.leaves
 
 exports.getLeaves = async (req, res) => {
+	let leave_requests = []
 	let user = EmployeeController.isEmployee(req)
 	let leave_types = await leave_prefernces()
 	console.log('email', req.session.user)
+	let current_user_email = req.session.user.email
+	// search on employees to find if current_user_email is one of the supervisor's email
+	let supervisor_found = await EmployeeController.isSupervisor(current_user_email) 
+	if(supervisor_found){
+		leave_requests = supervisor_found[current_user_email]
+		console.log('super', JSON.stringify(supervisor_found))
+	}else {
+		console.log('an employee')
+	}
 	//get supervisors names and show in dropdown
-	let supervisors = await EmployeeController.employeeWithSupervisor()
-	console.log('EmployeeController.employeeWithSupervisor()', supervisors)
+	// let supervisors = await EmployeeController.employeeWithSupervisor()
+	// console.log('EmployeeController.employeeWithSupervisor()', supervisors)
+	//now find employees under a supervisors 
+	// let employeesUnderSupervisor = await EmployeeController.employeesUnderSupervisor(supervisors)
 	res.render('leaves', {
 		name: req.session.user.name,
-		email: req.session.user.email,
+		email: current_user_email,
 		phone: req.session.user.phone,
 		isEmployee: user.isEmployee,
-		supervisors: supervisors,
+		leave_requests: leave_requests.length>0 ? leave_requests : [],
+		supervisor_email: req.session.user.supervisor_email,
 		prefernces: leave_types,
 		navigation: {
 			role: user.role,
@@ -81,7 +94,7 @@ exports.postLeave = (req, res, next) => {
 				<p>Best Regards</p>
 				<b>${req.session.user.name}</b>`
 			)
-			// res.render('leaves')
+			res.redirect('leaves')
 		}
 	}).catch(err => {
 		console.log('err in postLeave', err)
