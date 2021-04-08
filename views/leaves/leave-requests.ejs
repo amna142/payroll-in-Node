@@ -1,0 +1,69 @@
+<div class="container" id="leave_request">
+	<h5>Employee Leaves Requests</h5>
+	<br />
+	<ul class="collection">
+		<% if(leave_requests.length){
+					
+  									for(var i = 0; i< leave_requests.length; i++) {  
+										  for(var j=0; j< leave_requests[i].leaves.length; j++) {  %>
+
+		<li class="collection-item avatar" id=<%= leave_requests[i].id %>>
+			<img src="/default-user.jpg" alt="" class="circle">
+			<span class="title"><b><%= leave_requests[i].name %></b> <br>
+				<%= leave_requests[i].email %></span>
+			<p><b>Dates:</b> <%= leave_requests[i].leaves[j].from_date %> to
+				<%= leave_requests[i].leaves[j].to_date %> <br>
+				<b>Reason:</b> <%= leave_requests[i].leaves[j].comments %> <br>
+				**I don't understand this situation, so I am refering it to high
+				authorituies.** <br>
+				<a class="waves-effect waves-light btn"><i class="material-icons right">near_me</i>Refer</a>
+			</p>
+			<div class="secondary-content">
+				<a class="waves-effect waves-light btn red modal-trigger" href="#reject_leave"
+					data-id=<%= leave_requests[i].leaves[j].id %>><i class="material-icons left">cancel</i>Reject</a>
+				<a class="waves-effect waves-light btn modal-trigger" href="#accept_leave"
+					data-id=<%= leave_requests[i].leaves[j].id %>> <i class="material-icons right">check</i>Accept</a>
+			</div>
+		</li>
+		<% } } } %>
+
+	</ul>
+</div>
+
+
+
+<!-- Modal Structure for Acceptance-->
+<div id="accept_leave" class="modal">
+	<div class="modal-content">
+		<h4>Leave Acceptance Confirmation</h4>
+		<p>Do you want to accept leave of the employee?</p>
+	</div>
+	<div class="modal-footer" id="accept_leave_confirmation">
+	</div>
+</div>
+
+<!-- Modal Structure for Rejection -->
+<div id="reject_leave" class="modal">
+	<div class="modal-content">
+		<h4>Leave Rejection Confirmation</h4>
+		<p>Are you sure to reject leave of the employee?</p>
+		<div class="row">
+			<form class="col s12" method="POST" action="/leave/reject/">
+				<div class="row">
+					<div class="input-field col s12">
+						<textarea id="rejection_reason" name="rejection_reason" class="materialize-textarea"></textarea>
+						<label for="rejection_reason">Rejection Reason</label>
+					</div>
+
+					<input type="hidden" name="leave_request_id" id="leave_request_id" />
+				</div>
+				<div class="modal-footer">
+					<button class="btn waves-effect waves-light" type="submit" value="Add">Submit
+						<i class="material-icons right">check</i>
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+</div>

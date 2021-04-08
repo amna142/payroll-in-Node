@@ -26,6 +26,22 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.INTEGER,
 			allowNull: false,
 			required: true
+		},
+		rejected_by: {
+			type: Sequelize.STRING,
+			allowNull: true,
+			required: false,
+			isEmail: true
+		},
+		rejection_reason: {
+			type: Sequelize.STRING,
+			allowNull: true,
+			required: false
+		},
+		referal_reason: {
+			type: Sequelize.STRING,
+			allowNull: true, 
+			required: false
 		}
 	})
 	return Leaves

@@ -78,7 +78,6 @@ exports.findEmployeeById = (id) => {
 			]
 		}]
 	}).then(employee => {
-		console.log('employee found', JSON.stringify(employee))
 		return JSON.stringify(employee)
 	}).catch(err => {
 		console.log('errpr while finding employee', err)
@@ -153,16 +152,6 @@ exports.employeesUnderSupervisor = (supervisors) => {
 		}]
 	}).then(employeeWithLeaves => {
 		console.log('result', JSON.stringify(employeeWithLeaves))
-		//see which employee has requested a leave
-		// employeeWithLeaves.forEach(employeeLeaves => {
-		// 	let supervisor_mail = employeeLeaves.supervisor_email
-		// 	let obj = {
-		// 		supervisor_mail
-		// 	}
-		// 	temp.push(obj)
-
-		// });
-		// console.log('temp', temp)
 	}).catch(err => {
 		console.log('err in employeesUnderSupervisor', err)
 	})
@@ -170,6 +159,7 @@ exports.employeesUnderSupervisor = (supervisors) => {
 
 
 exports.isSupervisor = (email_id) => {
+	console.log('current user emaiil', email_id)
 	let temp = []
 	let obj = {}
 	return Employee.findAll({
@@ -183,18 +173,57 @@ exports.isSupervisor = (email_id) => {
 		include: [{
 			model: Leaves,
 			where: {
-				leaveRequestStatusId: 3,
-
+				leaveRequestStatusId: 1,
 			},
 			attributes: ['id', 'from_date', 'to_date', 'comments', 'days_applied', 'leaveTypeId', 'leaveRequestStatusId']
 		}]
-
 	}).then(result => {
+		console.log('result', result)
 		if (result.length > 0) {
 			obj[email_id] = result
 			return obj
 		}
 	}).catch(err => {
 		console.log('err in isSupervisor', err)
+	})
+}
+
+
+exports.findByPk = (id) => {
+	return Leaves.findByPk(id, {
+		attributes: ['id', 'from_date', 'to_date', 'days_applied', 'comments'],
+		include: [{
+			model: Employee,
+			attributes: ['id', 'name', 'email', 'phone', 'attendMachineId', 'supervisor_email']
+		}]
+	}).then(employee => {
+		return employee
+	}).catch(err => {
+		console.log('err in findByPk employee', err)
+	})
+}
+
+
+exports.findHR = () => {
+	return EmployeeDesignation.findOne({
+		attributes: ['id', 'designation_type'],
+		where: {
+			designation_type: 'HR',
+
+		},
+		include: [{
+			model: Employee,
+			attributes: ['id', 'name', 'email', 'supervisor_email'],
+			where: {
+				supervisor_email: {
+					[Op.ne]: null
+				}
+			}
+		}]
+	}).then(result => {
+		console.log('result', JSON.stringify(result))
+		return result
+	}).catch(err => {
+		console.log('err in findHR', err)
 	})
 }

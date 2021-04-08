@@ -595,7 +595,6 @@ exports.viewEmployee = async (req, res) => {
 
 	employee.starting_date = logsController.convertDate(employee.starting_date)
 	employee.dob = logsController.convertDate(employee.dob)
-	console.log('employee.starting_date', employee.starting_date)
 	let user_role = employeeController.isEmployee(req)
 	res.render('employee-management/view', {
 		employee: employee,

@@ -1,6 +1,6 @@
 
                     
-insert into leave_types(name, description, createdAt, updatedAt) VALUES ('Casual', 'casual leave includes cusual person condition', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+insert into leave_types(name, description, createdAt, updatedAt) VALUES ('Sick', 'casual leave includes cusual person condition', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 
 select * from leave_types
 
@@ -13,14 +13,17 @@ VALUES ('amna_ali','amna@dummy.com', '123', '1 May 1997', 'abc address', '0305-6
 
 
 UPDATE employees
-SET isInactive=0 WHERE id=2;
+SET  supervisor_email='nauman@dynasoftcloud.com' WHERE id=4;
+
+UPDATE leaves
+SET leaveRequestStatusId='1' WHERE id=2;
 
 
 UPDATE company_funds SET name='umar' where id=1
 
 INSERT INTO roles(title, createdAt, updatedAt) VALUES ('admin',CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-delete from employees where id=1
+delete from employees
 
 delete from leaves
 
@@ -31,7 +34,7 @@ select * from employee_types
 SELECT SCOPE_IDENTITY() AS roleId
 
 
-INSERT INTO employee_designations(designation_type, createdAt, updatedAt) VALUES ('Netsuite Developer', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+INSERT INTO employee_designations(designation_type, createdAt, updatedAt) VALUES ('CEO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 
 select * from employee_designations
 

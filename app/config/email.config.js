@@ -8,11 +8,12 @@ const transporter = nodeMailer.createTransport(sendMailerTransporter({
 	}
 }))
 
-const send_email = (email_to, email_from, email_subject, email_body) => {
+const send_email = (email_to, email_from, cc_email, email_subject, email_body) => {
 	console.log('email_body', email_body)
 	return transporter.sendMail({
 		to: email_to,
 		from: email_from,
+		cc: cc_email ? cc_email : null,
 		subject: email_subject,
 		html: email_body
 	})

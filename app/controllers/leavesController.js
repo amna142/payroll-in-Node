@@ -1,15 +1,17 @@
 const EmployeeController = require('../controllers/employeeController')
 const ENUM = require('../util/constants')
-const handlebars = require('handlebars')
+const db = require('../util/database')
+const Employee = db.employee;
+const fs = require('fs')
+const Sequelize = require('sequelize')
+const Op = Sequelize.Op
 const {
 	send_email
 } = require('../config/email.config')
-const db = require('../util/database')
-const fs = require('fs')
 const LeaveQouta = db.leave_qouta
 const LeaveTypes = db.leave_types
 const LeaveRequest = db.leaves
-
+const leaveRequestStatus = db.leave_request_status
 exports.getLeaves = async (req, res) => {
 	let leave_requests = []
 	let user = EmployeeController.isEmployee(req)
@@ -17,24 +19,25 @@ exports.getLeaves = async (req, res) => {
 	console.log('email', req.session.user)
 	let current_user_email = req.session.user.email
 	// search on employees to find if current_user_email is one of the supervisor's email
-	let supervisor_found = await EmployeeController.isSupervisor(current_user_email) 
-	if(supervisor_found){
+	let supervisor_found = await EmployeeController.isSupervisor(current_user_email)
+	if (supervisor_found) {
 		leave_requests = supervisor_found[current_user_email]
 		console.log('super', JSON.stringify(supervisor_found))
-	}else {
-		console.log('an employee')
+	} else {
+		console.log('No leave requests', JSON.stringify(supervisor_found))
 	}
-	//get supervisors names and show in dropdown
-	// let supervisors = await EmployeeController.employeeWithSupervisor()
-	// console.log('EmployeeController.employeeWithSupervisor()', supervisors)
-	//now find employees under a supervisors 
-	// let employeesUnderSupervisor = await EmployeeController.employeesUnderSupervisor(supervisors)
+
+	//here comes leave status either rejected or accepted 
+	let leaveHistory = leave_history(req.session.user.email)
+
+
+
 	res.render('leaves', {
 		name: req.session.user.name,
 		email: current_user_email,
 		phone: req.session.user.phone,
 		isEmployee: user.isEmployee,
-		leave_requests: leave_requests.length>0 ? leave_requests : [],
+		leave_requests: leave_requests.length > 0 ? leave_requests : [],
 		supervisor_email: req.session.user.supervisor_email,
 		prefernces: leave_types,
 		navigation: {
@@ -59,6 +62,29 @@ let leave_prefernces = () => {
 }
 
 
+let leave_history = (user_email) => {
+	console.log('user_email', user_email)
+	return Employee.findAll({
+		attributes: ['id','name', 'email', 'supervisor_email'],
+		where: {
+			email: user_email
+		},
+		include: [{
+			model: LeaveRequest,
+			attributes: ['id', 'from_date', 'to_date', 'comments', 'days_applied', 'rejected_by', 'rejection_reason', 'referal_reason', 'leaveTypeId'],
+			include: [{
+				model: leaveRequestStatus,
+				attributes: ['id', 'status']
+			}]
+		}]
+	}).then(result=>{
+		console.log('result of leave_history', JSON.stringify(result))
+	}).catch(err=>{
+		console.log('err of leave_history', err)
+	})
+}
+
+
 exports.postLeave = (req, res, next) => {
 	console.log('req.body', req.body)
 	//calculate number of days 
@@ -73,7 +99,7 @@ exports.postLeave = (req, res, next) => {
 		to_date: req.body.to_date,
 		comments: req.body.comments,
 		days_applied: leave_days,
-		leaveRequestStatusId: '3',
+		leaveRequestStatusId: '1',
 		employeeId: req.session.user.id
 	}
 	// create leaves 
@@ -113,3 +139,96 @@ var readHTMLFile = function (path, callback) {
 		}
 	});
 };
+
+
+exports.AcceptLeave = async (req, res, next) => {
+	let HREmails = []
+	let leave_request_id = req.params.id;
+	console.log('leave_request_id', leave_request_id)
+	let HRObj = await EmployeeController.findHR()
+	HRObj.dataValues.employees.forEach(element => {
+		HREmails.push(element.dataValues.email)
+	});
+	//find HR email
+	let employeeObj = await EmployeeController.findByPk(leave_request_id)
+	console.log('employee', req.session.user.email)
+	LeaveRequest.update({
+		leaveRequestStatusId: 2
+	}, {
+		where: {
+			id: leave_request_id
+		}
+	}).then(result => {
+		if (result) {
+			//id update completes, send email to approver and employee as well 
+			send_email(
+				employeeObj.employee.email,
+				req.session.user.email,
+				HREmails[0], //here HR email comes
+				`Leave Request Approved for ${employeeObj.employee.name}`,
+				`<p>Hello ${employeeObj.employee.name}, </br></p>
+				<p>Hope you're doing fine. ${req.session.user.email} have approved leave from <b>${req.body.from_date}</b> till  <b>${req.body.to_date}</b>.</p>
+				<b> Reason Employee Gave For Leave</b>
+				<p> ${employeeObj.comments}</p>
+				<p>this email has been CC to HR</p>
+				<p>Best Regards</p>
+				<b>${req.session.user.name}</b>`
+			)
+			res.redirect('/leaves')
+		}
+	}).catch(err => {
+		console.log('err of AcceptLeave', err)
+	})
+}
+
+
+exports.RejectLeave = async (req, res, next) => {
+	console.log('req.body', req.body)
+	let HREmails = []
+	let HRObj = await EmployeeController.findHR()
+	HRObj.dataValues.employees.forEach(element => {
+		HREmails.push(element.dataValues.email)
+	});
+	let employeeObj = await EmployeeController.findByPk(parseInt(req.body.leave_request_id))
+	console.log('employee', HREmails[0])
+	//update status from leave table and insert rejection reason
+	//now update leave with status and rejection reason
+	let leaveStatusUpdate = updateLeaveApproveStatus(parseInt(req.body.leave_request_id), req.body.rejection_reason, req.session.user.email)
+	// now send email that leave has been rejected
+	if (leaveStatusUpdate) {
+		send_email(
+			employeeObj.employee.email, //to
+			req.session.user.email, //from
+			HREmails[0], //here HR email comes
+			`Leave Request Rejected for ${employeeObj.employee.name}`,
+			`<p>Hello ${employeeObj.employee.name}, </br></p>
+				<p>Hope you're doing fine. ${req.session.user.name} have rejected leave from <b>${employeeObj.from_date}</b> till  <b>${employeeObj.to_date}</b>.</p>
+				<b> Reason Employee Gave For Rejection</b>
+				<p> ${req.body.rejection_reason}</p>
+				<p>this email has been CC to HR</p>
+				<p>Best Regards</p>
+				<b>${req.session.user.name}</b>`
+		)
+		res.redirect('/leaves')
+	}
+}
+
+
+let updateLeaveApproveStatus = (leave_request_id, rejection_reason, name) => {
+	return LeaveRequest.update({
+		rejection_reason: rejection_reason,
+		leaveRequestStatusId: 3,
+		rejected_by: name
+	}, {
+		where: {
+			id: leave_request_id
+		}
+	}).then(result => {
+		console.log('result of updateLeaveApproveStatus', result)
+		if (result) {
+			return result
+		}
+	}).catch(err => {
+		console.log('err of updateLeaveApproveStatus', err)
+	})
+}
