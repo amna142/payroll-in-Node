@@ -29,9 +29,6 @@ exports.getLeaves = async (req, res) => {
 
 	//here comes leave status either rejected or accepted 
 	let leaveHistory = leave_history(req.session.user.email)
-
-
-
 	res.render('leaves', {
 		name: req.session.user.name,
 		email: current_user_email,

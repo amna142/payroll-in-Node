@@ -5,11 +5,12 @@
     margin-top: 0;
 ">
 	<li class="center no-padding">
-		<div class="indigo darken-2 white-text" style="height: 180px;">
+		<div class="indigo darken-2 white-text" style="height: 200px;">
 			<div class="row">
-				<img style="margin-top: 15%;" width="100" height="100"
+					<%- include('./user_profile.ejs'); %>
+				<!-- <img style="margin-top: 15%;" width="100" height="100"
 					src="/default-user.jpg" 
-					class="circle responsive-img" />
+					class="circle responsive-img" /> -->
 
 				<p style="margin-top: -17%;">
 					<div class="row">
@@ -21,13 +22,10 @@
 	</li>
 
 	<li id="dash_dashboard"><a class="waves-effect" href="/"><b>Dashboard</b></a></li>
-	<li id="dash_settings"><a class="waves-effect" href="/settings"><b>Settings</b></a></li>
-	<li id="dash_attendance"><a class="waves-effect" href="/attendance"><b>Attendance</b></a></li>
-	<li id="dash_leaves"><a class="waves-effect" href="/leave_prefernces"><b>Leaves Preferences</b></a></li>
 	<ul class="collapsible" data-collapsible="accordion">
 
 		<li id="dash_users">
-			<div id="dash_users_header" class="collapsible-header waves-effect"><b>Users</b></div>
+			<div id="dash_users_header" class="collapsible-header waves-effect" style="padding-left: 14%;"><b>Users</b></div>
 			<div id="dash_users_body" class="collapsible-body">
 				<ul>
 					<li id="users_seller">
@@ -40,21 +38,8 @@
 				</ul>
 			</div>
 		</li>
-
-		<!-- <li id="dash_products">
-			<div id="dash_products_header" class="collapsible-header waves-effect"><b>Settings</b></div>
-			<div id="dash_products_body" class="collapsible-body">
-				<ul>
-					<li id="products_product">
-						<a class="waves-effect" style="text-decoration: none;" href="#!">Products</a>
-						<a class="waves-effect" style="text-decoration: none;" href="#!">Orders</a>
-					</li>
-				</ul>
-			</div>
-		</li> -->
-
 		<li id="dash_categories">
-			<div id="dash_categories_header" class="collapsible-header waves-effect"><b>Payroll</b></div>
+			<div id="dash_categories_header" class="collapsible-header waves-effect" style="padding-left: 14%;"><b>Payroll</b></div>
 			<div id="dash_categories_body" class="collapsible-body">
 				<ul>
 					<li id="categories_category">
@@ -69,18 +54,21 @@
 		</li>
 
 		<li id="dash_brands">
-			<div id="dash_brands_header" class="collapsible-header waves-effect"><b>Leaves</b></div>
+			<div id="dash_brands_header" class="collapsible-header waves-effect" style="padding-left: 14%;"><b>Leaves</b></div>
 			<div id="dash_brands_body" class="collapsible-body">
 				<ul>
-					<li id="brands_brand">
-						<a class="waves-effect" style="text-decoration: none;" href="#!">Brand</a>
+					<li id="dash_leaves">
+						<a class="waves-effect" style="text-decoration: none;" href="/leave_prefernces">Leaves Preferences</a>
 					</li>
 
-					<li id="brands_sub_brand">
-						<a class="waves-effect" style="text-decoration: none;" href="#!">Sub Brand</a>
+					<li id="leaves">
+						<a class="waves-effect" style="text-decoration: none;" href="/leaves">Leave Request</a>
 					</li>
 				</ul>
 			</div>
 		</li>
 	</ul>
+	<li id="dash_settings"><a class="waves-effect" href="/settings"><b>Settings</b></a></li>
+	<li id="dash_attendance"><a class="waves-effect" href="/attendance"><b>Attendance</b></a></li>
+	<!-- <li id="dash_leaves"><a class="waves-effect" href="/leave_prefernces"><b>Leaves Preferences</b></a></li> -->
 </ul>

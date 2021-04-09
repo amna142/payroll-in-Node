@@ -1,21 +1,22 @@
 <%- include('../includes/header'); %>
 <link rel="stylesheet" href="/css/home.css">
+<link rel="stylesheet" href="/css/user_profile.css">
 </head>
 
 <body>
 	<% if (isAuthenticated) { %>
 
+	
 	<%- include('./partials/side-nav.ejs', {data: name}) %>
 
 	<%- include('./partials/nav-bar.ejs'); %>
-
 
 	<%- include('./partials/main-body.ejs'); %>
 
 	<%- include('../audit-logs/logs.ejs', {data: data}); %>
 
 	<% } %>
-	
+
 
 	<%- include('../includes/footer'); %>
 
@@ -28,7 +29,15 @@
 				accordion: false // A setting that changes the collapsible behavior to expandable instead of the default accordion style
 			});
 			// $('select').material_select();
+			var elems = document.querySelectorAll('.fixed-action-btn');
+			var instances = M.FloatingActionButton.init(elems, {
+				direction: 'left',
+				hoverEnabled: false
+			});
+			var elems = document.querySelectorAll('.dropdown-trigger');
+			var instances = M.Dropdown.init(elems, {
+				alignment: 'left',
+				constrainWidth: false
+			});
 		});
 	</script>
-
-

@@ -13,7 +13,7 @@ VALUES ('amna_ali','amna@dummy.com', '123', '1 May 1997', 'abc address', '0305-6
 
 
 UPDATE employees
-SET  supervisor_email='nauman@dynasoftcloud.com' WHERE id=4;
+SET  email='qaiser.siddiqui@dynasoftcloud.com' WHERE id=4;
 
 UPDATE leaves
 SET leaveRequestStatusId='1' WHERE id=2;
