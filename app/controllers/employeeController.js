@@ -113,6 +113,27 @@ exports.isEmployee = (req) => {
 }
 
 
+exports.EmployeeDesignation = (req) =>{
+	let userId = req.session.user.id;
+	return Employee.findOne({
+		attributes: ['id', 'name'],
+		where: {
+			id: userId
+		},
+		include: [{
+			model: EmployeeDesignation,
+			attributes: ['id', 'designation_type']
+		}]
+	}).then(result=> {
+		console.log('result', JSON.stringify(result))
+		return result.employee_designation
+	}).catch(err=>{
+		console.log('err', err)
+	})
+	
+}
+
+
 //employee having supervisors 
 exports.employeeWithSupervisor = () => {
 	let temp = []

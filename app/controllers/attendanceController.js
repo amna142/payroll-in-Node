@@ -10,6 +10,7 @@ const constants = require('../util/constants')
 const TimeEntries = db.time_entries
 
 exports.getAttendanceFile = (req, res, next) => {
+	console.log('req.file', req)
 	let entries = [],
 		time_entries = [],
 		timeEntries = [],
@@ -196,24 +197,23 @@ let attendanceEntries = (attendance, times, res) => {
 
 
 exports.getAttendance = async (req, res) => {
-	//
 	let entries;
-	let user = EmployeeController.isEmployee(req)
-	if(user.role == 'Admin'){
+	let user = await EmployeeController.EmployeeDesignation(req)
+	if (user.designation_type == 'HR') {
+
 		entries = await getAllAttendanceEntries()
-	}else {
+		console.log('i am inside if', JSON.stringify(entries))
+	} else {
 		entries = await getEmployeeAttendance(req.session.user.attendMachineId)
 	}
-	if (entries.length > 0) {
-		res.render('attendance', {
-			attendance: entries,
-			name: req.session.user.name,
-			navigation: {
-				role: user.role,
-				pageName: constants.attendance
-			},
-		})
-	}
+	res.render('attendance', {
+		attendance: entries,
+		name: req.session.user.name,
+		navigation: {
+			role: user.role,
+			pageName: constants.attendance
+		},
+	})
 }
 
 let getAllAttendanceEntries = () => {

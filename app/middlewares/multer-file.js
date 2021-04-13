@@ -22,7 +22,8 @@ const storage = multer.diskStorage({
 // }	
 
 const fileFilter = (req, file, cb) => {
-	if (file.mimetype === 'application/pdf' || file.mimetype === 'application/octet-stream') {
+	console.log('file amna here', file)
+	if (file.mimetype === 'application/pdf' || file.mimetype === 'application/octet-stream' || file.mimetype === 'application/vnd.ms-excel') {
 		cb(null, true)
 	} else {
 		req.flash('error', 'file type is not supported')

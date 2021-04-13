@@ -1,8 +1,10 @@
-const EmployeeController = require('../controllers/employeeController')
+const EmployeeController = require('./employeeController')
 const ENUM = require('../util/constants')
 const db = require('../util/database')
 const LeaveQouta = db.leave_qouta
+const CompanyPreferences = db.company_preferences
 const LeaveTypes = db.leave_types
+const date = require('date-and-time')
 exports.getLeaves = async (req, res, next) => {
 	let user = EmployeeController.isEmployee(req)
 	let preferences = await leave_prefernces()
@@ -32,7 +34,7 @@ let leave_prefernces = () => {
 }
 
 exports.getAddPrefrence = async (req, res, next) => {
-	
+
 	let user = EmployeeController.isEmployee(req)
 	//get leave types from database
 	let leave_types = await leaveTypes()
@@ -74,5 +76,62 @@ exports.postAddPrefrence = (req, res, next) => {
 		result ? res.redirect('/leave_prefernces') : res.redirect('/leave_prefernce/add')
 	}).catch(err => {
 		console.log('err in postAddPrefrence', err)
+	})
+}
+
+exports.getCompanyPreferences = async (req, res) => {
+	//fetch data from company preferences
+	let user = EmployeeController.isEmployee(req)
+	let company_preferences = await fetchDataFromCompanyPreferences()
+	console.log('company_preferences', company_preferences)
+	res.render('company-preferences', {
+		name: req.session.user.name,
+		company_preferences: company_preferences,
+		isEmployee: user.isEmployee,
+		navigation: {
+			role: user.role,
+			pageName: ENUM.leave_prefernces
+		}
+	})
+}
+
+let fetchDataFromCompanyPreferences = () => {
+	return CompanyPreferences.findOne({
+		attributes: ['id', 'start_time', 'off_time', 'working_hours', 'working_days', 'over_time']
+	}).then(result => {
+		console.log('result.dataValues', result.dataValues)
+		return result.dataValues;
+	}).catch(err => {
+		console.log('err in fetchDataFromCompanyPreferences', err)
+	})
+}
+
+exports.postCompanyPreferences = (req, res) => {
+	let obj = req.body;
+	let temp = []
+	let id = obj.company_preference_id
+	delete obj['company_preference_id']
+	let keys = Object.keys(obj)
+	keys.map((key) => {
+		if (obj[key]) {
+			temp[key] = obj[key].replace(/^\s+|\s+$/g, '')
+		}
+	})
+	//now update these values in company Preferences table
+	let updateStatus = updatePreferences(temp, parseInt(id));
+	if (updateStatus) {
+		res.redirect('/company_preferences')
+	}
+}
+let updatePreferences = (values_to_update, id) => {
+	return CompanyPreferences.update(values_to_update, {
+		where: {
+			id: id
+		}
+	}).then(result => {
+		console.log('result in updatePreferences', result)
+		return result
+	}).catch(err => {
+		console.log('err in updatePreferences', err)
 	})
 }

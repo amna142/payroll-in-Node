@@ -34,7 +34,7 @@ select * from employee_types
 SELECT SCOPE_IDENTITY() AS roleId
 
 
-INSERT INTO employee_designations(designation_type, createdAt, updatedAt) VALUES ('CEO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+INSERT INTO employee_designations(designation_type, createdAt, updatedAt) VALUES ('HR', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 
 select * from employee_designations
 
@@ -48,8 +48,8 @@ select * from salaries
 select * from employee_grades 
 
 select * from EmpGrade_Allowances
-delete    from employee_grades
-delete from employee_grades
+delete    from time_entries
+delete from attendances
 
 INSERT INTO employee_grades(grade, min_salary, max_salary, createdAt, updatedAt) VALUES ('OG3', 40000, 60000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 
@@ -58,3 +58,4 @@ INSERT INTO employee_grades(grade, min_salary, max_salary, createdAt, updatedAt)
 insert into leave_request_statuses(status, createdAt, updatedAt) VALUES ('Rejected', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 
 select * from leave_request_statuses
+

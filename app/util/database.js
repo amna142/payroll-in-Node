@@ -56,6 +56,7 @@ db.leave_types = require('../models/leaveTypes.js')(sequelize, Sequelize)
 db.leave_qouta = require('../models/leaveQouta.js')(sequelize, Sequelize)
 db.leaves = require('../models/leaves')(sequelize, Sequelize)
 db.leave_request_status = require('../models/leaveRequestStatus')(sequelize, Sequelize)
+db.company_preferences = require('../models/companyPreferences')(sequelize, Sequelize)
 //1 employee can have many roles
 //1 role can be assigend to many employees (1(role) -> many(employees))
 

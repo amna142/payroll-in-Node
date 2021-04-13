@@ -1,0 +1,136 @@
+<%- include('../includes/header'); %>
+<link rel="stylesheet" href="/css/home.css">
+<link rel="stylesheet" href="/css/user_profile.css">
+<link rel="stylesheet" href="/css/leave-preferences.css">
+<style>
+	.editHover {
+		background: #E8F3FF
+	}
+</style>
+</head>
+
+
+<body>
+
+	<%- include('../admin/partials/side-nav', {data: name}); %>
+	<%- include('../admin/partials/nav-bar.ejs',{data: navigation}); %>
+	<main>
+		<form method="POST" action="/company_preferences" name="company_preferences_form">
+			<div class="row" style="margin-top: 5%;">
+				<% if(Object.keys(company_preferences)) { %>
+				<input type="hidden" id='company_preference_id' name="company_preference_id" value=<%= company_preferences.id %> />
+				<% for(var i=0; i< Object.keys(company_preferences).length; i++) {
+				
+				if(Object.keys(company_preferences)[i] !== 'id'){	%>
+				<div class="col s3">
+					<input type="hidden" id="<%= Object.keys(company_preferences)[i] %>"
+					name="<%= Object.keys(company_preferences)[i] %>" />
+					<div class="card">
+						<div class="card-content">
+							<span class="card-title grey-text text-darken-4"
+								id="<%= Object.keys(company_preferences)[i] %>"><%= Object.keys(company_preferences)[i] %></span>
+							<p class="inline-editable center" name="<%= Object.keys(company_preferences)[i] %>"
+								id="<%= Object.keys(company_preferences)[i] %>">
+								<%- company_preferences[Object.keys(company_preferences)[i]] %>
+							</p>
+						</div>
+						<div class="card-action">
+							<a href="//materializecss.com">Dashboard</a>
+							<a href='//github.com/Dogfalo/materialize'>Employees</a>
+						</div>
+					</div>
+				</div>
+				<% }
+				}
+		} %>
+			</div>
+			<div class="divider"> </div>
+			<br>
+			<div class="row right">
+				<div class="col s12">
+					<button type="submit" class="btn waves-effect waves-light" value="add">Submit</button>
+				</div>
+			</div>
+		</form>
+	</main>
+
+
+	<%- include('../includes/footer'); %>
+
+
+	<script>
+		$(document).ready(function () {
+			$(".inline-editable").hover(
+				function () {
+					$(this).addClass("editHover");
+				},
+				function () {
+					$(this).removeClass("editHover");
+				}
+			);
+
+			var oldText,
+				newText;
+
+			$(".inline-editable").bind("click", replaceHTML)
+
+			function replaceHTML() {
+				console.log('editing', $(".editing"))
+				if (!$(".editing").length) {
+					oldText = $(this).html()
+					$(this).val = ''
+					$(this).addClass("editing");
+					var form = createForm(oldText);
+					$(this).html("")
+						.html(form);
+					$(this).unbind('click', replaceHTML);
+				}
+			}
+
+			function createForm(text) {
+				var form = "<form class=\"inline-editor\">";
+				form += "<input type=\"text\" class=\"editBox\" value=\"";
+				form += oldText;
+				form += "\" /> </form>";
+				form += "<a href=\"#\" type=\"submit\" value=\"add\" class=\"btnSave white-text btn \">Save</a>";
+				form += "<a href=\"#\" class=\"btnDiscard\">Cancel</a>";
+				return form
+			}
+
+			$(document.body).on("click", ".btnDiscard", function () {
+				$(this).parent().html(oldText);
+				$(".inline-editable").removeClass("editing");
+				$(".inline-editable").bind('click', replaceHTML);
+				$(".inline-editable").removeClass("editHover");
+			});
+
+			$(document.body).on("click", ".btnSave", function () {
+				newText = $(this).parent()
+					.find(".editBox")
+					.val();
+				saveChanges(this, newText)
+			});
+
+			// use enter button
+			$(document.body).on("submit", ".inline-editor", function (e) {
+				e.preventDefault();
+				var newText = $(div).find(".editBox").val()
+				saveChanges(this, newText)
+			})
+
+			function saveChanges(div, newText) {
+				// get data for DB
+				console.log('newText', newText)
+				var id = $(div).parent().attr("id");
+				// var dataToUpdate = {
+				// 	id: id,
+				// 	text: newText
+				// };
+				$('#' + id).val(newText)
+				$(".inline-editable").removeClass("editing");
+				$(div).parent().html(newText);
+				$(".inline-editable").bind('click', replaceHTML);
+				$(".inline-editable").removeClass("editHover");
+			}
+		});
+	</script>

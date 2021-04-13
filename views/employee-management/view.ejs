@@ -1,6 +1,7 @@
 <%- include('../includes/header'); %>
 <link rel="stylesheet" href="/css/home.css">
 <link rel="stylesheet" href="/css/logs.css">
+<link rel="stylesheet" href="/css/user_profile.css">
 </head>
 <script>
 	document.addEventListener('DOMContentLoaded', function () {
@@ -18,7 +19,7 @@
 
 			<ul class="collapsible">
 				<li class="active">
-					<div class="collapsible-header"><i class="material-icons">person</i>Personal History</div>
+					<div class="collapsible-header"><i class="material-icons">person</i>Personal Details</div>
 					<div class="collapsible-body">
 						<ul class="collection center-align">
 							<li class="collection-item"><b>Name:</b> <span> <%= employee.name %></span></li>
@@ -31,7 +32,7 @@
 					</div>
 				</li>
 				<li>
-					<div class="collapsible-header"><i class="material-icons">business_center</i>Employment History
+					<div class="collapsible-header"><i class="material-icons">business_center</i>Employment Details
 					</div>
 					<div class="collapsible-body">
 
@@ -49,7 +50,7 @@
 					</div>
 				</li>
 				<li>
-					<div class="collapsible-header"><i class="material-icons">attach_money</i>Salary History</div>
+					<div class="collapsible-header"><i class="material-icons">attach_money</i>Salary Details</div>
 					<div class="collapsible-body">
 						<ul class="collection center-align">
 							<li class="collection-item"><b>Employee Grade:</b> <span>
