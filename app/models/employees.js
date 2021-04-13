@@ -79,6 +79,11 @@ module.exports = (sequelize, Sequelize) => {
 			required: false,
 			isEmail: true,
 			notEmpty: false
+		},
+		profile_image: {
+			type: Sequelize.STRING,
+			required: false,
+			allowNull: true
 		}
 	});
 	return Employee

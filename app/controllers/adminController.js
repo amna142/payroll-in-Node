@@ -4,7 +4,6 @@ const constants = require('../util/constants')
 const email = require('../util/constants')
 const fs = require('fs');
 const nodeParser = require('node-date-parser')
-const path = require('path')
 const {
 	transporter
 } = require('../config/email.config')

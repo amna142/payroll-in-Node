@@ -3,8 +3,12 @@ const router = express.Router()
 const adminController = require('../controllers/adminController')
 const isAuth = require('../middlewares/is-auth')
 const upload = require('../middlewares/multer-file').single('resume')
+const uploadImage = require('../middlewares/multer-file').single('user_profile_image')
+const EmployeeController = require('../controllers/employeeController')
 //login -> Admin Request
 router.get('/', isAuth, adminController.adminHome)
+router.post('/user_profile_image', EmployeeController.postUserProfile)
+
 router.get('/employees', isAuth, adminController.employeesIndexPage)
 
 //add requests

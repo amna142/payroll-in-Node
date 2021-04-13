@@ -20,11 +20,13 @@ const errorRoutes = require('./app/routes/errorRoutes')
 const flash = require('connect-flash')
 const secretKey = require('./app/config/secret')
 
-app.set('view engine', 'ejs')
-app.set('views', 'views')
 app.use(bodyParser.urlencoded({
 	extended: false
 }))
+app.use(express.json());
+app.set('view engine', 'ejs')
+app.set('views', 'views')
+
 
 app.use('/', serveStatic(path.join(__dirname, 'app/assets')))
 app.use('/', serveStatic(path.join(__dirname, 'public')))
@@ -49,12 +51,12 @@ app.use(leavesRoutes)
 app.use(logsRoutes)
 app.use(errorRoutes)
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.WEB_PORT || 3000
 
 //{force: true}
 db.sequelize.sync().then(result => {
 	
-	app.listen(3000, () => {
+	app.listen(PORT, () => {
 		// console.log(result)
 		console.log(`Server is running on port ${PORT}`)
 	})

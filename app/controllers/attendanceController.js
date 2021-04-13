@@ -199,8 +199,8 @@ let attendanceEntries = (attendance, times, res) => {
 exports.getAttendance = async (req, res) => {
 	let entries;
 	let user = await EmployeeController.EmployeeDesignation(req)
-	if (user.designation_type == 'HR') {
-
+	console.log('user', JSON.stringify(user))
+	if (user.designation_type == 'HR' || req.session.user.role === 'admin') {
 		entries = await getAllAttendanceEntries()
 		console.log('i am inside if', JSON.stringify(entries))
 	} else {

@@ -2,6 +2,8 @@ const {
 	template
 } = require('handlebars')
 const Sequelize = require('sequelize')
+const fs = require('fs');
+const path = require('path')
 const db = require("../util/database")
 const Op = Sequelize.Op
 const Allowance = db.allowances
@@ -113,7 +115,7 @@ exports.isEmployee = (req) => {
 }
 
 
-exports.EmployeeDesignation = (req) =>{
+exports.EmployeeDesignation = (req) => {
 	let userId = req.session.user.id;
 	return Employee.findOne({
 		attributes: ['id', 'name'],
@@ -121,16 +123,21 @@ exports.EmployeeDesignation = (req) =>{
 			id: userId
 		},
 		include: [{
-			model: EmployeeDesignation,
-			attributes: ['id', 'designation_type']
-		}]
-	}).then(result=> {
+				model: EmployeeDesignation,
+				attributes: ['id', 'designation_type']
+			},
+			{
+				model: Role,
+				attributes: ['title']
+			}
+		]
+	}).then(result => {
 		console.log('result', JSON.stringify(result))
 		return result.employee_designation
-	}).catch(err=>{
+	}).catch(err => {
 		console.log('err', err)
 	})
-	
+
 }
 
 
@@ -247,4 +254,29 @@ exports.findHR = () => {
 	}).catch(err => {
 		console.log('err in findHR', err)
 	})
+}
+
+
+exports.postUserProfile = (req, res) => {
+	// console.log('req', req.body);
+	var profileImg = req.body.userImgBase64;
+	console.log('profileImg.length',profileImg.length);
+	var ext = req.body.ext;
+	if (!profileImg || !ext) res.json({
+		status: 301,
+		data: null,
+		message: 'Unexpected error has occurred!'
+	});
+
+	else {
+		const imgPth = `public/templates/${new Date().getMilliseconds()}.${ext}`;
+		const buffer = Buffer.from(profileImg, "base64");
+		fs.writeFile(buffer, 'base64', (err) =>{
+			if (err) {
+				console.log(err);
+				res.json(err)
+			}
+			else res.json(imgPth);
+		})
+	}
 }

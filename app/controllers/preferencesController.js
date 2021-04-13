@@ -4,7 +4,6 @@ const db = require('../util/database')
 const LeaveQouta = db.leave_qouta
 const CompanyPreferences = db.company_preferences
 const LeaveTypes = db.leave_types
-const date = require('date-and-time')
 exports.getLeaves = async (req, res, next) => {
 	let user = EmployeeController.isEmployee(req)
 	let preferences = await leave_prefernces()

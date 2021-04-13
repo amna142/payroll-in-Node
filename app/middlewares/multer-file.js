@@ -30,11 +30,21 @@ const fileFilter = (req, file, cb) => {
 		cb(null, false)
 	}
 }
+const userProfileFilter = (req, file, cb) =>{
+	console.log('image file amna here', file)
+	if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+		cb(null, true)
+	} else {
+		req.flash('error', 'image file type is not supported')
+		cb(null, false)
+	}
+}
 
 var uplaod = multer({
 	storage: storage,
 	// onError: error,
-	fileFilter: fileFilter
+	fileFilter: fileFilter,
+	userProfileFilter: userProfileFilter
 	
 })
 
