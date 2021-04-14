@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="/css/home.css">
 <link rel="stylesheet" href="/css/logs.css">
 <link rel="stylesheet" href="/css/user_profile.css">
+<link rel="stylesheet" href="/css/chosen-required.css">
 </head>
 
 <body>
@@ -27,6 +28,9 @@
 			<% if(!isEmployee) { %>
 			<a class="btn blue lighten-2" style="margin-top: 10px;" href="/employee/add" class="btn btn-secondary">New
 				Employee</a>
+			<% } else if(isEmployee && designation === 'HR') { %>
+			<a class="btn blue lighten-2" style="margin-top: 10px;" href="/employee/add" class="btn btn-secondary">New
+				Employee</a>
 			<% } %>
 
 			<table class="striped responsive-table" id="employee_table">
@@ -48,15 +52,14 @@
 					
   for(var i = 0; i< data.length; i++) {%>
 					<tr>
-
 						<td hidden id="employee_id"><%= data[i].id%></td>
 						<td><%= data[i].name%></td>
 						<td><%= data[i].email%></td>
 						<td><%= data[i].phone%></td>
 						<td><%= data[i].dob%></td>
 						<td><%= data[i].address%></td>
-						<td><%= data[i].hiring_date%></td>
-						<td><%= data[i].designation%></td>
+						<td><%= data[i].starting_date%></td>
+						<td><%= data[i].employee_designation%></td>
 						<td><%= data[i].employee_type%></td>
 
 						<td>
@@ -71,6 +74,11 @@
 							<a class="btn-floating delete modal-trigger waves-effect waves-light red accent-3"
 								href="#delete_employee"><i class="material-icons">delete</i></a>
 							<!-- <a class="btn delete modal-trigger red accent-3" href="#delete_employee">Delete</a> -->
+							<% } else if(isEmployee && designation === 'HR'){ %>
+							<a class="btn-floating waves-effect waves-light modal-trigger edit"
+								href="../employee/edit/<%=data[i].id%>"><i class="material-icons">edit</i></a>
+							<a class="btn-floating delete modal-trigger waves-effect waves-light red accent-3"
+								href="#delete_employee"><i class="material-icons">delete</i></a>
 							<% } %>
 						</td>
 					</tr>

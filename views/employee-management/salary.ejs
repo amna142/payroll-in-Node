@@ -1,37 +1,36 @@
 <script>
 	$(document).ready(function () {
-		$('#salary').change(function () {
-			var employee_salary = document.getElementById("salary").value;
-			var employee_grade_id = document.getElementById('grade').value
-			if (employee_grade_id) {
-				var employee_grade = $("#grade option:selected").text();
-				employee_grade = JSON.stringify(employee_grade).split(/[.>\),<]/)
-				if (employee_salary >= employee_grade[1] && employee_salary <= employee_grade[3]) {
-					console.log('i am focused out', employee_grade)
-					var span_msg = document.getElementById('msg')
-					if (span_msg.hasAttribute('data-success')) {
-						span_msg.setAttribute('data-success', 'Salary selected' + employee_salary)
-						console.log('data-success', span_msg)
-					}
-					console.log('span_msg', span_msg)
-				} else {
-					var span_msg = document.getElementById('msg')
-					if (span_msg.hasAttribute('data-error')) {
-						span_msg.setAttribute('data-error', 'Salary is out of range')
-						console.log('data-error', span_msg)
-					}
-				}
-			}
-		})
 		$('#grade').change(function () {
 			let grade_id = document.getElementById('grade').value
 			if (grade_id) {
 				var d = document.getElementById('salary')
 				if (d.hasAttribute('disabled')) {
 					d.removeAttribute('disabled')
-					console.log('d', d)
 				}
 			}
+		})
+		$('#salary').change(function () {
+			let gradeValue = $('#grade').val();
+			let salaryValue = $(this).val();
+			fetch('http://localhost:3000/grade_salary_validation', {
+				method: 'POST',
+				body: JSON.stringify({
+					grade: gradeValue,
+					salary: salaryValue
+				}),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			}).then(res => {
+				return res.json()
+			}).then(response => {
+				console.log('response', response)
+				if(response.status!=200){
+					alert('salary isnt in grade range, please enter salary in between range')
+				}
+			}).catch(err => {
+				console.log('err in grade valu validation', err)
+			})
 		})
 	})
 </script>

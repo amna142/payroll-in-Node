@@ -148,7 +148,6 @@ exports.AcceptLeave = async (req, res, next) => {
 	});
 	//find HR email
 	let employeeObj = await EmployeeController.findByPk(leave_request_id)
-	console.log('employee', req.session.user.email)
 	LeaveRequest.update({
 		leaveRequestStatusId: 2
 	}, {
@@ -187,7 +186,6 @@ exports.RejectLeave = async (req, res, next) => {
 		HREmails.push(element.dataValues.email)
 	});
 	let employeeObj = await EmployeeController.findByPk(parseInt(req.body.leave_request_id))
-	console.log('employee', HREmails[0])
 	//update status from leave table and insert rejection reason
 	//now update leave with status and rejection reason
 	let leaveStatusUpdate = updateLeaveApproveStatus(parseInt(req.body.leave_request_id), req.body.rejection_reason, req.session.user.email)

@@ -35,6 +35,7 @@ exports.getPage = async (req, res, next) => {
 //get Allowances
 
 exports.getSettings = async (req, res) => {
+	console.log('req.sess', req.session.user)
 	let allowances = await AllowanceController.findAll()
 	let grades = await GradeController.findAll()
 	let funds = await FundController.findAll()

@@ -4,7 +4,9 @@ const {
 const Sequelize = require('sequelize')
 const fs = require('fs');
 const path = require('path')
+const isValidBirthdate = require('is-valid-birthdate');
 const db = require("../util/database")
+const LogsController = require('../controllers/logsController')
 const Op = Sequelize.Op
 const Allowance = db.allowances
 const Fund = db.company_funds
@@ -256,12 +258,69 @@ exports.findHR = () => {
 	})
 }
 
+exports.findUser = (id) => {
+	return Employee.findAll({
+		attributes: ['id', 'name', 'email', 'phone', 'dob', 'address', 'starting_date'],
+		where: {
+			id: id
+		},
+		include: [{
+				model: EmployeeDesignation,
+				attributes: ['designation_type']
+			},
+			{
+				model: EmployeeType,
+				attributes: ['employee_type']
+			}
+		]
+	}).then(result => {
+		console.log('result in findCurrentUser', JSON.stringify(result))
+		let currentEmployee = result[0].dataValues
+		console.log()
+		currentEmployee.employee_designation = currentEmployee.employee_designation.dataValues.designation_type;
+		currentEmployee.employee_type = currentEmployee.employee_type.dataValues.employee_type;
+		currentEmployee.starting_date = LogsController.convertDate(currentEmployee.starting_date)
+		currentEmployee.dob = LogsController.convertDate(currentEmployee.dob)
+		return result
+	}).catch(err => {
+		console.log('err in findCurrentUser', err)
+	})
+}
 
+exports.ValidateDOB = (req, res) => {
+	console.log('dob body', req.body)
+	let dob = req.body.dob;
+	if (!dob) res.json({
+		status: 301,
+		data: null,
+		message: 'Unexpected error has occurred!'
+	})
+	else {
+		let validate = isValidBirthdate(dob, {
+			minAge: 18
+		})
+		console.log('validate dob', validate)
+		if (validate) {
+			res.json({
+				status: 200,
+				data: validate,
+				message: 'Valid Date of Birth!'
+			})
+		} else {
+			res.json({
+				status: 400,
+				data: null,
+				message: 'invalid Date of Birth!'
+			})
+		}
+	}
+}
 exports.postUserProfile = (req, res) => {
 	// console.log('req', req.body);
 	var profileImg = req.body.userImgBase64;
-	console.log('profileImg.length',profileImg.length);
+	console.log('profileImg.length', profileImg.length);
 	var ext = req.body.ext;
+	console.log('ext', ext)
 	if (!profileImg || !ext) res.json({
 		status: 301,
 		data: null,
@@ -270,13 +329,54 @@ exports.postUserProfile = (req, res) => {
 
 	else {
 		const imgPth = `public/templates/${new Date().getMilliseconds()}.${ext}`;
+		console.log('imgPath', typeof (imgPth));
 		const buffer = Buffer.from(profileImg, "base64");
-		fs.writeFile(buffer, 'base64', (err) =>{
+		fs.writeFile(buffer, 'base64', (err) => {
 			if (err) {
-				console.log(err);
+				console.log('i am inside')
+				console.log("err of postUserProfile", err);
 				res.json(err)
+			} else {
+				console.log('i am outside');
+				res.json(imgPth);
 			}
-			else res.json(imgPth);
 		})
 	}
+}
+
+exports.GradeSalaryValidation = async (req, res) => {
+	console.log('req.body', req.body)
+	let gradeId = req.body.grade;
+	let salary = req.body.salary;
+	//find grade min max range
+	let salaryRange = await EmployeeGradeSalary(gradeId)
+	console.log('salaryRange', salaryRange)
+	if (salary > salaryRange.min_salary && salary < salaryRange.max_salary) {
+		res.json({
+			data: null,
+			status: 200,
+			message: 'success'
+		})
+	} else {
+		res.json({
+			data: null,
+			status: 301,
+			message: 'err'
+		})
+	}
+
+}
+
+let EmployeeGradeSalary = (gradeId) => {
+	return EmployeeGrade.findOne({
+		attributes: ['min_salary', 'max_salary'],
+		where: {
+			id: gradeId
+		}
+	}).then(result => {
+		console.log('result', result.min_salary)
+		return result
+	}).catch(err => {
+		console.log('err in EmployeeGradeSalary', err)
+	})
 }

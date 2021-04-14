@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 const constants = require('../util/constants')
 const email = require('../util/constants')
 const fs = require('fs');
+const isValidBirthdate = require('is-valid-birthdate')
 const nodeParser = require('node-date-parser')
 const {
 	transporter
@@ -11,7 +12,10 @@ const logsController = require('./logsController')
 var oldRecord;
 var AUDIT_LOGS = []
 const employeeController = require('./employeeController')
-const salariesController = require('./employeeSalaries')
+const salariesController = require('./employeeSalaries');
+const {
+	employee_designation
+} = require('../util/database');
 exports.adminHome = async (req, res) => {
 	//get Cookie
 	let logsArray = []
@@ -47,19 +51,37 @@ function getLogs() {
 	})
 }
 exports.employeesIndexPage = async (req, res) => {
-	let logsArray = []
+	let logsArray = [];
 	let emp = await findAllEmployees()
-	let employeesArray = []
+	let employeesArray = [],
+		currentEmployee = []
 	//get role of user to restrict access
 	let isUser = employeeController.isEmployee(req)
 	isUser.role === 'Employee' ? logsArray = await logsController.employeeLogs(req.session.user.id) : logsArray = await logsController.getLogs()
+	
+	var des = await designation(req.session.user.employeeDesignationId)
+	console.log('designation', des)
 	if (emp.length > 0) {
-		let employee_designation, employee_type;
+		var emp_designation, employee_type;
+		if (isUser.isEmployee) {
+			currentEmployee.push({
+				id: req.session.user.id,
+				name: req.session.user.name,
+				email: req.session.user.email,
+				phone: req.session.user.phone,
+				dob: logsController.convertDate(req.session.user.dob),
+				address: req.session.user.address,
+				starting_date: logsController.convertDate(req.session.user.starting_date),
+				employee_designation: await designation(req.session.user.employeeDesignationId),
+				employee_type: await type(req.session.user.employeeTypeId)
+			})
+			console.log('currentUser', currentEmployee)
+		}
 		for (var i = 0; i < emp.length; i++) {
 			let unitEmployee = emp[i]
 			//fetch employee designation
-			employee_designation = await designation(unitEmployee.employeeDesignationId)
-			employee_type = await type(unitEmployee.employeeDesignationId)
+			emp_designation = await designation(unitEmployee.employeeDesignationId)
+			employee_type = await type(unitEmployee.employeeTypeId)
 			//convert date 
 			employeesArray.push({
 				id: unitEmployee.id,
@@ -68,13 +90,14 @@ exports.employeesIndexPage = async (req, res) => {
 				phone: unitEmployee.phone,
 				dob: logsController.convertDate(unitEmployee.dob),
 				address: unitEmployee.address,
-				hiring_date: logsController.convertDate(unitEmployee.starting_date),
-				designation: employee_designation,
+				starting_date: logsController.convertDate(unitEmployee.starting_date),
+				employee_designation: emp_designation,
 				employee_type: employee_type
 			})
 		}
 		res.render('employee-management', {
-			data: employeesArray,
+			data: (isUser.isEmployee && des != 'HR') ? currentEmployee : employeesArray,
+			designation: des,
 			pageTitle: 'Employees',
 			isEmployee: isUser.isEmployee,
 			navigation: {
@@ -128,11 +151,13 @@ let findAllEmployees = (req, res) => {
 }
 
 let type = (id) => {
+	console.log('id for employee type', id)
 	return db.employee_type.findOne({
 		where: {
 			id: id
 		}
 	}).then(result => {
+		console.log("result", JSON.stringify(result))
 		return result.dataValues.employee_type
 	}).catch(err => {
 		console.log('err', err)
@@ -305,47 +330,50 @@ exports.postAddEmployee = async (req, res) => {
 		employeeGradeId: gradeId,
 		attendMachineId: req.body.machine_attendance_id
 	}
-	if (Object.keys(params).length > 0) {
-		Object.keys(params).forEach(function (key) {
-			var value = params[key]
-			console.log(key, value)
-			AUDIT_LOGS.push({
-				name: req.session.user.name,
-				emp_id: req.session.user.id,
-				date: new Date(),
-				time: getTime(),
-				action: constants.SET,
-				record_type: 'Employee',
-				field_id: key,
-				new_value: value
-			})
-		})
-	}
-	let value = await employeeByEmail(params.email)
-	console.log(value)
-	if (value) {
-		// now add employee
-		db.employee.create(params).then((employee) => {
-			console.log('employee created', employee)
-			let empId = employee.dataValues.id
-			//before employee creation, the create employee salary record
-			salariesController.createSalary(empId, req.body.salary, gradeId)
-			logsController.insertLogs(AUDIT_LOGS)
-			res.redirect('/employees')
-			return transporter.sendMail({
-				to: email,
-				from: email.FROM,
-				subject: 'Employee Created',
-				html: `
-				<p>You Account has been Created</p>
-				<p>Click this <a href="http://localhost:3000/login">link</a> to get Into the System</p>	`
-			})
-		})
-	} else {
-		console.log('employee already exist')
-		req.flash('err', 'employee already exist')
-		res.redirect('/employees')
-	}
+	//check if dob is validate 
+	let validateDOB = isValidBirthdate(params.dob)
+	console.log('validateDOB', validateDOB)
+	// if (Object.keys(params).length > 0) {
+	// 	Object.keys(params).forEach(function (key) {
+	// 		var value = params[key]
+	// 		console.log(key, value)
+	// 		AUDIT_LOGS.push({
+	// 			name: req.session.user.name,
+	// 			emp_id: req.session.user.id,
+	// 			date: new Date(),
+	// 			time: getTime(),
+	// 			action: constants.SET,
+	// 			record_type: 'Employee',
+	// 			field_id: key,
+	// 			new_value: value
+	// 		})
+	// 	})
+	// }
+	// let value = await employeeByEmail(params.email)
+	// console.log(value)
+	// if (value) {
+	// 	// now add employee
+	// 	db.employee.create(params).then((employee) => {
+	// 		console.log('employee created', employee)
+	// 		let empId = employee.dataValues.id
+	// 		//before employee creation, the create employee salary record
+	// 		salariesController.createSalary(empId, req.body.salary, gradeId)
+	// 		logsController.insertLogs(AUDIT_LOGS)
+	// 		res.redirect('/employees')
+	// 		return transporter.sendMail({
+	// 			to: email,
+	// 			from: email.FROM,
+	// 			subject: 'Employee Created',
+	// 			html: `
+	// 			<p>You Account has been Created</p>
+	// 			<p>Click this <a href="http://localhost:3000/login">link</a> to get Into the System</p>	`
+	// 		})
+	// 	})
+	// } else {
+	// 	console.log('employee already exist')
+	// 	req.flash('err', 'employee already exist')
+	// 	res.redirect('/employees')
+	// }
 }
 
 
@@ -377,7 +405,7 @@ exports.getEditEmployee = async (req, res) => {
 			starting_date: logsController.convertDate(employeeFound.starting_date),
 			file: employeeFound.file,
 			grades: grades,
-			dob:  logsController.convertDate(employeeFound.dob),
+			dob: logsController.convertDate(employeeFound.dob),
 			employeeTypes: employeeTypes,
 			employeeDesignations: employeeDesignations,
 			type: employee_type,
@@ -553,7 +581,6 @@ exports.getAdminIndexPage = (req, res, next) => {
 			console.log('no user found')
 		} else {
 			if (employee) {
-				console.log('employee', employee)
 				let arr = []
 				for (var i = 0; i < employee.length; i++) {
 					arr.push({

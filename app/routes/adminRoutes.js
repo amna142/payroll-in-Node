@@ -8,9 +8,10 @@ const EmployeeController = require('../controllers/employeeController')
 //login -> Admin Request
 router.get('/', isAuth, adminController.adminHome)
 router.post('/user_profile_image', EmployeeController.postUserProfile)
-
+router.post('/grade_salary_validation', EmployeeController.GradeSalaryValidation)
 router.get('/employees', isAuth, adminController.employeesIndexPage)
 
+router.post('/validate_dob', isAuth, EmployeeController.ValidateDOB)
 //add requests
 
 router.get('/employee/add', isAuth, adminController.getAddEmployee)
