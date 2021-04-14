@@ -18,8 +18,11 @@
 		<div class="col s8 user-message user-message--error"><%= errorMessage %>
 		</div>
 		<% } %>
-		<a class="btn-floating btn-large  waves-effect waves-light indigo-text text-lighten-1"
+		<% if(navigation.role == 'Admin' || designation === 'HR' ) { %>
+			<a class="btn-floating btn-large  waves-effect waves-light indigo-text text-lighten-1"
 			href="/settings/allowances/add"><i class="material-icons">add</i></a>
+					<%  } %>
+		
 		<table class="striped responsive-table" id="allowance_table">
 			<thead>
 				<tr>
@@ -27,7 +30,7 @@
 					<th>Name</th>
 					<th>Description</th>
 					<th>Amount</th>
-					<% if(navigation.role == 'Admin' ) { %>
+					<% if(navigation.role == 'Admin' || designation === 'HR' ) { %>
 					<th>Actions</th>
 					<%  } %>
 				</tr>
@@ -42,7 +45,7 @@
 					<td><%= allowances[i].name%></td>
 					<td><%= allowances[i].description%></td>
 					<td><%= allowances[i].amount%></td>
-					<% if(navigation.role == 'Admin') {%>
+					<% if(navigation.role == 'Admin' || designation === 'HR') {%>
 					<td>
 						<a class="modal-trigger" href="#allowance-edit-modal" id="edit-modal"><i
 								class="indigo-text text-lighten-1 material-icons">edit</i></a>

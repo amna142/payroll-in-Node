@@ -35,7 +35,8 @@ exports.getPage = async (req, res, next) => {
 //get Allowances
 
 exports.getSettings = async (req, res) => {
-	console.log('req.sess', req.session.user)
+	var designation = await EmployeeController.CurrentUserDesignation(req.session.user.employeeDesignationId)
+	console.log('designation type', designation.designation_type)
 	let allowances = await AllowanceController.findAll()
 	let grades = await GradeController.findAll()
 	let funds = await FundController.findAll()
@@ -50,11 +51,13 @@ exports.getSettings = async (req, res) => {
 			record_type: 'Allowance'
 		})
 	}
+	console.log('designation', designation.designation_type)
 	res.render('settings', {
 		allowances: allowances,
 		grades: grades,
 		navigation: {role: user.role, pageName: constants.setting},
 		funds: funds,
+		designation: designation.designation_type,
 		name: req.session.user.name,
 		logsData: logsArray,
 		errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null,

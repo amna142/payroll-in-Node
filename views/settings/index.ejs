@@ -19,7 +19,7 @@
 		<div class="row">
 			<div class="col s12">
 				<ul class="tabs">
-					<% if(navigation.role == 'Admin') { %>
+					<% if(navigation.role == 'Admin' || designation === 'HR') { %>
 					<li class="tab col s3"><a class="active" href="#grades">Grades</a></li>
 					<li class="tab col s3"><a href="#allowances">Allowance</a></li>
 					<li class="tab col s3"><a href="#funds">Funds</a></li>
@@ -46,7 +46,7 @@
 					<h3 class='header'>Company Funds</h3>
 					<%- include('./funds/index'); %>
 				</div>
-				<% if(navigation.role == 'Admin') {%>
+				<% if(navigation.role == 'Admin' || designation === 'HR') {%>
 				<div id="attendance" class="col s12">
 					<h3 class='header'>Attendance</h3>
 					<%- include('./attendance/index'); %>

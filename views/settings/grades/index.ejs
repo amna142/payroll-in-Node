@@ -18,8 +18,11 @@
 	<%- include('./edit.ejs'); %>
 	<!-- Modal Structure -->
 	<div style="padding-left: 1%;">
+		<% if(navigation.role == 'Admin' || designation === 'HR') {%>
 		<a class="btn blue lighten-2" style="margin-top: 7px;" href="/settings/grades/add" class="btn btn-secondary">New
 			Grade</a>
+		<% } %>
+
 		<% var d = JSON.stringify(grades) %>
 		<table id="grades_table" class="display" style="width:100%">
 			<thead>
@@ -74,17 +77,18 @@
 						data: "max_salary"
 						// render: $.fn.dataTable.render.number(',', '.', 0, '$')
 					},
-					
+
 					{
 						data: null,
 						className: "center",
 						render: function (data, type, row) {
 							console.log('type:', '<%- navigation.role %>')
-							return '<%- navigation.role %>' === 'Admin' ? `<a class="btn-floating waves-effect waves-light modal-trigger" id="grade-modal" href="#grade-edit-modal"><i
+							return '<%- navigation.role %>' === 'Admin' || '<%- designation %>' ===
+								'HR' ? `<a class="btn-floating waves-effect waves-light modal-trigger" id="grade-modal" href="#grade-edit-modal"><i
 								class="material-icons">edit</i></a>
 								<a class="btn-floating waves-effect waves-light red modal-trigger" href="#modal1"><i
-								class="material-icons">delete</i></a>`
-								: ''
+								class="material-icons">delete</i></a>` :
+								''
 						}
 					}
 				],

@@ -13,8 +13,11 @@
 	</div>
 	<%- include('../../admin/partials/side-nav'); %>
 	<div style="padding-left: 1%;">
-		<a class="btn-floating btn-large  waves-effect waves-light indigo-text text-lighten-1"
+		<% if(navigation.role == 'Admin' || designation === 'HR') {%>
+				<a class="btn-floating btn-large  waves-effect waves-light indigo-text text-lighten-1"
 			href="/settings/funds/add"><i class="material-icons">add</i></a>
+					<% } %>
+		
 		<table class="striped responsive-table" id="fund_table">
 			<thead>
 				<tr>
@@ -22,7 +25,7 @@
 					<th>Name</th>
 					<th>Description</th>
 					<th>Amount</th>
-					<% if(navigation.role == 'Admin') {%>
+					<% if(navigation.role == 'Admin' || designation === 'HR') {%>
 					<th>Actions</th>
 					<% } %>
 					
@@ -36,7 +39,7 @@
 					<td><%= funds[i].name%></td>
 					<td><%= funds[i].description%></td>
 					<td><%= funds[i].amount%></td>
-					<% if(navigation.role == 'Admin')  { %>
+					<% if(navigation.role == 'Admin' || designation === 'HR')  { %>
 					<td>
 						<a class="modal-trigger" href="#funds-edit-modal" id="edit-modal"><i
 								class="indigo-text text-lighten-1 material-icons">edit</i></a>
