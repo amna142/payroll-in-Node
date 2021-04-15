@@ -1,6 +1,6 @@
-
 <%- include('../../includes/header'); %>
 <link rel="stylesheet" href="/css/user_profile.css">
+<link rel="stylesheet" href="/css/error-message.css">
 </head>
 
 <body>
@@ -8,17 +8,24 @@
 
 
 	<div class="container" style="padding-top: 3%; padding-left: 5%;">
+		<% if(errorMessage) { %>
+
+		<div class="col s8 user-message user-message--error"><%= errorMessage %>
+		</div>
+		<% } %>
+
 		<div class="row">
 			<form class="col s12" action="/settings/funds/add" method="POST" name="form1">
 				<h5><b style="color: coral;">Funds Details</b></h5>
+
 				<div class="divider"></div>
 				<br />
 				<blockquote>
 					<div class="row">
 						<div class="input-field col s6">
 							<i class="material-icons prefix">check_box_outline_blank</i>
-							<input  type="text" class="validate" required="" aria-required="true"
-								class="form-control" name="fund_name" id="fund_name" value="">
+							<input type="text" class="validate" required="" aria-required="true" class="form-control"
+								name="fund_name" id="fund_name" value="">
 							<label for="fund_name">Fund Name</label>
 						</div>
 					</div>

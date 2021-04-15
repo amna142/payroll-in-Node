@@ -71,6 +71,7 @@
 
 			$('#fund_table tbody').on('click', 'a.modal-trigger', function () {
 				var $row = $(this).closest("tr"); // Find the row
+				console.log('amna row', $row)
 				var $fundId = $row.find("#fund_id").text();
 				console.log('fundId', $fundId)
 				// modal population.

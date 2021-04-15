@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="/css/user_profile.css">
 <link rel="stylesheet" href="/css/home.css">
 <link rel="stylesheet" href="/css/chosen-required.css"/>
+<link rel="stylesheet" href="/css/error-message.css">
 <script>
 	$(document).ready(function () {
 		$('#add-grade-form #min_salary').change(validateMinMaxSalary)
@@ -27,6 +28,11 @@
 	<%- include('../../admin/partials/side-nav'); %>
 
 	<div class="container" style="padding-top: 3%; padding-left: 5%;">
+		<% if(errorMessage) { %>
+
+		<div class="col s8 user-message user-message--error"><%= errorMessage %>
+		</div>
+		<% } %>
 		<div class="row">
 			<div class="row">
 				<form class="col s12" action="/settings/grades/add" method="POST" name="form1" id="add-grade-form">

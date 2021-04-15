@@ -9,6 +9,8 @@ const constants = require('../util/constants')
 const nodeDateParser = require('node-date-parser')
 var AUDIT_LOGS = []
 
+var errorMessages = [];
+
 exports.getPage = async (req, res, next) => {
 	let path = req.path;
 	let pathArray = path.split('/')
@@ -21,14 +23,31 @@ exports.getPage = async (req, res, next) => {
 		funds = await FundController.findAll()
 	}
 	path = path.replace(path[0], '')
-	console.log('errorMessage', req.flash('error').length > 0 ? req.flash('error')[0] : null)
+	if(req.flash('error').length>0) {
+		errorMessages.push(req.flash('error'))
+	}
+	console.log('error length', errorMessages)
+	console.log('amna obj', {
+		allowances: allowances,
+		name: req.session.user.name,
+		errorMessage: errorMessages.length > 0 ? errorMessages[0] : null,
+		navigation: {
+			role: user.role,
+			pageName: constants.setting
+		},
+		funds: funds
+	})
 	res.render(path, {
 		allowances: allowances,
 		name: req.session.user.name,
-		errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null,
-		navigation: {role: user.role, pageName: constants.setting},
+		errorMessage: errorMessages.length > 0 ? errorMessages[0] : null,
+		navigation: {
+			role: user.role,
+			pageName: constants.setting
+		},
 		funds: funds
 	})
+	errorMessages = []
 }
 
 
@@ -55,7 +74,10 @@ exports.getSettings = async (req, res) => {
 	res.render('settings', {
 		allowances: allowances,
 		grades: grades,
-		navigation: {role: user.role, pageName: constants.setting},
+		navigation: {
+			role: user.role,
+			pageName: constants.setting
+		},
 		funds: funds,
 		designation: designation.designation_type,
 		name: req.session.user.name,
@@ -80,7 +102,7 @@ exports.postAddAllowances = async (req, res) => {
 			AUDIT_LOGS.push({
 				name: req.session.user.name,
 				emp_id: req.session.user.id,
-				date:  nodeParser.parse(new Date()),
+				date: nodeParser.parse(new Date()),
 				time: LogsController.getTime(),
 				action: ENUM.SET,
 				record_type: 'Allowance',
@@ -100,6 +122,7 @@ exports.postAddAllowances = async (req, res) => {
 	} else {
 		console.log('duplicate allowance isnt allowed')
 		req.flash('error', 'Duplicate Allowance isnt Allowed')
+		errorMessages.push(req.flash('error')[0])
 		res.redirect('/settings/allowances/add')
 	}
 }
@@ -155,8 +178,9 @@ exports.postAddGrade = async (req, res) => {
 		}
 	} else {
 		console.log('grade already exist')
-		req.flash('error', 'Grade Already Exist')
-		res.redirect('/settings#grades')
+		req.flash('error', 'Grade with same name already Exist. Please try with unique name')
+		errorMessages.push(req.flash('error')[0])
+		res.redirect('/settings/grades/add')
 	}
 }
 exports.deleteGrade = async (req, res) => {
@@ -323,7 +347,6 @@ exports.editFund = async (req, res) => {
 }
 
 exports.postFund = async (req, res, next) => {
-	console.log('req amna', req.body)
 	let params = {
 		name: req.body.fund_name,
 		description: req.body.fund_description,
@@ -355,12 +378,15 @@ exports.postFund = async (req, res, next) => {
 		}
 	} else {
 		console.log('duplicate funds arent allowed')
-		req.flash('error', 'Duplicate Funds isnt Allowed')
+		req.flash('error', 'Duplicate Fund isnt Allowed')
+		errorMessages.push(req.flash('error')[0]);
+		console.log('amna check error here', req.flash('error'))
 		res.redirect('/settings/funds/add')
 	}
 }
 
 exports.deleteFund = async (req, res) => {
+	console.log('heeelllloooooo')
 	console.log('req.body', req.body)
 	let fundId = req.params.id
 	//call destroy function from database
@@ -375,7 +401,7 @@ exports.deleteFund = async (req, res) => {
 			record_type: 'Funds'
 		})
 		LogsController.insertLogs(AUDIT_LOGS)
-		res.redirect('/settings#funds')
+		// res.redirect('/settings#funds')
 	}
 }
 
@@ -468,7 +494,3 @@ function FieldsDifference(oldRecord, newRecord) {
 	console.log('updatedFields', obj)
 	return obj
 }
-
-
-
-
