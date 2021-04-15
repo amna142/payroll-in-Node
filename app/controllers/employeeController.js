@@ -321,7 +321,7 @@ exports.ValidateDOB = (req, res) => {
 	}
 }
 exports.postUserProfile = (req, res) => {
-	// console.log('req', req.body);
+	console.log('req', req.body);
 	var profileImg = req.body.userImgBase64;
 	console.log('profileImg.length', profileImg.length);
 	var ext = req.body.ext;

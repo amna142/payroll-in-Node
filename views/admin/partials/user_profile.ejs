@@ -22,14 +22,11 @@
 				$('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
 				$('#imagePreview').hide();
 				$('#imagePreview').fadeIn(650);
-				
 				let fileExt = reader.result.split(';')[0].split('/')[1];
 				let regexForImg = fileExt.toLowerCase() == 'jpeg' ? /^data:image\/jpeg;base64,/ :
 					/^data:image\/png;base64,/;
-
 				//decode base64 string
 				console.log((reader.result.replace(regexForImg, "")).length)
-
 				fileExt = fileExt.toLowerCase() === 'jpeg' ? 'jpg' : 'png';
 				fetch('http://localhost:3000/user_profile_image', {
 						method: 'post',
