@@ -23,7 +23,7 @@ exports.getPage = async (req, res, next) => {
 		funds = await FundController.findAll()
 	}
 	path = path.replace(path[0], '')
-	if(req.flash('error').length>0) {
+	if (req.flash('error').length > 0) {
 		errorMessages.push(req.flash('error'))
 	}
 	console.log('error length', errorMessages)
@@ -315,6 +315,7 @@ exports.editGrade = async (req, res, next) => {
 }
 
 exports.editFund = async (req, res) => {
+	console.log('req.body', req.body)
 	let id = req.body.fund_id_edit;
 	let newRecord = {
 		id: parseInt(id),
@@ -328,21 +329,32 @@ exports.editFund = async (req, res) => {
 	let updated_fund_record = FieldsDifference(oldRecord, newRecord)
 	console.log('updated_fund_record', updated_fund_record)
 	//find by fund name
+	let fund_update;
 	let fund_exist = await FundController.findByName(newRecord.name)
 	console.log('fund_exist', fund_exist)
-	if (fund_exist.id === newRecord.id) {
-		if (Object.keys(updated_fund_record).length > 0) {
-			let fund_update = await FundController.edit(updated_fund_record, parseInt(id))
-			if (fund_update) {
+	if (Object.keys(updated_fund_record).length > 0) {
+		if (fund_exist) {
+			if (fund_exist.id === newRecord.id) {
+				//update allowance record in database
+				fund_update = await FundController.edit(updated_fund_record, parseInt(id))
+				if (fund_update) {
+					res.redirect('/settings#funds')
+				}
+			} else {
+				req.flash('error', 'Fund with the same name exist')
+				console.log('fund with the same name exist')
 				res.redirect('/settings#funds')
 			}
 		} else {
-			console.log('nothing has been changed')
-			res.redirect('/settings#funds')
+			fund_update = await FundController.edit(updated_fund_record, parseInt(id))
+			if (fund_update) {
+				this.getSettings(req, res)
+			}
 		}
 	} else {
-		console.log('fund with the same name exist')
-		res.redirect('/settings#funds')
+		req.flash('error', 'nothing has been changed. please change any field')
+		console.log('nothing has been changed. please change any field')
+		this.getSettings(req, res)
 	}
 }
 
@@ -395,13 +407,13 @@ exports.deleteFund = async (req, res) => {
 		AUDIT_LOGS.push({
 			name: req.session.user.name,
 			emp_id: req.session.user.id,
-			date: nodeParser.parse(new Date()),
+			date: new Date(),
 			time: LogsController.getTime(),
 			action: ENUM.DELETE,
 			record_type: 'Funds'
 		})
 		LogsController.insertLogs(AUDIT_LOGS)
-		// res.redirect('/settings#funds')
+		res.redirect('/settings#funds')
 	}
 }
 

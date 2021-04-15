@@ -101,7 +101,7 @@ exports.employeesIndexPage = async (req, res) => {
 			pageTitle: 'Employees',
 			isEmployee: isUser.isEmployee,
 			navigation: {
-				role: isUser.role,
+				role: isUser.role ? isUser.role : 'Employee',
 				pageName: constants.employee
 			},
 			name: req.session.user.name,
@@ -192,7 +192,7 @@ exports.getDeleteEmployee = (req, res) => {
 		AUDIT_LOGS.push({
 			name: req.session.user.name,
 			emp_id: req.session.user.id,
-			date: new Date(),
+			date:  new Date(),
 			time: getTime(),
 			action: constants.DELETE,
 			record_type: 'Employee'
@@ -333,66 +333,71 @@ exports.postAddEmployee = async (req, res) => {
 	//check if dob is validate 
 	let validateDOB = isValidBirthdate(params.dob)
 	console.log('validateDOB', validateDOB)
-	// if (Object.keys(params).length > 0) {
-	// 	Object.keys(params).forEach(function (key) {
-	// 		var value = params[key]
-	// 		console.log(key, value)
-	// 		AUDIT_LOGS.push({
-	// 			name: req.session.user.name,
-	// 			emp_id: req.session.user.id,
-	// 			date: new Date(),
-	// 			time: getTime(),
-	// 			action: constants.SET,
-	// 			record_type: 'Employee',
-	// 			field_id: key,
-	// 			new_value: value
-	// 		})
-	// 	})
-	// }
-	// let value = await employeeByEmail(params.email)
-	// console.log(value)
-	// if (value) {
-	// 	// now add employee
-	// 	db.employee.create(params).then((employee) => {
-	// 		console.log('employee created', employee)
-	// 		let empId = employee.dataValues.id
-	// 		//before employee creation, the create employee salary record
-	// 		salariesController.createSalary(empId, req.body.salary, gradeId)
-	// 		logsController.insertLogs(AUDIT_LOGS)
-	// 		res.redirect('/employees')
-	// 		return transporter.sendMail({
-	// 			to: email,
-	// 			from: email.FROM,
-	// 			subject: 'Employee Created',
-	// 			html: `
-	// 			<p>You Account has been Created</p>
-	// 			<p>Click this <a href="http://localhost:3000/login">link</a> to get Into the System</p>	`
-	// 		})
-	// 	})
-	// } else {
-	// 	console.log('employee already exist')
-	// 	req.flash('err', 'employee already exist')
-	// 	res.redirect('/employees')
-	// }
+	if (Object.keys(params).length > 0) {
+		Object.keys(params).forEach(function (key) {
+			var value = params[key]
+			console.log(key, value)
+			AUDIT_LOGS.push({
+				name: req.session.user.name,
+				emp_id: req.session.user.id,
+				date: new Date(),
+				time: getTime(),
+				action: constants.SET,
+				record_type: 'Employee',
+				field_id: key,
+				new_value: value
+			})
+		})
+	}
+	let value = await employeeByEmail(params.email)
+	console.log(value)
+	if (value) {
+		// now add employee
+		db.employee.create(params).then((employee) => {
+			console.log('employee created', employee)
+			let empId = employee.dataValues.id
+			//before employee creation, the create employee salary record
+			salariesController.createSalary(empId, req.body.salary, gradeId)
+			logsController.insertLogs(AUDIT_LOGS)
+			res.redirect('/employees')
+			return transporter.sendMail({
+				to: email,
+				from: email.FROM,
+				subject: 'Employee Created',
+				html: `
+				<p>You Account has been Created</p>
+				<p>Click this <a href="http://localhost:3000/login">link</a> to get Into the System</p>	`
+			})
+		})
+	} else {
+		console.log('employee already exist')
+		req.flash('err', 'employee already exist')
+		res.redirect('/employees')
+	}
 }
 
 
 exports.getEditEmployee = async (req, res) => {
 	var grades = await employeeController.getAllGrades()
 	var empId = req.params.id
+	console.log('empId', empId)
 	var employeeFound = await findById(empId)
 	oldRecord = employeeFound;
-	let employeeDesignations = await employeeDesignation()
+	let employeeDesignations = await employeeDesignation();
 	let employeeTypes = await typesOfEmployeee();
-	let des = await designation(employeeFound.designation)
 	let employee_type = await type(employeeFound.type)
-	let isUser = employeeController.isEmployee(req)
+	let isUser = employeeController.isEmployee(req);
+	console.log('req.session.user', req.session.user)
+	let userDesignation = await  employeeController.CurrentUserDesignation(req.session.user.employeeDesignationId)
+	console.log('userDesignation', userDesignation)
 	if (isUser.role === 'Employee') {
 		logsArray = await logsController.employeeLogs(req.session.user.id)
 	} else {
 		logsArray = await getLogs()
 	}
 	let GRADE_OBJ = await employeeController.findGradeById(employeeFound.employee_grade_id)
+	let empSalary = await employeeController.findEmployeeSalary(parseInt(empId))
+	console.log('empSalary', empSalary.amount)
 	if (employeeFound) {
 		res.render('employee-management/edit', {
 			pageTitle: 'Employee Edit Form',
@@ -405,18 +410,19 @@ exports.getEditEmployee = async (req, res) => {
 			starting_date: logsController.convertDate(employeeFound.starting_date),
 			file: employeeFound.file,
 			grades: grades,
+			salary: empSalary.amount,
 			dob: logsController.convertDate(employeeFound.dob),
 			employeeTypes: employeeTypes,
 			employeeDesignations: employeeDesignations,
 			type: employee_type,
-			designation: des,
+			designation: userDesignation.dataValues.designation_type,
 			navigation: {
 				role: isUser.role,
 				pageName: constants.employee,
 				pageExtension: constants.UPDATE
 			},
 			name: req.session.user.name,
-			employee_grade: GRADE_OBJ.grade,
+			employee_grade: GRADE_OBJ,
 			errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null
 		})
 	} else {
@@ -426,6 +432,7 @@ exports.getEditEmployee = async (req, res) => {
 exports.postEditEmployee = async (req, res) => {
 	AUDIT_LOGS = []
 	console.log('req.body', req.body)
+	console.log('oldRecord', oldRecord)
 	//convert old record date into new record date type
 	oldRecord.dob = nodeParser.parse(oldRecord.dob)
 	oldRecord.starting_date = nodeParser.parse(oldRecord.starting_date)

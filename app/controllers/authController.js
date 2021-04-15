@@ -45,7 +45,8 @@ exports.postLogin = (req, res) => {
 	var empPassword = req.body.password
 	db.employee.findOne({
 		where: {
-			email: empEmail
+			email: empEmail,
+			isInactive: 0
 		},
 		include: [{
 			model: db.role

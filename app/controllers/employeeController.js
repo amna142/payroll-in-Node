@@ -17,11 +17,15 @@ const EmployeeDesignation = db.employee_designation
 const EmployeeGrade = db.employee_grade
 const EmployeeAllowances = db.employee_allowances
 const EmployeeFunds = db.employee_funds
+const EmployeeSalaries = db.salaries
 const Leaves = db.leaves
 const EmployeeSalary = db.salaries
 exports.getAllGrades = () => {
 	let employee_grades = []
 	return db.employee_grade.findAll({
+		where: {
+			isInactive: 0
+		},
 		include: [{
 			model: Allowance,
 			as: 'allowances',
@@ -51,6 +55,7 @@ exports.getAllGrades = () => {
 
 exports.findGradeById = (id) => {
 	return db.employee_grade.findOne({
+		attributes: ['id', 'grade', 'min_salary', 'max_salary', 'isInactive'],
 		where: {
 			id: id
 		}
@@ -392,5 +397,17 @@ exports.CurrentUserDesignation = (id) => {
 		return result
 	}).catch(err => {
 		console.log('err in CurrentUserDesignation', err)
+	})
+}
+
+exports.findEmployeeSalary = (id) =>{
+	return EmployeeSalaries.findOne({
+		where: {
+			employeeId: id
+		}
+	}).then(result=>{
+		return result
+	}).catch(err=>{
+		console.log('err in findEmployeeSalary', err)
 	})
 }

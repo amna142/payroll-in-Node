@@ -80,10 +80,10 @@
 
 			$('#allowance_table tbody').on('click', 'a.modal-trigger', function () {
 				var $row = $(this).closest("tr"); // Find the row
-				var $text = $row.find("#allowance_id").text();
+				var $allowance_id = $row.attr('data-allowance-id');
 				// modal population.
 				document.querySelector('#del-allowance-confirm-modal').innerHTML =
-					`<a href="/settings/allowance/delete/${$text}" class="modal-close waves-effect waves-green btn-flat" id='${$text}'>Agree</a>`;
+					`<a href="/settings/allowance/delete/${$allowance_id}" class="modal-close waves-effect waves-green btn-flat" id='${$allowance_id}'>Agree</a>`;
 			})
 			$('#allowance_table tbody').on('click', '#edit-modal', function () {
 				let $row = $(this).closest("tr"); // Find the row

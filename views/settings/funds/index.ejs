@@ -71,8 +71,9 @@
 
 			$('#fund_table tbody').on('click', 'a.modal-trigger', function () {
 				var $row = $(this).closest("tr"); // Find the row
-				console.log('amna row', $row)
-				var $fundId = $row.find("#fund_id").text();
+				console.log('row',$row)
+
+				var $fundId = $row.attr('data-fund-id');
 				console.log('fundId', $fundId)
 				// modal population.
 				document.querySelector('#del-confirm-fund-modal').innerHTML =

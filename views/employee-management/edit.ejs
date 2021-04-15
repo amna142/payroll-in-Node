@@ -1,5 +1,6 @@
 <%- include('../includes/header'); %>
 <link rel="stylesheet" href="/css/home.css">
+<link rel="stylesheet" href="/css/user_profile.css">
 <script>
 	$(document).ready(function () {
 		$('select').formSelect();
@@ -38,10 +39,10 @@
 						</div>
 						<div class="input-field col s4">
 							<i class="material-icons prefix">email</i>
-							<% if(isEmployee) {%>
+							<% if(isEmployee && designation!=='HR') {%>
 							<input type="email" name="email" required="" scale_text aria-required="true" id="email"
 								value="<%= email %>" disabled>
-							<%} else{ %>
+							<%} else if(designation === 'HR' || navigation.role==='Admin'){ %>
 							<input type="email" name="email" required="" scale_text aria-required="true" id="email"
 								value="<%= email %>">
 							<% } %>
@@ -63,10 +64,10 @@
 						</div>
 						<div class="input-field col s3">
 							<i class="material-icons prefix">date_range</i>
-							<% if(isEmployee) {%>
+							<% if(isEmployee && designation!=='HR') {%>
 							<input type="text" class="datepicker" name="dob" id="dob" value="<%= dob %>" required=""
 								aria-required="true" disabled>
-							<%} else{ %>
+							<%} else if(navigation.role === 'Admin' || designation=== 'HR'){ %>
 							<input type="text" class="datepicker" name="dob" id="dob" value="<%= dob %>" required=""
 								aria-required="true">
 							<% } %>
@@ -79,7 +80,7 @@
 					<div class="row">
 						<div class="input-field col s6">
 							<i class="material-icons prefix">person_add</i>
-							<% if(isEmployee) {%>
+							<% if(isEmployee && designation!='HR') {%>
 							<select name="employee_type" disabled>
 								<option value="" disabled selected><%= type %></option>
 								<% if(employeeTypes.length) { 
@@ -88,7 +89,7 @@
 								</option>
 								<% } } %>
 							</select>
-							<%} else{ %>
+							<%} else if(navigation.role === 'Admin' || designation=== 'HR'){ %>
 							<select name="employee_type">
 								<option value="" disabled selected><%= type %></option>
 								<% if(employeeTypes.length) { 
@@ -101,7 +102,7 @@
 						</div>
 						<div class="input-field col s6">
 							<i class="material-icons prefix">verified_user</i>
-							<% if(isEmployee) {%>
+							<% if(isEmployee && designation!=='HR') {%>
 							<select name="designation" disabled>
 								<option value="" disabled selected><%= designation  %></option>
 								<% if(employeeDesignations.length) { 
@@ -109,7 +110,7 @@
 								<option value="<%= employeeDesignations[i].id %>">
 									<%= employeeDesignations[i].designation_type %> </option> <% } } %>
 							</select>
-							<%} else{ %>
+							<%} else if(designation=== 'HR' || navigation.role==='Admin') { %>
 							<select name="designation">
 								<option value="" disabled selected><%= designation  %></option>
 								<% if(employeeDesignations.length) { 
@@ -123,10 +124,10 @@
 					<div class="row">
 						<div class="input-field col s4">
 							<i class="material-icons prefix">date_range</i>
-							<% if(isEmployee) {%>
+							<% if(isEmployee && designation!=='HR') {%>
 							<input type="text" class="datepicker" name="starting_date" id="starting_date"
 								value="<%= starting_date %>" required="" aria-required="true" disabled>
-							<%} else{ %>
+							<%} else if(designation==='HR' || navigation.role === 'Admin'){ %>
 							<input type="text" class="datepicker" name="starting_date" id="starting_date"
 								value="<%= starting_date %>" required="" aria-required="true">
 							<% } %>
@@ -147,20 +148,57 @@
 							</div>
 						</div>
 					</div>
-					<%- include('./salary.ejs'); %>
-					<div class="row right">
-						<div class="input-field col s12">
-							<button class="btn waves-effect waves-light" type="submit" value="Add">Submit
-								<i class="material-icons right">person</i>
-							</button>
-							<a class="btn waves-effect waves-light" href="/employees">
-								<i class="material-icons right">close</i>Cancel</a>
+					<h5><b style="color: coral;">Salary Details</b></h5>
+					<div class="divider"></div>
+					<br />
+					<div class="row">
+						<div class="input-field col s6">
+							<i class="material-icons prefix">grade</i>
+							<% if(isEmployee && designation!=='HR') { %>
+							<select name="employee_grade" disabled id='grade' required="" aria-required="true">
+								<option value="" disabled selected><%= employee_grade.grade %> (>
+									<%=employee_grade.min_salary %> , < <%= employee_grade.max_salary %> ) </option> <% if(grades.length) { 
+				for(var i = 0; i< grades.length; i++) { %> <option value="<%=grades[i].id %>"><%= grades[i].grade %>
+										(><%= grades[i].min_salary %>,
+										<<%= grades[i].max_salary %>) </option> <% } } %> </select> </div> <div
+											class="input-field col s6">
+											<i class="material-icons prefix">attach_money</i>
+											<input type="number" disabled size="8" class="validate" required=""
+												aria-required="true" class="form-control" name="salary" id="salary"
+												value="<%=salary %>">
+											<label for="icon_prefix">Employee Basic Salary</label>
 						</div>
-
+						<% } else if(designation=== 'HR' || navigation.role==='Admin') { %>
+						<select name="employee_grade" id='grade' required="" aria-required="true">
+							<option value="" disabled selected><%= employee_grade.grade %> (>
+								<%=employee_grade.min_salary %> , < <%= employee_grade.max_salary %> ) </option> <% if(grades.length) { 
+				for(var i = 0; i< grades.length; i++) { %> <option value="<%=grades[i].id %>"><%= grades[i].grade %>
+									(><%= grades[i].min_salary %>,
+									<<%= grades[i].max_salary %>) </option> <% } } %> </select> </div> <div
+										class="input-field col s6">
+										<i class="material-icons prefix">attach_money</i>
+										<input type="number" size="8" class="validate" required="" aria-required="true"
+											class="form-control" name="salary" id="salary" value="<%=salary %>">
+										<label for="icon_prefix">Employee Basic Salary</label>
+										<span class="helper-text" id="msg" data-error="" data-success="">Choose
+											Money in between
+											Range</span>
 					</div>
-				</form>
+					<% } %>
 			</div>
+			<div class="row right">
+				<div class="input-field col s12">
+					<button class="btn waves-effect waves-light" type="submit" value="Add">Submit
+						<i class="material-icons right">person</i>
+					</button>
+					<a class="btn waves-effect waves-light" href="/employees">
+						<i class="material-icons right">close</i>Cancel</a>
+				</div>
+
+			</div>
+			</form>
 		</div>
+	</div>
 	</div>
 
 	<%- include('../includes/footer'); %>
