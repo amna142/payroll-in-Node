@@ -387,13 +387,14 @@ let EmployeeGradeSalary = (gradeId) => {
 }
 
 exports.CurrentUserDesignation = (id) => {
+	console.log('id', id)
 	return EmployeeDesignation.findOne({
 		attributes: ['designation_type'],
 		where: {
 			id: id
 		}
 	}).then(result => {
-		console.log('result in CurrentUserDesignation', result)
+		// console.log('result in CurrentUserDesignation', result)
 		return result
 	}).catch(err => {
 		console.log('err in CurrentUserDesignation', err)

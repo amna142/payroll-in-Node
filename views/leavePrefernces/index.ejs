@@ -16,8 +16,10 @@
 					<div class="table-header">
 						<span class="table-title">Leave Types Preferences</span>
 						<div class="actions">
-							<a href="/leave_prefernce/add" class="modal-trigger waves-effect btn-flat nopadding"><i
+							<% if(navigation.role === 'Admin' || designation === 'HR') { %>
+								<a href="/leave_prefernce/add" class="modal-trigger waves-effect btn-flat nopadding"><i
 									class="material-icons">add_circle</i></a>
+							<% } %>
 							<a href="#" class="search-toggle waves-effect btn-flat nopadding"><i
 									class="material-icons">search</i></a>
 						</div>

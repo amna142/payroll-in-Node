@@ -31,6 +31,11 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.FLOAT,
 			allowNull: true,
 			required: false
+		},
+		total_annual_leaves: {
+			type: Sequelize.INTEGER,
+			allowNull: true, 
+			required: false
 		}
 	});
 	return CompanyPreferences

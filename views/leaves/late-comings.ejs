@@ -1,0 +1,45 @@
+<div class="container" id="late_comings">
+	<div class="row">
+		<label for="late_coming_month">Choose month to Calculate Late Comings</label>
+		<input type="date" id="late_coming_month" name="late_coming_month" value="" />
+	</div>
+	<div class="row">
+		<button class="btn waves-effect waves-light right" id="late_coming_calculation" onclick="CalculateLateComings()"
+			value="Add">Submit
+			<i class="material-icons right">check</i>
+		</button>
+	</div>
+	<ul class="collection with-header">
+
+	</ul>
+</div>
+
+<script>
+	document.getElementById('late_coming_calculation').disabled = true;
+	$('#late_coming_month').change(function () {
+		document.getElementById('late_coming_calculation').disabled = false
+	})
+
+	function CalculateLateComings() {
+		let input = document.getElementById('late_coming_month').value;
+		console.log('input', input)
+		fetch('http://localhost:3000/late_comings', {
+			method: 'POST',
+			body: JSON.stringify({
+				month: input
+			}),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		}).then(res => {
+			return res.json();
+		}).then(response => {
+			console.log('response', response)
+			if(response.status!==200){
+				alert(response.message)
+			}
+		}).catch(err => {
+			console.log('err in CalculateLateComings', err)
+		})
+	}
+</script>

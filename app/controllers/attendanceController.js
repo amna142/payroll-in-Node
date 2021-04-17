@@ -109,9 +109,10 @@ exports.getAttendanceFile = (req, res, next) => {
 			// console.log('attendance_record', JSON.stringify(attendance_record))
 			// console.log('time_entries', JSON.stringify(time_entries))
 			// getAttendance()
+			console.log('entries', JSON.stringify(time_entries))
 			let attendance = getAttendanceRecords(time_entries)
 			attendanceEntries(attendance.tempAttendance, attendance.checkingTimes, res)
-			//create bulk entries in attendnace table
+			// create bulk entries in attendnace table
 
 			console.log('CSV file successfully processed');
 		});
@@ -136,7 +137,7 @@ let getAttendanceRecords = (time_entries) => {
 		});
 	});
 	console.log('checkingTimes', JSON.stringify(checkingTimes))
-	// console.log('tempAttendance', JSON.stringify(tempAttendance))
+	console.log('tempAttendance', JSON.stringify(tempAttendance))
 	return {
 		checkingTimes: checkingTimes,
 		tempAttendance: tempAttendance
@@ -152,15 +153,13 @@ let attendanceEntries = (attendance, times, res) => {
 		if (!result) {
 			console.log('bulkCreate not workd in attendanceEntries')
 		}
-		console.log('result.length === times.length', result.length)
-		console.log('result.length === times.length', times.length)
 		if (result.length === times.length) {
 
 			//here create Bulk entries of time
 			for (let i = 0; i < times.length; i++) {
-				let hoursSum = 0;
 				let timeEntries = times[i].timeEntries
 				for (let j = 0; j < timeEntries.length; j++) {
+					let hoursSum = 0;
 					let splitcolon = times[i].working_hours[j].split(":");
 					let hours = parseFloat(splitcolon[0]);
 					let minutes = splitcolon[1];
@@ -168,9 +167,9 @@ let attendanceEntries = (attendance, times, res) => {
 					hoursSum = (hoursSum + hours + minutes);
 					temp.push({
 						attendanceId: result[i].id,
-						check_in: timeEntries[j].checkIn,
-						check_out: timeEntries[j].checkOut,
-						work_time: Math.round(hoursSum)
+						check_in: formatAMPM(timeEntries[j].checkIn),
+						check_out: formatAMPM(timeEntries[j].checkOut),
+						work_time: hoursSum
 					})
 				}
 			}
@@ -199,10 +198,8 @@ let attendanceEntries = (attendance, times, res) => {
 exports.getAttendance = async (req, res) => {
 	let entries;
 	let user = await EmployeeController.EmployeeDesignation(req)
-	console.log('user', JSON.stringify(user))
 	if (user.designation_type == 'HR' || req.session.user.role === 'admin') {
 		entries = await getAllAttendanceEntries()
-		console.log('i am inside if', JSON.stringify(entries))
 	} else {
 		entries = await getEmployeeAttendance(req.session.user.attendMachineId)
 	}
@@ -216,6 +213,27 @@ exports.getAttendance = async (req, res) => {
 	})
 }
 
+function formatAMPM(time) {
+	time = time.toLowerCase();
+
+	if (time.includes('leave')) {
+		return time
+	} else if (time === '' || time === undefined || time === null) {
+		let time = '0:00'
+		return time
+	} else {
+		var hours = time.split(':')[0];
+		var minutes = time.split(':')[1];
+		var ampm = hours >= 12 ? 'pm' : 'am';
+		hours = hours % 12;
+		hours = hours ? hours : 12; // the hour '0' should be '12'
+		minutes = minutes < 10 ? minutes : minutes;
+		var strTime = hours + ':' + minutes + ' ' + ampm;
+		return strTime;
+	}
+}
+
+
 let getAllAttendanceEntries = () => {
 	let tempArr = []
 	return Attendance.findAll({
@@ -226,19 +244,21 @@ let getAllAttendanceEntries = () => {
 		}]
 	}).then(result => {
 		if (result) {
+			console.log('result', JSON.stringify(result))
 			result.forEach(element => {
 				let entries = element.dataValues.time_entries
 				entries.forEach(timeEntry => {
-					element.dataValues['check In'] = timeEntry.check_in
-					element.dataValues['check Out'] = timeEntry.check_out
-					element.dataValues['work Time'] = timeEntry.work_time
+					let obj = {}
+					obj['check In'] = timeEntry.check_in
+					obj['check Out'] = timeEntry.check_out
+					obj['work Time'] = timeEntry.work_time
+					obj['date'] = dateParser.parse('Y-m-d', element.dataValues.date)
+					obj['machine_attendance_id'] = element.dataValues.machine_attendance_id
+					tempArr.push(obj)
 				});
-				element.dataValues.date = dateParser.parse('Y-m-d', element.dataValues.date)
-				delete element.dataValues.time_entries
-				tempArr.push(element.dataValues)
 			});
 		}
-		// console.log('result', JSON.stringify(tempArr))
+		console.log('result', JSON.stringify(tempArr))
 		return tempArr
 	}).catch(err => {
 		console.log('err', err)
@@ -248,6 +268,7 @@ let getAllAttendanceEntries = () => {
 
 
 let getEmployeeAttendance = (attendanceId) => {
+	console.log('attendanceId', attendanceId)
 	let tempArr = []
 	return Attendance.findAll({
 		attributes: ['id', 'date', 'machine_attendance_id'],
@@ -263,16 +284,47 @@ let getEmployeeAttendance = (attendanceId) => {
 			result.forEach(element => {
 				let entries = element.dataValues.time_entries
 				entries.forEach(timeEntry => {
-					element.dataValues['check In'] = timeEntry.check_in
-					element.dataValues['check Out'] = timeEntry.check_out
-					element.dataValues['work Time'] = timeEntry.work_time
+					let obj = {}
+					obj['check In'] = timeEntry.check_in
+					obj['check Out'] = timeEntry.check_out
+					obj['work Time'] = timeEntry.work_time
+					obj['date'] = dateParser.parse('Y-m-d', element.dataValues.date)
+					obj['machine_attendance_id'] = element.dataValues.machine_attendance_id
+					tempArr.push(obj)
 				});
-				element.dataValues.date = dateParser.parse('Y-m-d', element.dataValues.date)
-				delete element.dataValues.time_entries
-				tempArr.push(element.dataValues)
 			});
 		}
 		// console.log('result', JSON.stringify(tempArr))
+		return tempArr
+	}).catch(err => {
+		console.log('err', err)
+	})
+}
+
+
+exports.AttendanceByMonthAndYear = (month, year) => {
+	let tempArr = [];
+	return Attendance.findAll({
+		attributes: ['id', 'date', 'machine_attendance_id'],
+		include: [{
+			model: TimeEntries,
+			attributes: ['id', 'check_out', 'check_in', 'attendanceId', 'work_time'],
+			order: [
+				['id', 'ASC']
+			]
+		}]
+	}).then(result => {
+		if (result) {
+			result.forEach(element => {
+				let m = new Date(element.dataValues.date).getMonth() + 1;
+				let y = new Date(element.dataValues.date).getFullYear();
+
+				if (m === month && y === year) {
+					tempArr.push(element)
+				}
+			});
+		}
+		console.log('result of JSON.stringify(tempArr)', JSON.stringify(tempArr))
 		return tempArr
 	}).catch(err => {
 		console.log('err', err)

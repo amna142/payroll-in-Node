@@ -2,12 +2,14 @@ const EmployeeController = require('../controllers/employeeController')
 const ENUM = require('../util/constants')
 const db = require('../util/database')
 const Employee = db.employee;
+const AttendanceController = require('../controllers/attendanceController')
 const fs = require('fs')
 const Sequelize = require('sequelize')
 const Op = Sequelize.Op
 const {
 	send_email
-} = require('../config/email.config')
+} = require('../config/email.config');
+const PreferencesController = require('./preferencesController')
 const LeaveQouta = db.leave_qouta
 const LeaveTypes = db.leave_types
 const LeaveRequest = db.leaves
@@ -62,7 +64,7 @@ let leave_prefernces = () => {
 let leave_history = (user_email) => {
 	console.log('user_email', user_email)
 	return Employee.findAll({
-		attributes: ['id','name', 'email', 'supervisor_email'],
+		attributes: ['id', 'name', 'email', 'supervisor_email'],
 		where: {
 			email: user_email
 		},
@@ -74,9 +76,9 @@ let leave_history = (user_email) => {
 				attributes: ['id', 'status']
 			}]
 		}]
-	}).then(result=>{
+	}).then(result => {
 		console.log('result of leave_history', JSON.stringify(result))
-	}).catch(err=>{
+	}).catch(err => {
 		console.log('err of leave_history', err)
 	})
 }
@@ -226,4 +228,31 @@ let updateLeaveApproveStatus = (leave_request_id, rejection_reason, name) => {
 	}).catch(err => {
 		console.log('err of updateLeaveApproveStatus', err)
 	})
+}
+
+
+
+exports.CalculateLateComings = async (req, res) => {
+	let date = req.body.month;
+	let month = new Date(date).getMonth() + 1;
+	let year = new Date(date).getFullYear();
+	let company_settings = await PreferencesController.fetchDataFromCompanyPreferences();
+	let office_start_time = company_settings.start_time;
+	console.log('office_start_time', office_start_time)
+	//get time entries of specific month
+	var entries = await AttendanceController.AttendanceByMonthAndYear(month, year)
+	if (entries.length > 0) {
+		console.log('entries', JSON.stringify(entries))
+		res.send({
+			status: 200,
+			message: 'success!',
+			data: null
+		})
+	} else {
+		res.send({
+			status: 301,
+			message: `Attendance Entries for ${date} doesn't exist`,
+			data: null
+		})
+	}
 }

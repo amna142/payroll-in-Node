@@ -7,10 +7,13 @@ const LeaveTypes = db.leave_types
 exports.getLeaves = async (req, res, next) => {
 	let user = EmployeeController.isEmployee(req)
 	let preferences = await leave_prefernces()
-	res.render('leavePrefernces', {
+	let designation = await EmployeeController.CurrentUserDesignation(req.session.user.employeeDesignationId)
+	console.log('designation',  designation.dataValues.designation_type)
+	res.render('leavePrefernces/index', {
 		name: req.session.user.name,
 		isEmployee: user.isEmployee,
 		preferences: preferences,
+		designation: designation.dataValues.designation_type,
 		navigation: {
 			role: user.role,
 			pageName: ENUM.leave_prefernces
@@ -72,7 +75,8 @@ exports.postAddPrefrence = (req, res, next) => {
 	}
 	//insert qouta against leave type
 	LeaveQouta.create(params).then(result => {
-		result ? res.redirect('/leave_prefernces') : res.redirect('/leave_prefernce/add')
+		console.log('result', result)
+		// result ? res.redirect('/leave_prefernces') : res.redirect('/leave_prefernce/add')
 	}).catch(err => {
 		console.log('err in postAddPrefrence', err)
 	})
@@ -81,7 +85,7 @@ exports.postAddPrefrence = (req, res, next) => {
 exports.getCompanyPreferences = async (req, res) => {
 	//fetch data from company preferences
 	let user = EmployeeController.isEmployee(req)
-	let company_preferences = await fetchDataFromCompanyPreferences()
+	let company_preferences = await this.fetchDataFromCompanyPreferences()
 	console.log('company_preferences', company_preferences)
 	res.render('company-preferences', {
 		name: req.session.user.name,
@@ -94,7 +98,7 @@ exports.getCompanyPreferences = async (req, res) => {
 	})
 }
 
-let fetchDataFromCompanyPreferences = () => {
+exports.fetchDataFromCompanyPreferences  = () => {
 	return CompanyPreferences.findOne({
 		attributes: ['id', 'start_time', 'off_time', 'working_hours', 'working_days', 'over_time']
 	}).then(result => {
@@ -104,6 +108,7 @@ let fetchDataFromCompanyPreferences = () => {
 		console.log('err in fetchDataFromCompanyPreferences', err)
 	})
 }
+
 
 exports.postCompanyPreferences = (req, res) => {
 	let obj = req.body;
