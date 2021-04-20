@@ -1,0 +1,1 @@
+insert into company_preferences(start_time, off_time, working_hours, working_days, over_time, total_annual_leaves,  createdAt, updatedAt) VALUES('9:00 AM' , '5:30 PM' , 8.00, 6, 10, 18, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
