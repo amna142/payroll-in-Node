@@ -10,7 +10,6 @@ const constants = require('../util/constants')
 const TimeEntries = db.time_entries
 
 exports.getAttendanceFile = (req, res, next) => {
-	console.log('req.file', req)
 	let entries = [],
 		time_entries = [],
 		timeEntries = [],
@@ -27,20 +26,18 @@ exports.getAttendanceFile = (req, res, next) => {
 			entries.push(row)
 		})
 		.on('end', () => {
-			// console.log('entries', entries)
+			console.log('entries', entries.length)
 			let tempDate = entries[0].Date;
 			let tempEmp = entries[0].Name;
 			//here comes a mapping object array of attendnace
 			entries.forEach(entry => {
+				console.log('entry', JSON.stringify(entry))
 				if (tempEmp != entry.Name) {
-
 					let obj2 = {
 						Name: tempEmp,
 						attendanceRecord: attendance_record
 					}
-					console.log('obj2', obj2)
 					time_entries.push(obj2);
-
 					attendance_record = []
 					let times = {
 						checkIn: entry['Clock In'],
@@ -54,9 +51,7 @@ exports.getAttendanceFile = (req, res, next) => {
 						timeEntries: timeEntries
 
 					}
-					console.log('obj1', obj1)
 					attendance_record.push(obj1)
-					firstEntryFlag = 1
 				}
 				// console.log('time_entries', time_entries)
 				else if (tempEmp == entry.Name && tempDate != entry.Date) {
@@ -75,7 +70,6 @@ exports.getAttendanceFile = (req, res, next) => {
 					workingHours = []
 					workingHours.push(entry['Work Time'])
 					attendance_record.push(obj1)
-					firstEntryFlag = 1
 				} else {
 					timeEntries.push({
 						checkIn: entry['Clock In'],
@@ -109,7 +103,7 @@ exports.getAttendanceFile = (req, res, next) => {
 			// console.log('attendance_record', JSON.stringify(attendance_record))
 			// console.log('time_entries', JSON.stringify(time_entries))
 			// getAttendance()
-			console.log('entries', JSON.stringify(time_entries))
+			console.log('entries', time_entries.length)
 			let attendance = getAttendanceRecords(time_entries)
 			attendanceEntries(attendance.tempAttendance, attendance.checkingTimes, res)
 			// create bulk entries in attendnace table
@@ -135,9 +129,7 @@ let getAttendanceRecords = (time_entries) => {
 				working_hours: entry.Working_hours
 			})
 		});
-	});
-	console.log('checkingTimes', JSON.stringify(checkingTimes))
-	console.log('tempAttendance', JSON.stringify(tempAttendance))
+	})
 	return {
 		checkingTimes: checkingTimes,
 		tempAttendance: tempAttendance
@@ -169,7 +161,7 @@ let attendanceEntries = (attendance, times, res) => {
 						attendanceId: result[i].id,
 						check_in: formatAMPM(timeEntries[j].checkIn),
 						check_out: formatAMPM(timeEntries[j].checkOut),
-						work_time: hoursSum
+						work_time: Math.round(hoursSum)
 					})
 				}
 			}
@@ -181,7 +173,6 @@ let attendanceEntries = (attendance, times, res) => {
 					//get all attendance entries to show on attendance page
 					res.redirect('/attendance')
 				}
-				console.log('result of bulk create TimeEntries', result)
 			}).catch(err => {
 				console.log('err in createing bulk Create Time Entries', err)
 			})
@@ -244,7 +235,6 @@ let getAllAttendanceEntries = () => {
 		}]
 	}).then(result => {
 		if (result) {
-			console.log('result', JSON.stringify(result))
 			result.forEach(element => {
 				let entries = element.dataValues.time_entries
 				entries.forEach(timeEntry => {
@@ -258,7 +248,6 @@ let getAllAttendanceEntries = () => {
 				});
 			});
 		}
-		console.log('result', JSON.stringify(tempArr))
 		return tempArr
 	}).catch(err => {
 		console.log('err', err)

@@ -139,7 +139,6 @@ exports.EmployeeDesignation = (req) => {
 			}
 		]
 	}).then(result => {
-		console.log('result', JSON.stringify(result))
 		return result.employee_designation
 	}).catch(err => {
 		console.log('err', err)
@@ -279,7 +278,6 @@ exports.findUser = (id) => {
 			}
 		]
 	}).then(result => {
-		console.log('result in findCurrentUser', JSON.stringify(result))
 		let currentEmployee = result[0].dataValues
 		console.log()
 		currentEmployee.employee_designation = currentEmployee.employee_designation.dataValues.designation_type;

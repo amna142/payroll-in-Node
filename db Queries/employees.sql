@@ -29,7 +29,7 @@ delete from attendances
 
 INSERT INTO employee_types(employee_type, createdAt, updatedAt) VALUES ('Permanent', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 
-select * from employee_types
+select * from time_entries
 
 SELECT SCOPE_IDENTITY() AS roleId
 

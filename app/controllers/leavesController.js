@@ -230,19 +230,46 @@ let updateLeaveApproveStatus = (leave_request_id, rejection_reason, name) => {
 	})
 }
 
+let compareTimes  = async (time) => {
+}
 
 
 exports.CalculateLateComings = async (req, res) => {
 	let date = req.body.month;
+	let onLeaves = [];
+	let lateByWH = [];
 	let month = new Date(date).getMonth() + 1;
 	let year = new Date(date).getFullYear();
 	let company_settings = await PreferencesController.fetchDataFromCompanyPreferences();
 	let office_start_time = company_settings.start_time;
-	console.log('office_start_time', office_start_time)
+	let office_working_hours = company_settings.working_hours;
+
 	//get time entries of specific month
 	var entries = await AttendanceController.AttendanceByMonthAndYear(month, year)
 	if (entries.length > 0) {
-		console.log('entries', JSON.stringify(entries))
+		entries.forEach(entry => {
+			let time_entries = entry.dataValues.time_entries;
+			time_entries.forEach(time_entry => {
+			let total_hours = 0
+			//on leaves employees
+			if (time_entry.check_in.includes('leave')) {
+				let obj = {};
+				obj['date'] = entry.date;
+				onLeaves.push(obj)
+			} 
+			
+			if(time_entry.work_time<office_working_hours) {
+				//entries without leave entries
+
+				//late by working hours 
+				lateByWH.push({
+					date: entry.date,
+					working_hours: time_entry.work_time
+				})
+			}
+			});
+		});
+		console.log('lateByWH', JSON.stringify(lateByWH))
 		res.send({
 			status: 200,
 			message: 'success!',
