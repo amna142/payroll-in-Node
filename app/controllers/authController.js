@@ -61,8 +61,10 @@ exports.postLogin = (req, res) => {
 				if (employee.roleId !== null) {
 					let title = employee.role.dataValues.title
 					if (title === 'admin') {
-						console.log('outside')
-						if (empPassword == employee.password) {
+						console.log('password', empPassword+employee.password)
+						var isPasswordValid = passwordDoMatch(empPassword, employee.password)
+						console.log('outside', isPasswordValid)
+						if (isPasswordValid) {
 							req.session.isLoggedIn = true
 							req.session.user = employee
 							AUDIT_LOGS.push({
@@ -90,7 +92,7 @@ exports.postLogin = (req, res) => {
 					}
 				} else {
 					console.log('empPassword', empPassword + employee.password)
-					var isPasswordValid = bcrypt.compareSync(empPassword, employee.password)
+					var isPasswordValid = passwordDoMatch(empPassword, employee.password)
 					console.log('isPasswordValid', isPasswordValid)
 					if (isPasswordValid) {
 						req.session.isLoggedIn = true;
@@ -105,8 +107,13 @@ exports.postLogin = (req, res) => {
 						})
 						console.log('AUDIT_LOGS', AUDIT_LOGS)
 						logsController.insertLogs(AUDIT_LOGS)
-						res.redirect('/')
+						return req.session.save(err => {
+								console.log('err in saving session', err)
+								console.log('req.session.user.title', req.session.user.title)
+								res.redirect('/')
+							})
 					} else {
+
 						console.log('error in comapring password')
 						req.flash('error', 'Invalid Password')
 						res.redirect('/login')
@@ -118,6 +125,12 @@ exports.postLogin = (req, res) => {
 	}).finally(() => {
 		db.sequelize.close
 	})
+}
+
+
+let passwordDoMatch = (body_password, hashedPassword) =>{
+	return bcrypt.compareSync(body_password, hashedPassword)
+
 }
 
 function getTime() {
@@ -147,6 +160,7 @@ exports.getReset = (req, res, next) => {
 		message = null
 	}
 	let isLoggedIn = req.session.isLoggedIn
+	console.log('req', message)
 	res.render('auth/reset', {
 		path: '/reset',
 		pageTitle: 'Reset Password',
@@ -165,16 +179,15 @@ exports.postReset = (req, res, next) => {
 		const token = buffer.toString('hex')
 		db.employee.findOne({
 			where: {
-				email: email
+				email: email,
+				isInactive: 0
 			}
 		}).then(employee => {
 			console.log('employe Found by EMail', employee)
 			if (!employee) {
-				console.log('i am inside')
-				require.flash('error', 'No user with That Email Found')
-				return req.redirect('/reset')
+				req.flash('error', 'No employee of this email exists')
+				return this.getReset(req, res)
 			}
-			console.log('resetting token')
 			employee.resetToken = token;
 			employee.resetTokenExpiration = Date.now()
 			return employee.save()
@@ -182,6 +195,7 @@ exports.postReset = (req, res, next) => {
 			req.flash('error', 'An Email has been sent. Check your Inbox')
 			//here we have to send email
 			res.redirect('/login')
+			console.log('email', email)
 			return transporter.sendMail({
 				to: email,
 				from: constants.FROM,
@@ -201,7 +215,6 @@ exports.postReset = (req, res, next) => {
 exports.getNewPassword = (req, res, next) => {
 
 	var token = req.params.token
-	console.log('date', Date.now())
 	//find employee of the reset token
 	db.employee.findOne({
 		where: {
@@ -226,7 +239,9 @@ exports.getNewPassword = (req, res, next) => {
 			})
 		} else {
 			console.log('no employee found')
-			req.flash('error', 'No User Found')
+			req.flash('error', 'No User Found, Session has expired')
+			console.log(' req.token', token)
+			res.redirect('/new-password')
 		}
 	}).catch((err) => {
 		req.flash('error', 'No Employee Exist')
@@ -264,5 +279,6 @@ exports.postNewPassword = (req, res, next) => {
 	} else {
 		req.flash('error', 'please Enter Password and Confirm Password Same')
 		console.log('please enter password and confirm password same')
+		res.redirect(`/reset/${req.body.passwordToken}`)
 	}
 }

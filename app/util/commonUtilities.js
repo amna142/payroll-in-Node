@@ -10,7 +10,6 @@ let employeeByEmail = function (email) {
 		console.log('employe Found by EMail', employee)
 		if (employee === null) {
 			console.log('i am inside')
-			require.flash('error', 'No user with That Email Found')
 			return resizeBy.redirect('/reset')
 		}
 		
