@@ -96,8 +96,6 @@ exports.delete = (allowanceId) => {
 
 
 exports.edit = (params, id) => {
-	console.log('params', params)
-	console.log('id', parseInt(id))
 	return Allowance.update(params, {
 		where: {
 			id: parseInt(id)

@@ -126,6 +126,7 @@
 				$('#max_salary').val(rowData.max_salary)
 				$('#min_salary').val(rowData.min_salary)
 				$('#grade_id').val(rowData.id)
+				$('#isInactive').val(rowData.isInactive)
 				$('#oldRecord').val(JSON.stringify(rowData))
 				$('#selected_allowances').val(rowData.allowances.map(key => key.id)).trigger(
 					'chosen:updated');

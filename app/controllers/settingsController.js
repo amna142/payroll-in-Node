@@ -62,15 +62,15 @@ exports.getSettings = async (req, res) => {
 	// let user = req.session.user;
 	let logsArray = []
 	let user = EmployeeController.isEmployee(req)
-	if (user.role === 'Employee') {
+	console.log('user amna', user)
+	if (user.role === 'Employee' && designation.designation_type!=='HR') {
 		logsArray = await LogsController.employeeLogs(req.session.user.id)
 	} else {
 		logsArray = await LogsController.getLogs({
-			emp_id: user.id,
+			emp_id: req.session.user.id,
 			record_type: 'Allowance'
 		})
 	}
-	console.log('designation', designation.designation_type)
 	res.render('settings', {
 		allowances: allowances,
 		grades: grades,
@@ -102,7 +102,7 @@ exports.postAddAllowances = async (req, res) => {
 			AUDIT_LOGS.push({
 				name: req.session.user.name,
 				emp_id: req.session.user.id,
-				date: nodeParser.parse(new Date()),
+				date: new Date(),
 				time: LogsController.getTime(),
 				action: ENUM.SET,
 				record_type: 'Allowance',
@@ -116,6 +116,7 @@ exports.postAddAllowances = async (req, res) => {
 		let allowance = await AllowanceController.create(params)
 		old_allowance_value = params
 		if (allowance) {
+			console.log(JSON.stringify(AUDIT_LOGS))
 			LogsController.insertLogs(AUDIT_LOGS)
 			res.redirect('/settings#allowances')
 		}
@@ -208,11 +209,12 @@ exports.deleteAllowance = async (req, res) => {
 		AUDIT_LOGS.push({
 			name: req.session.user.name,
 			emp_id: req.session.user.id,
-			date: nodeParser.parse(new Date()),
+			date:new Date(),
 			time: LogsController.getTime(),
 			action: ENUM.DELETE,
 			record_type: 'Allowance'
 		})
+		console.log('AUDIT_LOGS', AUDIT_LOGS)
 		LogsController.insertLogs(AUDIT_LOGS)
 		res.redirect('/settings#allowances')
 	}
@@ -274,15 +276,13 @@ exports.editGrade = async (req, res, next) => {
 	let new_record = {
 		id: parseInt(req.body.grade_id),
 		grade: req.body.grade_short_form,
+		isInactive: req.body.isInactive,
 		min_salary: parseInt(req.body.min_salary),
 		max_salary: parseInt(req.body.max_salary),
 		allowances: selected_allowances,
 		funds: selected_funds
 	}
-	let updated_values = shallowEqual(JSON.parse(old_record), new_record)
-
-	//here adds updated logs
-	// addUpdatedLogs(updated_values, old_record)
+	let updated_values = await shallowEqual(JSON.parse(old_record), new_record)
 	console.log('updated_values', updated_values)
 	//see if grade of the given id exist 
 	let grade_exist = await GradeController.findById(parseInt(req.body.grade_id))
@@ -371,7 +371,7 @@ exports.postFund = async (req, res, next) => {
 			AUDIT_LOGS.push({
 				name: req.session.user.name,
 				emp_id: req.session.user.id,
-				date: nodeParser.parse(new Date()),
+				date: new Date(),
 				time: LogsController.getTime(),
 				action: ENUM.SET,
 				record_type: 'Funds',
@@ -399,7 +399,6 @@ exports.postFund = async (req, res, next) => {
 
 exports.deleteFund = async (req, res) => {
 	console.log('heeelllloooooo')
-	console.log('req.body', req.body)
 	let fundId = req.params.id
 	//call destroy function from database
 	let fund_destroyed = await FundController.delete(fundId)
@@ -418,6 +417,7 @@ exports.deleteFund = async (req, res) => {
 }
 
 function shallowEqual(oldRecord, newRecord) {
+	console.log('inside shallowEqual')
 	var obj = {}
 	delete oldRecord['updatedAt']
 	delete oldRecord['createdAt']
@@ -436,6 +436,8 @@ function shallowEqual(oldRecord, newRecord) {
 	const oldRecordValues = Object.values(oldRecord)
 	const newRecordKeys = Object.keys(newRecord);
 	const newRecordValues = Object.values(newRecord)
+	console.log('oldRecord keys', oldRecordKeys)
+	console.log('newRecord keys', newRecordKeys)
 	key_value = ''
 	if (oldRecordKeys.length !== newRecordKeys.length) {
 		return false;
@@ -448,7 +450,7 @@ function shallowEqual(oldRecord, newRecord) {
 			}
 		}
 	}
-	console.log('updatedFields', obj)
+	console.log('obj', obj)
 	return obj
 }
 

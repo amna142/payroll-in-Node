@@ -13,13 +13,13 @@
 								<thead>
 									<tr>
 										<th>EMP ID</th>
+										<th>NAME</th>
 										<th>ACTION</th>
 										<th>RECORD TYPE</th>
 										<th>FIELD ID</th>
 										<th>OLD VALUE</th>
 										<th>NEW VALUE</th>
 										<th>DATE</th>
-										<th>CREATOR NAME</th>
 									</tr>
 								</thead>
 							</table>
@@ -41,6 +41,9 @@
 				columns: [{
 						data: "emp_id"
 					},
+					 {
+						data: 'name'
+					},
 					{
 						data: "action"
 					},
@@ -57,8 +60,6 @@
 						data: "new_value"
 					}, {
 						data: 'time'
-					}, {
-						data: 'name'
 					}
 				]
 			});

@@ -14,10 +14,10 @@ exports.insertLogs = (AUDIT_LOGS) => {
 }
 
 
-exports.getLogs = (considtion) => {
+exports.getLogs = (condition) => {
 	let logsArray = []
 	return db.logs.findAll({
-		where: considtion
+		where: condition
 	}).then(logArr => {
 		logArr.forEach(element => {
 			logsArray.push(element.dataValues)

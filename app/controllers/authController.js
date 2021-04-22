@@ -75,7 +75,6 @@ exports.postLogin = (req, res) => {
 								action: constants.READ,
 								record_type: 'Employee'
 							})
-							console.log('AUDIT_LOGS', AUDIT_LOGS)
 							logsController.insertLogs(AUDIT_LOGS)
 							// insertLogs(AUDIT_LOGS)
 							return req.session.save(err => {

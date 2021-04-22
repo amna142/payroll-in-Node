@@ -18,6 +18,9 @@ exports.create = (params) => {
 exports.findAll = () => {
 	let arr = []
 	return Grade.findAll({
+		where: {
+			isInactive: false
+		},
 		include: [{
 			model: Allowance,
 			as: 'allowances',
@@ -32,10 +35,7 @@ exports.findAll = () => {
 			through: {
 				attributes: []
 			}
-		}],
-		where: {
-			isInactive: false
-		}
+		}]
 	}).then(results => {
 		// console.log(">> Created grade: " + JSON.stringify(results, null, 2))
 		if (results.length > 0) {
