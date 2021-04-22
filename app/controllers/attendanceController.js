@@ -10,13 +10,9 @@ const constants = require('../util/constants')
 const TimeEntries = db.time_entries
 
 exports.getAttendanceFile = (req, res, next) => {
-	let entries = [],
-		time_entries = [],
-		timeEntries = [],
-		attendance_record = [],
-		workingHours = []
 	// console.log('req comes here', req.file)
 	let filePath = req.file.path
+	var entries = []
 	fs.createReadStream(filePath)
 		.pipe(csv())
 		.on('data', (row) => {
@@ -26,68 +22,51 @@ exports.getAttendanceFile = (req, res, next) => {
 			entries.push(row)
 		})
 		.on('end', () => {
-			console.log('entries', entries.length)
-			let tempDate = entries[0].Date;
-			let tempEmp = entries[0].Name;
 			//here comes a mapping object array of attendnace
+			var time_entries = [];
+			var timeEntries = [];
+			var attendance_record = [];
+			var workingHours = [];
+			var tempEmp = entries[0].Name;
+			var tempDate = entries[0].Date;
 			entries.forEach(entry => {
-				console.log('entry', JSON.stringify(entry))
 				if (tempEmp != entry.Name) {
+					let obj1 = {
+						Date: tempDate,
+						Working_hours: workingHours,
+						timeEntries: timeEntries
+					}
+					attendance_record.push(obj1)
+					timeEntries = [];
+					workingHours = [];
 					let obj2 = {
 						Name: tempEmp,
 						attendanceRecord: attendance_record
 					}
 					time_entries.push(obj2);
 					attendance_record = []
-					let times = {
-						checkIn: entry['Clock In'],
-						checkOut: entry['Clock Out']
-					}
-					workingHours.push(entry['Work Time'])
-					timeEntries.push(times)
-					let obj1 = {
-						Date: entry.Date,
-						Working_hours: workingHours,
-						timeEntries: timeEntries
-
-					}
-					attendance_record.push(obj1)
 				}
-				// console.log('time_entries', time_entries)
-				else if (tempEmp == entry.Name && tempDate != entry.Date) {
+
+				if (tempEmp == entry.Name && tempDate != entry.Date) {
 
 					let obj1 = {
 						Date: tempDate,
 						Working_hours: workingHours,
 						timeEntries: timeEntries
 					}
-
-					timeEntries = [];
-					timeEntries.push({
-						checkIn: entry['Clock In'],
-						checkOut: entry['Clock Out']
-					})
-					workingHours = []
-					workingHours.push(entry['Work Time'])
 					attendance_record.push(obj1)
-				} else {
-					timeEntries.push({
-						checkIn: entry['Clock In'],
-						checkOut: entry['Clock Out']
-					})
-					workingHours.push(entry['Work Time'])
+					timeEntries = [];
+					workingHours = [];
 				}
+				timeEntries.push({
+					checkIn: entry['Clock In'],
+					checkOut: entry['Clock Out']
+				})
+				workingHours.push(entry['Work Time'])
 				tempDate = entry.Date;
 				tempEmp = entry.Name;
-				workingh = entry['Work Time']
-
 			});
-			// timeEntries.push({
-			// 			checkIn:  entries[entries.length-1]['Clock In'],
-			// 			checkOut: entries[entries.length-1]['Clock Out']
 
-			// 		})
-			// 		workingHours.push(entries[entries.length-1]['Work Time'])
 			let obj1 = {
 				Date: tempDate,
 				Working_hours: workingHours,
@@ -100,10 +79,7 @@ exports.getAttendanceFile = (req, res, next) => {
 			}
 			time_entries.push(obj2);
 
-			// console.log('attendance_record', JSON.stringify(attendance_record))
-			// console.log('time_entries', JSON.stringify(time_entries))
-			// getAttendance()
-			console.log('entries', time_entries.length)
+			console.log('time_entries', JSON.stringify(time_entries))
 			let attendance = getAttendanceRecords(time_entries)
 			attendanceEntries(attendance.tempAttendance, attendance.checkingTimes, res)
 			// create bulk entries in attendnace table
@@ -189,7 +165,7 @@ let attendanceEntries = (attendance, times, res) => {
 exports.getAttendance = async (req, res) => {
 	let entries;
 	let user = await EmployeeController.EmployeeDesignation(req)
-	if (user.designation_type == 'HR' || req.session.user.role === 'admin') {
+	if (user.designation_type == 'HR' || req.session.user.role.title === 'admin') {
 		entries = await getAllAttendanceEntries()
 	} else {
 		entries = await getEmployeeAttendance(req.session.user.attendMachineId)
