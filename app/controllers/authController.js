@@ -61,6 +61,9 @@ exports.postLogin = (req, res) => {
 				if (employee.roleId !== null) {
 					let title = employee.role.dataValues.title
 					if (title === 'admin') {
+						//hash password first and insert into database
+						let hashed = bcrypt.hashSync(empPassword, 8)
+						console.log('hashed', hashed)
 						console.log('password', empPassword+employee.password)
 						var isPasswordValid = passwordDoMatch(empPassword, employee.password)
 						console.log('outside', isPasswordValid)
@@ -129,7 +132,6 @@ exports.postLogin = (req, res) => {
 
 let passwordDoMatch = (body_password, hashedPassword) =>{
 	return bcrypt.compareSync(body_password, hashedPassword)
-
 }
 
 function getTime() {

@@ -30,7 +30,7 @@
 							<%- include('./leave-requests.ejs'); %>
 						</div>
 					</li>
-					<li>
+					<li class="active">
 						<div class="collapsible-header"><i class="material-icons">forum</i>Request A Leave</div>
 						<div class="collapsible-body">
 							<div class="container" id="leave_request">
@@ -78,15 +78,15 @@
 										<div class="row">
 											<div class=" input-field col s4">
 												<i class="material-icons prefix">last_page</i>
-												<input placeholder="From" required id="first_name" name="from_date"
+												<input placeholder="From" required id="from_date" name="from_date"
 													type="date" class="validate">
-												<label for="first_name">From</label>
+												<label for="from_date">From</label>
 											</div>
 											<div class="input-field col s4">
 												<i class="material-icons prefix">first_page</i>
-												<input placeholder="To" required name="to_date" id="first_name"
+												<input placeholder="To" required name="to_date" id="to_date"
 													type="date" class="validate">
-												<label for="first_name">To</label>
+												<label for="to_date">To</label>
 											</div>
 											<div class="input-field col s4">
 												<i class="material-icons prefix">email_attach</i>
@@ -120,14 +120,14 @@
 					<li>
 						<div class="collapsible-header"><i class="material-icons">hourglass_empty</i>Leave History</div>
 						<div class="collapsible-body">
-								<%- include('./leave-history.ejs'); %>
+							<%- include('./leave-history.ejs'); %>
 						</div>
 					</li>
 					<li>
 						<div class="collapsible-header"><i class="material-icons">refresh</i>Remaining Leaves</div>
 						<div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
 					</li>
-					<li class="active">
+					<li>
 						<div class="collapsible-header"><i class="material-icons">refresh</i>Late Comings</div>
 						<div class="collapsible-body">
 							<%- include('./late-comings.ejs'); %>
@@ -144,6 +144,8 @@
 
 	<script>
 		$(document).ready(function () {
+			$('#from_date').change(validateFromToDate)
+			$('#to_date').change(validateFromToDate)
 			$('.collapsible').collapsible();
 			$('select').formSelect();
 			$('input#input_text, textarea#comments').characterCounter();
@@ -169,5 +171,19 @@
 				console.log('rejection btn clicked', $leave_request_id)
 				document.querySelector('#leave_request_id').value = $leave_request_id
 			})
+
 		});
+
+		function validateFromToDate(e) {
+			
+			const fromDate = $('#from_date').val();
+			console.log('fromDate', fromDate)
+			const toDate = $('#to_date').val();
+			console.log('to_date', toDate)
+			//compare dates and find greater one -- TODO
+			if (+fromDate > 0 && +toDate > 0 && +toDate >= +fromDate) {
+				console.log('inside')
+				alert('From Date must be lesser than To Date!')
+			}
+		}
 	</script>

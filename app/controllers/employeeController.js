@@ -192,7 +192,7 @@ exports.employeesUnderSupervisor = (supervisors) => {
 }
 
 
-exports.isSupervisor = (email_id) => {
+exports.isSupervisor = (email_id, statusid) => {
 	console.log('current user emaiil', email_id)
 	let temp = []
 	let obj = {}
@@ -207,7 +207,7 @@ exports.isSupervisor = (email_id) => {
 		include: [{
 			model: Leaves,
 			where: {
-				leaveRequestStatusId: 1,
+				leaveRequestStatusId: statusid,
 			},
 			attributes: ['id', 'from_date', 'to_date', 'comments', 'days_applied', 'leaveTypeId', 'leaveRequestStatusId']
 		}]

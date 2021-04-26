@@ -4,6 +4,7 @@ const constants = require('../util/constants')
 const email = require('../util/constants')
 const fs = require('fs');
 const isValidBirthdate = require('is-valid-birthdate')
+const LeavesController = require('../controllers/leavesController')
 const nodeParser = require('node-date-parser')
 const {
 	transporter
@@ -356,8 +357,10 @@ exports.postAddEmployee = async (req, res) => {
 		db.employee.create(params).then((employee) => {
 			console.log('employee created', employee)
 			let empId = employee.dataValues.id
+			// LeavesController.leaveBalance(empId) -- TODO
 			//before employee creation, the create employee salary record
 			salariesController.createSalary(empId, req.body.salary, gradeId)
+			
 			logsController.insertLogs(AUDIT_LOGS)
 			res.redirect('/employees')
 			return transporter.sendMail({

@@ -57,6 +57,8 @@ db.leave_qouta = require('../models/leaveQouta.js')(sequelize, Sequelize)
 db.leaves = require('../models/leaves')(sequelize, Sequelize)
 db.leave_request_status = require('../models/leaveRequestStatus')(sequelize, Sequelize)
 db.company_preferences = require('../models/companyPreferences')(sequelize, Sequelize)
+db.events = require('../models/events')(sequelize, Sequelize)
+db.employee_leave_balance = require('../models/employeeLeaveBalance')(sequelize, Sequelize)
 //1 employee can have many roles
 //1 role can be assigend to many employees (1(role) -> many(employees))
 
@@ -204,7 +206,7 @@ db.leave_qouta.belongsTo(db.leave_types, {
 	onUpdate: 'CASCADE'
 })
 
-db.leave_types.hasOne(db.leaves,{
+db.leave_types.hasOne(db.leaves, {
 	foreignKey: {
 		allowNull: false
 	}
@@ -243,4 +245,15 @@ db.leaves.belongsTo(db.employee, {
 	onUpdate: 'CASCADE'
 })
 
+//employee with employee leave balance has one-to-one relation
+db.employee.hasOne(db.employee_leave_balance, {
+	foreignKey: {
+		allowNull: false
+	}
+})
+db.employee_leave_balance.belongsTo(db.employee, {
+	constraints: false,
+	onDelete: null,
+	onUpdate: 'CASCADE'
+})
 module.exports = db;

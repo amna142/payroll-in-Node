@@ -76,7 +76,7 @@ exports.postAddPrefrence = (req, res, next) => {
 	//insert qouta against leave type
 	LeaveQouta.create(params).then(result => {
 		console.log('result', result)
-		// result ? res.redirect('/leave_prefernces') : res.redirect('/leave_prefernce/add')
+		result ? res.redirect('/leave_preferences') : res.redirect('/leave_prefernce/add')
 	}).catch(err => {
 		console.log('err in postAddPrefrence', err)
 	})

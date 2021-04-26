@@ -1,12 +1,13 @@
 const fs = require('fs')
 const csv = require('csv-parser');
 const db = require('../util/database');
+const Employee = db.employee
 const timeEntries = require('../models/timeEntries');
 const dateParser = require('node-date-parser');
 const loadingSpinner = require('loading-spinner')
 const EmployeeController = require('../controllers/employeeController')
 const Attendance = db.attendance
-const constants = require('../util/constants')
+const constants = require('../util/constants');
 const TimeEntries = db.time_entries
 
 exports.getAttendanceFile = (req, res, next) => {
@@ -22,50 +23,43 @@ exports.getAttendanceFile = (req, res, next) => {
 			entries.push(row)
 		})
 		.on('end', () => {
-			//here comes a mapping object array of attendnace
-			var time_entries = [];
-			var timeEntries = [];
-			var attendance_record = [];
-			var workingHours = [];
-			var tempEmp = entries[0].Name;
-			var tempDate = entries[0].Date;
-			entries.forEach(entry => {
-				if (tempEmp != entry.Name) {
-					let obj1 = {
-						Date: tempDate,
-						Working_hours: workingHours,
-						timeEntries: timeEntries
-					}
-					attendance_record.push(obj1)
-					timeEntries = [];
-					workingHours = [];
-					let obj2 = {
-						Name: tempEmp,
-						attendanceRecord: attendance_record
-					}
-					time_entries.push(obj2);
-					attendance_record = []
-				}
+			let time_entries = this.attendanceMappingObject(entries)
+			console.log('time_entries', JSON.stringify(time_entries))
+			let attendance = getAttendanceRecords(time_entries)
+			attendanceEntries(attendance.tempAttendance, attendance.checkingTimes, res)
+			// create bulk entries in attendnace table
+			console.log('CSV file successfully processed');
+		});
+}
 
-				if (tempEmp == entry.Name && tempDate != entry.Date) {
 
-					let obj1 = {
-						Date: tempDate,
-						Working_hours: workingHours,
-						timeEntries: timeEntries
-					}
-					attendance_record.push(obj1)
-					timeEntries = [];
-					workingHours = [];
-				}
-				timeEntries.push({
-					checkIn: entry['Clock In'],
-					checkOut: entry['Clock Out']
-				})
-				workingHours.push(entry['Work Time'])
-				tempDate = entry.Date;
-				tempEmp = entry.Name;
-			});
+exports.attendanceMappingObject = (entries) => {
+	//here comes a mapping object array of attendnace
+	var time_entries = [];
+	var timeEntries = [];
+	var attendance_record = [];
+	var workingHours = [];
+	var tempEmp = entries[0].Name;
+	var tempDate = entries[0].Date;
+	entries.forEach(entry => {
+		if (tempEmp != entry.Name) {
+			let obj1 = {
+				Date: tempDate,
+				Working_hours: workingHours,
+				timeEntries: timeEntries
+			}
+			attendance_record.push(obj1)
+			timeEntries = [];
+			workingHours = [];
+			let obj2 = {
+				Name: tempEmp,
+				attendanceRecord: attendance_record
+			}
+			time_entries.push(obj2);
+			attendance_record = []
+		}
+
+		if (tempEmp == entry.Name && tempDate != entry.Date) {
 
 			let obj1 = {
 				Date: tempDate,
@@ -73,19 +67,30 @@ exports.getAttendanceFile = (req, res, next) => {
 				timeEntries: timeEntries
 			}
 			attendance_record.push(obj1)
-			let obj2 = {
-				Name: tempEmp,
-				attendanceRecord: attendance_record
-			}
-			time_entries.push(obj2);
+			timeEntries = [];
+			workingHours = [];
+		}
+		timeEntries.push({
+			checkIn: entry['Clock In'],
+			checkOut: entry['Clock Out']
+		})
+		workingHours.push(entry['Work Time'])
+		tempDate = entry.Date;
+		tempEmp = entry.Name;
+	});
 
-			console.log('time_entries', JSON.stringify(time_entries))
-			let attendance = getAttendanceRecords(time_entries)
-			attendanceEntries(attendance.tempAttendance, attendance.checkingTimes, res)
-			// create bulk entries in attendnace table
-
-			console.log('CSV file successfully processed');
-		});
+	let obj1 = {
+		Date: tempDate,
+		Working_hours: workingHours,
+		timeEntries: timeEntries
+	}
+	attendance_record.push(obj1)
+	let obj2 = {
+		Name: tempEmp,
+		attendanceRecord: attendance_record
+	}
+	time_entries.push(obj2);
+	return time_entries
 }
 
 
@@ -166,7 +171,7 @@ exports.getAttendance = async (req, res) => {
 	let entries;
 	let user = await EmployeeController.EmployeeDesignation(req)
 	if (user.designation_type == 'HR' || req.session.user.role.title === 'admin') {
-		entries = await getAllAttendanceEntries()
+		entries = await this.getAllAttendanceEntries()
 	} else {
 		entries = await getEmployeeAttendance(req.session.user.attendMachineId)
 	}
@@ -201,7 +206,7 @@ function formatAMPM(time) {
 }
 
 
-let getAllAttendanceEntries = () => {
+exports.getAllAttendanceEntries = () => {
 	let tempArr = []
 	return Attendance.findAll({
 		attributes: ['id', 'date', 'machine_attendance_id'],
@@ -211,6 +216,7 @@ let getAllAttendanceEntries = () => {
 		}]
 	}).then(result => {
 		if (result) {
+			console.log('result amna', JSON.stringify(result))
 			result.forEach(element => {
 				let entries = element.dataValues.time_entries
 				entries.forEach(timeEntry => {
@@ -267,31 +273,18 @@ let getEmployeeAttendance = (attendanceId) => {
 }
 
 
-exports.AttendanceByMonthAndYear = (month, year) => {
-	let tempArr = [];
+exports.AttendanceEntries = () => {
 	return Attendance.findAll({
 		attributes: ['id', 'date', 'machine_attendance_id'],
 		include: [{
 			model: TimeEntries,
-			attributes: ['id', 'check_out', 'check_in', 'attendanceId', 'work_time'],
-			order: [
-				['id', 'ASC']
-			]
+			attributes: ['id', 'check_out', 'check_in', 'attendanceId', 'work_time']
 		}]
 	}).then(result => {
 		if (result) {
-			result.forEach(element => {
-				let m = new Date(element.dataValues.date).getMonth() + 1;
-				let y = new Date(element.dataValues.date).getFullYear();
-
-				if (m === month && y === year) {
-					tempArr.push(element)
-				}
-			});
+			return result
 		}
-		console.log('result of JSON.stringify(tempArr)', JSON.stringify(tempArr))
-		return tempArr
 	}).catch(err => {
-		console.log('err', err)
+		console.log('err in AttendanceEntries', err)
 	})
 }
