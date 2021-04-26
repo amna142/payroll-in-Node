@@ -4,7 +4,6 @@
 <script>
 	$(document).ready(function () {
 		$('select').formSelect();
-		$('.datepicker').datepicker();
 	});
 </script>
 </head>
@@ -65,11 +64,10 @@
 						<div class="input-field col s3">
 							<i class="material-icons prefix">date_range</i>
 							<% if(isEmployee && designation!=='HR') {%>
-							<input type="text" class="datepicker" name="dob" id="dob" value="<%= dob %>" required=""
-								aria-required="true" disabled>
+							<input type="date" name="dob" id="dob" value="<%= dob %>" 
+								disabled>
 							<%} else if(navigation.role === 'Admin' || designation=== 'HR'){ %>
-							<input type="text" class="datepicker" name="dob" id="dob" value="<%= dob %>" required=""
-								aria-required="true">
+							<input type="date" name="dob" id="dob" value="<%= dob %>" required="" aria-required="true">
 							<% } %>
 							<label for="dob">DOB</label>
 						</div>
@@ -125,11 +123,11 @@
 						<div class="input-field col s4">
 							<i class="material-icons prefix">date_range</i>
 							<% if(isEmployee && designation!=='HR') {%>
-							<input type="text" class="datepicker" name="starting_date" id="starting_date"
-								value="<%= starting_date %>" required="" aria-required="true" disabled>
+							<input type="date" name="starting_date" id="starting_date" value="<%= starting_date %>"
+								required="" aria-required="true" disabled>
 							<%} else if(designation==='HR' || navigation.role === 'Admin'){ %>
-							<input type="text" class="datepicker" name="starting_date" id="starting_date"
-								value="<%= starting_date %>" required="" aria-required="true">
+							<input type="date" name="starting_date" id="starting_date" value="<%= starting_date %>"
+								required="" aria-required="true">
 							<% } %>
 
 							<label for="starting_date">Starting Date</label>

@@ -11,7 +11,6 @@ const AttendanceController = require('../controllers/attendanceController')
 
 router.get('/settings', isAuth, settingsController.getSettings)
 
-
 router.get('/settings/allowances/add', isAuth, settingsController.getPage)
 router.post('/settings/allowances/add', isAuth, settingsController.postAddAllowances)
 router.post('/settings/allowance/edit/', isAuth, settingsController.editAllowance)

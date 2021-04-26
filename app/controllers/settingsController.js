@@ -14,7 +14,8 @@ var errorMessages = [];
 exports.getPage = async (req, res, next) => {
 	let path = req.path;
 	let pathArray = path.split('/')
-	let allowances = []
+	let allowances = [],
+		logsArray = []
 	let user = EmployeeController.isEmployee(req)
 	let funds = []
 	if (pathArray.includes('grades')) {
@@ -26,21 +27,20 @@ exports.getPage = async (req, res, next) => {
 	if (req.flash('error').length > 0) {
 		errorMessages.push(req.flash('error'))
 	}
-	console.log('error length', errorMessages)
-	console.log('amna obj', {
-		allowances: allowances,
-		name: req.session.user.name,
-		errorMessage: errorMessages.length > 0 ? errorMessages[0] : null,
-		navigation: {
-			role: user.role,
-			pageName: constants.setting
-		},
-		funds: funds
-	})
+	var designation = await EmployeeController.CurrentUserDesignation(req.session.user.employeeDesignationId)
+	if (user.role === 'Employee' && designation.designation_type !== 'HR') {
+		logsArray = await LogsController.employeeLogs(req.session.user.id)
+	} else {
+		logsArray = await LogsController.getLogs({
+			emp_id: req.session.user.id,
+			record_type: 'Funds'
+		})
+	}
 	res.render(path, {
 		allowances: allowances,
 		name: req.session.user.name,
 		errorMessage: errorMessages.length > 0 ? errorMessages[0] : null,
+		logsData: logsArray,
 		navigation: {
 			role: user.role,
 			pageName: constants.setting
@@ -63,12 +63,11 @@ exports.getSettings = async (req, res) => {
 	let logsArray = []
 	let user = EmployeeController.isEmployee(req)
 	console.log('user amna', user)
-	if (user.role === 'Employee' && designation.designation_type!=='HR') {
+	if (user.role === 'Employee' && designation.designation_type !== 'HR') {
 		logsArray = await LogsController.employeeLogs(req.session.user.id)
 	} else {
 		logsArray = await LogsController.getLogs({
-			emp_id: req.session.user.id,
-			record_type: 'Allowance'
+			emp_id: req.session.user.id
 		})
 	}
 	res.render('settings', {
@@ -84,6 +83,7 @@ exports.getSettings = async (req, res) => {
 		logsData: logsArray,
 		errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null,
 	})
+	AUDIT_LOGS = []
 }
 
 //create Allowances
@@ -209,7 +209,7 @@ exports.deleteAllowance = async (req, res) => {
 		AUDIT_LOGS.push({
 			name: req.session.user.name,
 			emp_id: req.session.user.id,
-			date:new Date(),
+			date: new Date(),
 			time: LogsController.getTime(),
 			action: ENUM.DELETE,
 			record_type: 'Allowance'
@@ -236,12 +236,30 @@ exports.editAllowance = async (req, res, next) => {
 	//find by allowance name
 	let allowance_exist = await AllowanceController.findByName(newRecord.name)
 	if (Object.keys(updated_allowance_fields).length > 0) {
+
+		Object.keys(updated_allowance_fields).forEach(function (key) {
+			var value = updated_allowance_fields[key]
+			console.log(key, value)
+			AUDIT_LOGS.push({
+				name: req.session.user.name,
+				emp_id: req.session.user.id,
+				date: new Date(),
+				time: LogsController.getTime(),
+				action: ENUM.UPDATE,
+				record_type: 'Allowance',
+				field_id: key,
+				old_value: oldRecord[key],
+				new_value: value
+			})
+		})
+
 		if (allowance_exist) {
 			if (allowance_exist.id === newRecord.id) {
 
 				//update allowance record in database
 				allowance_update = await AllowanceController.edit(updated_allowance_fields, id)
 				if (allowance_update) {
+					LogsController.insertLogs(AUDIT_LOGS)
 					res.redirect('/settings#allowances')
 				}
 			} else {
@@ -284,9 +302,29 @@ exports.editGrade = async (req, res, next) => {
 	}
 	let updated_values = await shallowEqual(JSON.parse(old_record), new_record)
 	console.log('updated_values', updated_values)
+	console.log('old_record', old_record)
 	//see if grade of the given id exist 
 	let grade_exist = await GradeController.findById(parseInt(req.body.grade_id))
 	if (grade_exist) {
+
+		Object.keys(updated_values).forEach(function (key) {
+			var value = updated_values[key]
+			console.log('old_record[key]', old_record[key])
+			console.log('key', key)
+			AUDIT_LOGS.push({
+				name: req.session.user.name,
+				emp_id: req.session.user.id,
+				date: new Date(),
+				time: LogsController.getTime(),
+				action: ENUM.UPDATE,
+				record_type: 'Grades',
+				field_id: key,
+				old_value: old_record[key],
+				new_value: value
+			})
+		})
+
+
 		selected_allowances = updated_values.allowances
 		selected_funds = updated_values.funds
 		delete updated_values['allowances']
@@ -307,7 +345,7 @@ exports.editGrade = async (req, res, next) => {
 			req.flash('error', 'No funds has been updated')
 			console.log('No funds has been updated')
 		}
-
+		LogsController.insertLogs(AUDIT_LOGS)
 		res.redirect('/settings#grades')
 	} else {
 		console.log('grade doesnt exist')
@@ -332,12 +370,32 @@ exports.editFund = async (req, res) => {
 	let fund_update;
 	let fund_exist = await FundController.findByName(newRecord.name)
 	console.log('fund_exist', fund_exist)
+	console.log('new_record', newRecord)
 	if (Object.keys(updated_fund_record).length > 0) {
+		Object.keys(updated_fund_record).forEach(function (key) {
+			var value = updated_fund_record[key]
+			console.log(key, value)
+			AUDIT_LOGS.push({
+				name: req.session.user.name,
+				emp_id: req.session.user.id,
+				date: new Date(),
+				time: LogsController.getTime(),
+				action: ENUM.UPDATE,
+				record_type: 'Funds',
+				field_id: key,
+				old_value: oldRecord[key],
+				new_value: value
+			})
+		})
+
+		console.log('AUDIT_LOGS', JSON.stringify(AUDIT_LOGS))
+
 		if (fund_exist) {
 			if (fund_exist.id === newRecord.id) {
 				//update allowance record in database
 				fund_update = await FundController.edit(updated_fund_record, parseInt(id))
 				if (fund_update) {
+					LogsController.insertLogs(AUDIT_LOGS)
 					res.redirect('/settings#funds')
 				}
 			} else {
@@ -392,13 +450,11 @@ exports.postFund = async (req, res, next) => {
 		console.log('duplicate funds arent allowed')
 		req.flash('error', 'Duplicate Fund isnt Allowed')
 		errorMessages.push(req.flash('error')[0]);
-		console.log('amna check error here', req.flash('error'))
 		res.redirect('/settings/funds/add')
 	}
 }
 
 exports.deleteFund = async (req, res) => {
-	console.log('heeelllloooooo')
 	let fundId = req.params.id
 	//call destroy function from database
 	let fund_destroyed = await FundController.delete(fundId)
@@ -454,36 +510,6 @@ function shallowEqual(oldRecord, newRecord) {
 	return obj
 }
 
-function addUpdatedLogs(updated_values, old_record) {
-	if (Object.keys(updated_values).length === 0) {
-		console.log('You didnt updated anything')
-		req.flash('error', 'You didnt updated anything. please update fields or move back')
-		let message = req.flash('error')
-		message = message.length > 0 ? message : null
-		var user = req.session.user;
-		var isEmployee = false
-		if (user.roleId === null) {
-			isEmployee = true
-		} else {
-			isEmployee = false
-		}
-	} else {
-		Object.keys(updated_values).forEach(function (key) {
-			var value = updated_values[key]
-			AUDIT_LOGS.push({
-				name: req.session.user.name,
-				emp_id: req.session.user.id,
-				date: nodeParser.parse(new Date()),
-				time: LogsController.getTime(),
-				action: ENUM.UPDATE,
-				record_type: 'Grades',
-				field_id: key,
-				old_value: oldRecord[key],
-				new_value: value
-			})
-		})
-	}
-}
 
 function FieldsDifference(oldRecord, newRecord) {
 	var obj = {}

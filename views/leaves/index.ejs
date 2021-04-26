@@ -1,6 +1,7 @@
 <%- include('../includes/header'); %>
 <link rel="stylesheet" href="/css/home.css">
 <link rel="stylesheet" href="/css/user_profile.css">
+<link rel="stylesheet" href="/css/error-message.css">
 <style>
 	.form {
 		margin: 0 0 1em 0;
@@ -20,6 +21,7 @@
 	<main>
 
 		<div class="row">
+
 			<div id="leaves" class="col s12">
 
 				<ul class="collapsible">
@@ -36,6 +38,14 @@
 							<div class="container" id="leave_request">
 								<h5>Request a Leave</h5>
 								<br />
+								<div class="row">
+									<% if(errorMessage) { %>
+
+									<div class="col s8 user-message user-message--error"><%= errorMessage %>
+									</div>
+									<% } %>
+								</div>
+
 								<div class="row">
 
 									<form class="col s12" method="POST" action="/leaves" name="leave_request_form">
@@ -84,8 +94,8 @@
 											</div>
 											<div class="input-field col s4">
 												<i class="material-icons prefix">first_page</i>
-												<input placeholder="To" required name="to_date" id="to_date"
-													type="date" class="validate">
+												<input placeholder="To" required name="to_date" id="to_date" type="date"
+													class="validate">
 												<label for="to_date">To</label>
 											</div>
 											<div class="input-field col s4">
@@ -175,14 +185,15 @@
 		});
 
 		function validateFromToDate(e) {
-			
+
 			const fromDate = $('#from_date').val();
 			console.log('fromDate', fromDate)
 			const toDate = $('#to_date').val();
 			console.log('to_date', toDate)
 			//compare dates and find greater one -- TODO
-			if (+fromDate > 0 && +toDate > 0 && +toDate >= +fromDate) {
-				console.log('inside')
+			var d1 = new Date(fromDate);
+			var d2 = new Date(toDate);
+			if (d1.getTime() > d2.getTime()) {
 				alert('From Date must be lesser than To Date!')
 			}
 		}

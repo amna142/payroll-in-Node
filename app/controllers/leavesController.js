@@ -16,6 +16,9 @@ const LeaveQouta = db.leave_qouta
 const LeaveTypes = db.leave_types
 const LeaveRequest = db.leaves
 const leaveRequestStatus = db.leave_request_status
+
+
+
 exports.getLeaves = async (req, res) => {
 	let leave_requests = []
 	let user = EmployeeController.isEmployee(req)
@@ -33,7 +36,7 @@ exports.getLeaves = async (req, res) => {
 	}
 	//here comes leave status either rejected or accepted 
 	let leaveHistory = await leave_history(req.session.user.email)
-	console.log('leaveHistory', JSON.stringify(leaveHistory))
+	// console.log('leaveHistory', JSON.stringify(leaveHistory))
 	res.render('leaves', {
 		name: req.session.user.name,
 		email: current_user_email,
@@ -47,6 +50,7 @@ exports.getLeaves = async (req, res) => {
 			role: user.role,
 			pageName: ENUM.leave_prefernces
 		},
+		errorMessage: req.flash('error')[0]
 	})
 }
 
@@ -106,28 +110,71 @@ exports.postLeave = async (req, res, next) => {
 		leaveRequestStatusId: statusId.id,
 		employeeId: req.session.user.id
 	}
-	// create leaves 
-	LeaveRequest.create(params).then(result => {
-		console.log('result', result)
-		//if created send email to the supervisor
-		if (result) {
-			send_email(
-				req.session.user.supervisor_email,
-				req.session.user.email,
-				`Leave Request from ${req.session.user.name}`,
-				`<p>Hello ${req.session.user.supervisor_email}, </br></p>
-				<p>Hope you're doing fine. I (${req.session.user.name}) am Requesting a leave from <b>${req.body.from_date}</b> till  <b>${req.body.to_date}</b>.</p>
-				<b> Reason For Leave</b>
-				<p> ${req.body.comments}</p>
-				<button > Approve </button> || <button> Reject </button> || <button> Refer </button>
-				<p>Click this <a href="http://localhost:3000/leaves">link</a> to get Into the System</p> </br>
-				<p>Best Regards</p>
-				<b>${req.session.user.name}</b>`
-			)
-			res.redirect('leaves')
+	//check leaves if applied first on these dates
+	let applied_leave = await LeaveIsAlreadyApplied(params.from_date, params.to_date, params.employeeId)
+	console.log('applied_leave', applied_leave)
+	if (applied_leave.length > 0) {
+		//user can't apply another leave on same date
+		req.flash('error', 'leave on dates already exits')
+		res.redirect('/leaves')
+	} else {
+		// create leaves 
+		console.log('i am creating new leave')
+		LeaveRequest.create(params).then(result => {
+			console.log('result', result)
+			//if created send email to the supervisor
+			if (result) {
+				send_email(
+					req.session.user.supervisor_email,
+					req.session.user.email,
+					`Leave Request from ${req.session.user.name}`,
+					`<p>Hello ${req.session.user.supervisor_email}, </br></p>
+			<p>Hope you're doing fine. I (${req.session.user.name}) am Requesting a leave from <b>${req.body.from_date}</b> till  <b>${req.body.to_date}</b>.</p>
+			<b> Reason For Leave</b>
+			<p> ${req.body.comments}</p>
+			<button > Approve </button> || <button> Reject </button> || <button> Refer </button>
+			<p>Click this <a href="http://localhost:3000/leaves">link</a> to get Into the System</p> </br>
+			<p>Best Regards</p>
+			<b>${req.session.user.name}</b>`
+				)
+				res.redirect('leaves')
+			}
+		}).catch(err => {
+			console.log('err in postLeave', err)
+		})
+	}
+
+}
+
+let LeaveIsAlreadyApplied = async (from, to, empId) => {
+	let pendingLeaveStatusId = await findLeaveStatusId('Pending')
+	let acceptedLeaveStatusId = await findLeaveStatusId('Accepted')
+	console.log('from_date', new Date(from))
+	console.log('to_date', new Date(to))
+	return Leaves.findAll({
+		where: {
+			employeeId: empId,
+			[Op.and]: [{
+				from_date: {
+					[Op.between]: [new Date(from), new Date(to)]
+				},
+				to_date: {
+					[Op.between]: [new Date(from), new Date(to)]
+				}
+			}],
+			[Op.or]: [{
+					leaveRequestStatusId: pendingLeaveStatusId.id
+				},
+				{
+					leaveRequestStatusId: acceptedLeaveStatusId.id
+				}
+			]
 		}
+	}).then(result => {
+		console.log('result of LeaveIsAlreadyApplied', JSON.stringify(result))
+		return result
 	}).catch(err => {
-		console.log('err in postLeave', err)
+		console.log('err of LeaveIsAlreadyApplied', err)
 	})
 }
 
@@ -176,12 +223,12 @@ exports.AcceptLeave = async (req, res, next) => {
 				HREmails[0], //here HR email comes
 				`Leave Request Approved for ${employeeObj.employee.name}`,
 				`<p>Hello ${employeeObj.employee.name}, </br></p>
-				<p>Hope you're doing fine. ${req.session.user.email} have approved leave from <b>${req.body.from_date}</b> till  <b>${req.body.to_date}</b>.</p>
-				<b> Reason Employee Gave For Leave</b>
-				<p> ${employeeObj.comments}</p>
-				<p>this email has been CC to HR</p>
-				<p>Best Regards</p>
-				<b>${req.session.user.name}</b>`
+			<p>Hope you're doing fine. ${req.session.user.email} have approved leave from <b>${req.body.from_date}</b> till  <b>${req.body.to_date}</b>.</p>
+			<b> Reason Employee Gave For Leave</b>
+			<p> ${employeeObj.comments}</p>
+			<p>this email has been CC to HR</p>
+			<p>Best Regards</p>
+			<b>${req.session.user.name}</b>`
 			)
 			res.redirect('/leaves')
 		}
@@ -211,12 +258,12 @@ exports.RejectLeave = async (req, res, next) => {
 			HREmails[0], //here HR email comes
 			`Leave Request Rejected for ${employeeObj.employee.name}`,
 			`<p>Hello ${employeeObj.employee.name}, </br></p>
-				<p>Hope you're doing fine. ${req.session.user.name} have rejected leave from <b>${employeeObj.from_date}</b> till  <b>${employeeObj.to_date}</b>.</p>
-				<b> Reason Employee Gave For Rejection</b>
-				<p> ${req.body.rejection_reason}</p>
-				<p>this email has been CC to HR</p>
-				<p>Best Regards</p>
-				<b>${req.session.user.name}</b>`
+			<p>Hope you're doing fine. ${req.session.user.name} have rejected leave from <b>${employeeObj.from_date}</b> till  <b>${employeeObj.to_date}</b>.</p>
+			<b> Reason Employee Gave For Rejection</b>
+			<p> ${req.body.rejection_reason}</p>
+			<p>this email has been CC to HR</p>
+			<p>Best Regards</p>
+			<b>${req.session.user.name}</b>`
 		)
 		res.redirect('/leaves')
 	}
@@ -456,7 +503,7 @@ let findLeaveStatusId = (params) => {
 			status: params
 		}
 	}).then(result => {
-		console.log('result in findAcceptedLeaveId', result)
+		console.log('result in findAcceptedLeaveId', result.id)
 		return result
 	}).catch(err => {
 		console.log('err in findAcceptedLeaveId', err)
@@ -497,7 +544,7 @@ exports.leaveBalance = async (employeeId) => {
 		employeeId: employeeId,
 		total_leaves_allowed: totalLeavesAllowed,
 		remaining_leaves: totalLeavesAllowed
-	}).then(record=>{
+	}).then(record => {
 		console.log('rescord created', record)
 		return record;
 	}).catch(err => {
