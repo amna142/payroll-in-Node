@@ -13,6 +13,7 @@
 				<%= leave_requests[i].email %></span>
 			<p><b>Dates:</b> <%= leave_requests[i].leaves[j].from_date %> to
 				<%= leave_requests[i].leaves[j].to_date %> <br>
+				<b>Days Applied</b> <%= leave_requests[i].leaves[j].days_applied %> <br>
 				<b>Reason:</b> <%= leave_requests[i].leaves[j].comments %> <br>
 				**I don't understand this situation, so I am refering it to high
 				authorituies.** <br>
@@ -25,8 +26,9 @@
 					data-id=<%= leave_requests[i].leaves[j].id %>> <i class="material-icons right">check</i>Accept</a>
 			</div>
 		</li>
-		<% } } } %>
-
+		<% } } }else { %>
+			***No leave Requests
+			<% } %>
 	</ul>
 </div>
 

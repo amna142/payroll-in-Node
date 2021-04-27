@@ -3,6 +3,7 @@ const ENUM = require('../util/constants')
 const db = require('../util/database')
 const Employee = db.employee;
 const Leaves = db.leaves;
+const sequelize = require('sequelize')
 const AttendanceController = require('../controllers/attendanceController')
 const fs = require('fs')
 const Sequelize = require('sequelize')
@@ -11,7 +12,7 @@ const {
 	send_email
 } = require('../config/email.config');
 const PreferencesController = require('./preferencesController');
-const employeeLeaveBalance = require('../models/employeeLeaveBalance');
+const employeeLeaveBalance = db.employee_leave_balance;
 const LeaveQouta = db.leave_qouta
 const LeaveTypes = db.leave_types
 const LeaveRequest = db.leaves
@@ -36,7 +37,10 @@ exports.getLeaves = async (req, res) => {
 	}
 	//here comes leave status either rejected or accepted 
 	let leaveHistory = await leave_history(req.session.user.email)
-	// console.log('leaveHistory', JSON.stringify(leaveHistory))
+	console.log('leave_requests', JSON.stringify(leave_requests))
+
+	let remaining_leaves = await EmployeeLeaveBalance(req.session.user.id)
+	console.log('remaining_leaves', remaining_leaves)
 	res.render('leaves', {
 		name: req.session.user.name,
 		email: current_user_email,
@@ -46,6 +50,7 @@ exports.getLeaves = async (req, res) => {
 		leave_requests: leave_requests.length > 0 ? leave_requests : [],
 		supervisor_email: req.session.user.supervisor_email,
 		prefernces: leave_types,
+		remaining_leaves: remaining_leaves,
 		navigation: {
 			role: user.role,
 			pageName: ENUM.leave_prefernces
@@ -97,7 +102,7 @@ exports.postLeave = async (req, res, next) => {
 	let from_date = new Date(req.body.from_date);
 	let to_date = new Date(req.body.to_date)
 	let time_difference = to_date.getTime() - from_date.getTime()
-	let leave_days = Math.round(time_difference / (1000 * 3600 * 24))
+	let leave_days = Math.round((time_difference / (1000 * 3600 * 24)) + 1)
 	console.log('leave_days', leave_days)
 	let statusId = await findLeaveStatusId('Pending')
 	console.log('statusId', statusId)
@@ -149,8 +154,6 @@ exports.postLeave = async (req, res, next) => {
 let LeaveIsAlreadyApplied = async (from, to, empId) => {
 	let pendingLeaveStatusId = await findLeaveStatusId('Pending')
 	let acceptedLeaveStatusId = await findLeaveStatusId('Accepted')
-	console.log('from_date', new Date(from))
-	console.log('to_date', new Date(to))
 	return Leaves.findAll({
 		where: {
 			employeeId: empId,
@@ -202,8 +205,13 @@ exports.AcceptLeave = async (req, res, next) => {
 	});
 	//find HR email
 	let employeeObj = await EmployeeController.findByPk(leave_request_id)
+	console.log('employeeObj', JSON.stringify(employeeObj))
 	let statusId = await findLeaveStatusId('Accepted')
 	console.log('sattus IS', JSON.stringify(statusId.id))
+	//fetch employee leave balance
+	let employee_leave_balance = await EmployeeLeaveBalance(employeeObj.employee.id)
+	let balance  = employee_leave_balance.remaining_leaves - employeeObj.days_applied
+	console.log('employee_leave_balance amna', balance)
 	LeaveRequest.update({
 		leaveRequestStatusId: statusId.id,
 		rejected_by: req.session.user.email
@@ -213,27 +221,58 @@ exports.AcceptLeave = async (req, res, next) => {
 		}
 	}).then(result => {
 		if (result) {
+			//after leave acceptance, deduct leaves from qouta if avaialable 
+			employeeLeaveBalance.update({
+					remaining_leaves: balance
+				}, {
+					where: {
+						employeeId: employeeObj.employee.id
+					}
+				}
 
-			//after leave acceptance, deduct leaves from qouta if avaialable
-
-			//id update completes, send email to approver and employee as well 
-			send_email(
-				employeeObj.employee.email,
-				req.session.user.email,
-				HREmails[0], //here HR email comes
-				`Leave Request Approved for ${employeeObj.employee.name}`,
-				`<p>Hello ${employeeObj.employee.name}, </br></p>
+			).then(result => {
+				console.log('result in employeeLeaveBalance', result)
+				return result
+			}).then(employee_leave_balance_id => {
+				if (employee_leave_balance_id) {
+					send_email(
+						employeeObj.employee.email,
+						req.session.user.email,
+						HREmails[0], //here HR email comes
+						`Leave Request Approved for ${employeeObj.employee.name}`,
+						`<p>Hello ${employeeObj.employee.name}, </br></p>
 			<p>Hope you're doing fine. ${req.session.user.email} have approved leave from <b>${req.body.from_date}</b> till  <b>${req.body.to_date}</b>.</p>
 			<b> Reason Employee Gave For Leave</b>
 			<p> ${employeeObj.comments}</p>
 			<p>this email has been CC to HR</p>
 			<p>Best Regards</p>
 			<b>${req.session.user.name}</b>`
-			)
-			res.redirect('/leaves')
+					)
+					res.redirect('/leaves')
+				}
+			}).catch(err => {
+				console.log('err in employeeLeaveBalance', err)
+			})
+			//id update completes, send email to approver and employee as well 
 		}
 	}).catch(err => {
 		console.log('err of AcceptLeave', err)
+	})
+}
+
+let EmployeeLeaveBalance = (id) => {
+	console.log('employee id', id)
+	return employeeLeaveBalance.findOne({
+		attributes: ['total_leaves_allowed', 'remaining_leaves'],
+		where: {
+			employeeId: id
+		},
+		raw: true
+	}).then(result => {
+		console.log('result of EmployeeLeaveBalance', result)
+		return result
+	}).catch(err => {
+		console.log('err of EmployeeLeaveBalance')
 	})
 }
 
@@ -246,9 +285,10 @@ exports.RejectLeave = async (req, res, next) => {
 	});
 	let employeeObj = await EmployeeController.findByPk(parseInt(req.body.leave_request_id))
 	let statusId = await findLeaveStatusId('Rejected')
+	console.log('statusId', statusId.id)
 	//update status from leave table and insert rejection reason
 	//now update leave with status and rejection reason
-	let leaveStatusUpdate = updateLeaveApproveStatus(parseInt(req.body.leave_request_id), req.body.rejection_reason, req.session.user.email, statusId)
+	let leaveStatusUpdate = updateLeaveApproveStatus(parseInt(req.body.leave_request_id), req.body.rejection_reason, req.session.user.email, statusId.id)
 	// now send email that leave has been rejected
 
 	if (leaveStatusUpdate) {
@@ -288,9 +328,6 @@ let updateLeaveApproveStatus = (leave_request_id, rejection_reason, name, status
 		console.log('err of updateLeaveApproveStatus', err)
 	})
 }
-
-let compareTimes = async (time) => {}
-
 
 exports.CalculateLateComings = async (req, res) => {
 	let date = req.body.month;
@@ -431,7 +468,6 @@ let mappingObject = (entries) => {
 }
 
 let isLeaveApplied = (name, date) => {
-	console.log('entru.date', date)
 	return Employee.findAll({
 		attributes: ['id', 'attendMachineId'],
 		where: {
@@ -501,7 +537,7 @@ let findLeaveStatusId = (params) => {
 		attributes: ['id'],
 		where: {
 			status: params
-		}
+		}, raw: true
 	}).then(result => {
 		console.log('result in findAcceptedLeaveId', result.id)
 		return result
@@ -510,45 +546,40 @@ let findLeaveStatusId = (params) => {
 	})
 }
 
-let acceptedLeaves = () => {
-	let statusId = findLeaveStatusId('Accepted')
-	if (statusId) {
-		return Leaves.findAll({
-			where: {
-				leaveRequestStatusId: statusId
-			}
-		}).then(result => {
-			console.log('result', JSON.stringify(result))
-		}).catch(err => {
-			console.log('err in acceptedLeaves', err)
-		})
-	}
+
+let totalLeaves = () => {
+	return LeaveQouta.findAll({
+		attributes: [
+			[sequelize.fn('sum', sequelize.col('leaves_allowed')), 'total_leaves']
+		],
+		raw: true
+	}).then(result => {
+		console.log('result of totalLeaves', result)
+		return result[0].total_leaves
+	}).catch(err => {
+		console.log('err of totalLeaves', err)
+	})
 
 }
 
-
 exports.leaveBalance = async (employeeId) => {
-	let totalLeavesAllowed = 0
-	//calculate Total Leaves of an employee
-	let total_leaves = await leave_prefernces()
-	if (total_leaves.length > 0) {
-		total_leaves.forEach(element => {
-			totalLeavesAllowed = totalLeavesAllowed + element.leaves_allowed
-		});
-	} else {
-		console.log('no leave preferences are added')
-	}
-	console.log('totalLeavesAllowed', totalLeavesAllowed)
-	//now create leave balance record
-	return employeeLeaveBalance.create({
-		employeeId: employeeId,
-		total_leaves_allowed: totalLeavesAllowed,
-		remaining_leaves: totalLeavesAllowed
-	}).then(record => {
-		console.log('rescord created', record)
-		return record;
-	}).catch(err => {
-		console.log('err in employee leave balance creation', err)
-	})
+	let leaveCount = await totalLeaves()
+	console.log('hello amna', employeeId)
+	console.log('leaveCount', leaveCount)
 
+	//now create leave balance record
+	if (leaveCount && employeeId) {
+		return employeeLeaveBalance.create({
+			employeeId: employeeId,
+			total_leaves_allowed: leaveCount,
+			remaining_leaves: leaveCount
+		}).then(record => {
+			console.log('rescord created', JSON.stringify(record))
+			return record;
+		}).catch(err => {
+			console.log('err in employee leave balance creation', err)
+		})
+	} else {
+		console.log('please provide leave preferneces')
+	}
 }

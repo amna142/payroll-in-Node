@@ -59,7 +59,7 @@ exports.employeesIndexPage = async (req, res) => {
 	//get role of user to restrict access
 	let isUser = employeeController.isEmployee(req)
 	isUser.role === 'Employee' ? logsArray = await logsController.employeeLogs(req.session.user.id) : logsArray = await logsController.getLogs()
-	
+
 	var des = await designation(req.session.user.employeeDesignationId)
 	console.log('designation', des)
 	if (emp.length > 0) {
@@ -193,7 +193,7 @@ exports.getDeleteEmployee = (req, res) => {
 		AUDIT_LOGS.push({
 			name: req.session.user.name,
 			emp_id: req.session.user.id,
-			date:  new Date(),
+			date: new Date(),
 			time: getTime(),
 			action: constants.DELETE,
 			record_type: 'Employee'
@@ -353,14 +353,16 @@ exports.postAddEmployee = async (req, res) => {
 	let value = await employeeByEmail(params.email)
 	console.log(value)
 	if (value) {
+	
 		// now add employee
 		db.employee.create(params).then((employee) => {
 			console.log('employee created', employee)
 			let empId = employee.dataValues.id
-			// LeavesController.leaveBalance(empId) -- TODO
+			
+			LeavesController.leaveBalance(empId)
 			//before employee creation, the create employee salary record
 			salariesController.createSalary(empId, req.body.salary, gradeId)
-			
+
 			logsController.insertLogs(AUDIT_LOGS)
 			res.redirect('/employees')
 			return transporter.sendMail({
@@ -391,7 +393,7 @@ exports.getEditEmployee = async (req, res) => {
 	let employee_type = await type(employeeFound.type)
 	let isUser = employeeController.isEmployee(req);
 	console.log('req.session.user', req.session.user)
-	let userDesignation = await  employeeController.CurrentUserDesignation(req.session.user.employeeDesignationId)
+	let userDesignation = await employeeController.CurrentUserDesignation(req.session.user.employeeDesignationId)
 	console.log('userDesignation', userDesignation)
 	if (isUser.role === 'Employee') {
 		logsArray = await logsController.employeeLogs(req.session.user.id)

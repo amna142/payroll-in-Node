@@ -1,0 +1,21 @@
+<div class="container" id="leave_balance">
+	<!-- accepted leaves -->
+	<ul class="collection with-header">
+		<li class="collection-header">
+			<h6><b> Employee Leave Balance </b></h6>
+		</li>
+
+		<% if(remaining_leaves!==null) { %>
+
+		<li class="collection-item grey">Total Leaves You were allowed:
+			<b><%= remaining_leaves.total_leaves_allowed %></b></li>
+		<li class="collection-item green">Total Leaves You have Consumed: <b>
+				<%= remaining_leaves.total_leaves_allowed - remaining_leaves.remaining_leaves %></b></li>
+		<li class="collection-item orange">Remaining Leaves You have in Balance:
+			<b><%= remaining_leaves.remaining_leaves %></b></li>
+		<% } else {%>
+		<li class="collection-item">No Leave Balance</li>
+		<% } %>
+	</ul>
+
+</div>

@@ -7,8 +7,9 @@ const LeaveTypes = db.leave_types
 exports.getLeaves = async (req, res, next) => {
 	let user = EmployeeController.isEmployee(req)
 	let preferences = await leave_prefernces()
+	console.log('preferences', JSON.stringify(preferences))
 	let designation = await EmployeeController.CurrentUserDesignation(req.session.user.employeeDesignationId)
-	console.log('designation',  designation.dataValues.designation_type)
+	console.log('designation', designation.dataValues.designation_type)
 	res.render('leavePrefernces/index', {
 		name: req.session.user.name,
 		isEmployee: user.isEmployee,
@@ -40,7 +41,6 @@ exports.getAddPrefrence = async (req, res, next) => {
 	let user = EmployeeController.isEmployee(req)
 	//get leave types from database
 	let leave_types = await leaveTypes()
-	console.log('leave_types', leave_types)
 	res.render('leavePrefernces/add', {
 		name: req.session.user.name,
 		isEmployee: user.isEmployee,
@@ -98,7 +98,7 @@ exports.getCompanyPreferences = async (req, res) => {
 	})
 }
 
-exports.fetchDataFromCompanyPreferences  = () => {
+exports.fetchDataFromCompanyPreferences = () => {
 	return CompanyPreferences.findOne({
 		attributes: ['id', 'start_time', 'off_time', 'working_hours', 'working_days', 'over_time']
 	}).then(result => {
