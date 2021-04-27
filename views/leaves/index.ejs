@@ -133,14 +133,20 @@
 							<%- include('./leave-history.ejs'); %>
 						</div>
 					</li>
-					<li class="active">
+					<li>
 						<div class="collapsible-header"><i class="material-icons">refresh</i>Remaining Leaves</div>
 						<div class="collapsible-body">
 							<%- include('./remaining-leaves.ejs'); %>
 						</div>
 					</li>
+					<li class="active">
+						<div class="collapsible-header"><i class="material-icons">block</i>Late Comings</div>
+						<div class="collapsible-body">
+							<%- include('./late-comings.ejs'); %>
+						</div>
+					</li>
 					<li>
-						<div class="collapsible-header"><i class="material-icons">refresh</i>Late Comings</div>
+						<div class="collapsible-header"><i class="material-icons">block</i>Fine & penalty</div>
 						<div class="collapsible-body">
 							<%- include('./late-comings.ejs'); %>
 						</div>
@@ -150,9 +156,7 @@
 		</div>
 	</main>
 
-
 	<%- include('../includes/footer'); %>
-
 
 	<script>
 		$(document).ready(function () {

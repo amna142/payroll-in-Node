@@ -100,10 +100,10 @@ exports.getCompanyPreferences = async (req, res) => {
 
 exports.fetchDataFromCompanyPreferences = () => {
 	return CompanyPreferences.findOne({
-		attributes: ['id', 'start_time', 'off_time', 'working_hours', 'working_days', 'over_time']
+		attributes: ['id', 'start_time', 'off_time', 'working_hours', 'working_days', 'over_time'],
+		raw: true
 	}).then(result => {
-		console.log('result.dataValues', result.dataValues)
-		return result.dataValues;
+		return result;
 	}).catch(err => {
 		console.log('err in fetchDataFromCompanyPreferences', err)
 	})

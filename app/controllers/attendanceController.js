@@ -1,8 +1,6 @@
 const fs = require('fs')
 const csv = require('csv-parser');
 const db = require('../util/database');
-const Employee = db.employee
-const timeEntries = require('../models/timeEntries');
 const dateParser = require('node-date-parser');
 const loadingSpinner = require('loading-spinner')
 const EmployeeController = require('../controllers/employeeController')
@@ -23,6 +21,7 @@ exports.getAttendanceFile = (req, res, next) => {
 			entries.push(row)
 		})
 		.on('end', () => {
+			console.log('entries', JSON.stringify(entries))
 			let time_entries = this.attendanceMappingObject(entries)
 			console.log('time_entries', JSON.stringify(time_entries))
 			let attendance = getAttendanceRecords(time_entries)
@@ -44,7 +43,7 @@ exports.attendanceMappingObject = (entries) => {
 	entries.forEach(entry => {
 		if (tempEmp != entry.Name) {
 			let obj1 = {
-				Date: tempDate,
+				Date:tempDate,
 				Working_hours: workingHours,
 				timeEntries: timeEntries
 			}
@@ -281,7 +280,7 @@ exports.AttendanceEntries = () => {
 			attributes: ['id', 'check_out', 'check_in', 'attendanceId', 'work_time']
 		}]
 	}).then(result => {
-		if (result) {
+		if (result) {	
 			return result
 		}
 	}).catch(err => {

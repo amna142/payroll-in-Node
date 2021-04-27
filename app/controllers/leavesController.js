@@ -347,72 +347,73 @@ exports.CalculateLateComings = async (req, res) => {
 	attendance_entries = weekendsOffDays(attendance_entries)
 
 	attendance_entries = mappingObject(attendance_entries)
-	if (attendance_entries.length > 0) {
-		//late by Working Hours
-		attendance_entries.forEach(entry => {
-			let working_hours = 0;
-			entry.attendanceRecord.forEach(element => {
+	console.log('attendance_entries', JSON.stringify(attendance_entries))
+	// if (attendance_entries.length > 0) {
+	// 	//late by Working Hours
+	// 	attendance_entries.forEach(entry => {
+	// 		let working_hours = 0;
+	// 		entry.attendanceRecord.forEach(element => {
 
-				//**************Absence Deductions**************
-				//Absence Deduction occurs when there's no leave of employee in employee Leave Record. 
+	// 			//**************Absence Deductions**************
+	// 			//Absence Deduction occurs when there's no leave of employee in employee Leave Record. 
 
-				if (element.timeEntries[0].check_in.includes('leave') || element.timeEntries[0].check_in.includes('Leave') || element.timeEntries[0].check_in.includes('LEAVE')) {
-					let isLeave = isLeaveApplied(entry.Name, element.Date)
-					if (!isLeave) {
-						absentees.push(entry)
-					}
-				}
+	// 			if (element.timeEntries[0].check_in.includes('leave') || element.timeEntries[0].check_in.includes('Leave') || element.timeEntries[0].check_in.includes('LEAVE')) {
+	// 				let isLeave = isLeaveApplied(entry.Name, element.Date)
+	// 				if (!isLeave) {
+	// 					absentees.push(entry)
+	// 				}
+	// 			}
 
-				//Absent Deduction also occurs when HR writes Absent keyword in employee's clock In time entry on working days.
-				if (element.timeEntries[0].check_in.includes('absent') || element.timeEntries[0].check_in.includes('Absent') || element.timeEntries[0].check_in.includes('ABSENT')) {
-					absentees.push(entry)
-				}
+	// 			//Absent Deduction also occurs when HR writes Absent keyword in employee's clock In time entry on working days.
+	// 			if (element.timeEntries[0].check_in.includes('absent') || element.timeEntries[0].check_in.includes('Absent') || element.timeEntries[0].check_in.includes('ABSENT')) {
+	// 				absentees.push(entry)
+	// 			}
 
-				//working hours per entry 
+	// 			//working hours per entry 
 
-				element.timeEntries.forEach(time_entry => {
-					working_hours = working_hours + time_entry.work_time
-				});
-				//***************Late Comings ***************
+	// 			element.timeEntries.forEach(time_entry => {
+	// 				working_hours = working_hours + time_entry.work_time
+	// 			});
+	// 			//***************Late Comings ***************
 
-				//1. Employee is late if he comes after company specific clock In time
-				//2. mployee is late if he doesn't complete company's specific Working hours in a day
-				let late = lateByStartTime(element.timeEntries[0].check_in, office_start_time)
-				late ? startTimeLate.push(entry) : (working_hours < office_working_hours) ? lateByWH.push(entry) : null
-
-
-				//in OL clock in time is ignored but late coming will be decided on working hours.
-				// If he/she can't complete company's specified working hours then he's late. This late will be added in late coming record. 
-				if (element.timeEntries[0].check_in === 'OL') {
-					if (working_hours < office_working_hours) {
-						count++
-						if (count > 3) {
-							lateByWH.push(entry)
-						}
-					}
-				}
-			});
+	// 			//1. Employee is late if he comes after company specific clock In time
+	// 			//2. mployee is late if he doesn't complete company's specific Working hours in a day
+	// 			let late = lateByStartTime(element.timeEntries[0].check_in, office_start_time)
+	// 			late ? startTimeLate.push(entry) : (working_hours < office_working_hours) ? lateByWH.push(entry) : null
 
 
-			lateComings.push({
-				late_by_working_hours: lateByWH,
-				late_by_checkIn_time: startTimeLate,
-			})
-		});
+	// 			//in OL clock in time is ignored but late coming will be decided on working hours.
+	// 			// If he/she can't complete company's specified working hours then he's late. This late will be added in late coming record. 
+	// 			if (element.timeEntries[0].check_in === 'OL') {
+	// 				if (working_hours < office_working_hours) {
+	// 					count++
+	// 					if (count > 3) {
+	// 						lateByWH.push(entry)
+	// 					}
+	// 				}
+	// 			}
+	// 		});
 
-		console.log('lateByWH', JSON.stringify(onLeaves))
-		res.send({
-			status: 200,
-			message: 'success!',
-			data: lateComings
-		})
-	} else {
-		res.send({
-			status: 301,
-			message: `Attendance Entries for ${date} doesn't exist`,
-			data: null
-		})
-	}
+
+	// 		lateComings.push({
+	// 			late_by_working_hours: lateByWH,
+	// 			late_by_checkIn_time: startTimeLate,
+	// 		})
+	// 	});
+
+	// 	console.log('lateByWH', JSON.stringify(onLeaves))
+	// 	res.send({
+	// 		status: 200,
+	// 		message: 'success!',
+	// 		data: lateComings
+	// 	})
+	// } else {
+	// 	res.send({
+	// 		status: 301,
+	// 		message: `Attendance Entries for ${date} doesn't exist`,
+	// 		data: null
+	// 	})
+	// }
 }
 
 let mappingObject = (entries) => {
