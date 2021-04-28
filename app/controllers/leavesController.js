@@ -41,6 +41,22 @@ exports.getLeaves = async (req, res) => {
 
 	let remaining_leaves = await EmployeeLeaveBalance(req.session.user.id)
 	console.log('remaining_leaves', remaining_leaves)
+	// console.log('req.flash', {
+	// 	name: req.session.user.name,
+	// 	email: current_user_email,
+	// 	phone: req.session.user.phone,
+	// 	isEmployee: user.isEmployee,
+	// 	leaveDetails: leaveHistory.length > 0 ? leaveHistory : null,
+	// 	leave_requests: leave_requests.length > 0 ? leave_requests : [],
+	// 	supervisor_email: req.session.user.supervisor_email,
+	// 	prefernces: leave_types,
+	// 	remaining_leaves: remaining_leaves,
+	// 	navigation: {
+	// 		role: user.role,
+	// 		pageName: ENUM.leave_prefernces
+	// 	},
+	// 	errorMessage: req.flash('error')[0]
+	// });
 	res.render('leaves', {
 		name: req.session.user.name,
 		email: current_user_email,
@@ -53,9 +69,12 @@ exports.getLeaves = async (req, res) => {
 		remaining_leaves: remaining_leaves,
 		navigation: {
 			role: user.role,
-			pageName: ENUM.leave_prefernces
+			pageName: ENUM.leave_prefernces,
+
 		},
-		errorMessage: req.flash('error')[0]
+		errorMessage: req.flash('error')[0],
+
+
 	})
 }
 
@@ -199,6 +218,11 @@ exports.AcceptLeave = async (req, res, next) => {
 	let leave_request_id = req.params.id;
 	console.log('leave_request_id', leave_request_id)
 	let HRObj = await EmployeeController.findHR()
+	if (!HRObj) {
+		req.flash('error', 'HR not added!');
+		next();
+		return;
+	}
 	HRObj.dataValues.employees.forEach(element => {
 		HREmails.push(element.dataValues.email)
 	});
@@ -209,7 +233,7 @@ exports.AcceptLeave = async (req, res, next) => {
 	console.log('sattus IS', JSON.stringify(statusId.id))
 	//fetch employee leave balance
 	let employee_leave_balance = await EmployeeLeaveBalance(employeeObj.employee.id)
-	let balance  = employee_leave_balance.remaining_leaves - employeeObj.days_applied
+	let balance = employee_leave_balance.remaining_leaves - employeeObj.days_applied
 	console.log('employee_leave_balance amna', balance)
 	LeaveRequest.update({
 		leaveRequestStatusId: statusId.id,
@@ -278,7 +302,12 @@ let EmployeeLeaveBalance = (id) => {
 exports.RejectLeave = async (req, res, next) => {
 	console.log('req.body', req.body)
 	let HREmails = []
-	let HRObj = await EmployeeController.findHR()
+	let HRObj = await EmployeeController.findHR();
+	if (!HRObj) {
+		req.flash('error', 'HR not added!');
+		next();
+		return;
+	}
 	HRObj.dataValues.employees.forEach(element => {
 		HREmails.push(element.dataValues.email)
 	});
@@ -537,7 +566,8 @@ let findLeaveStatusId = (params) => {
 		attributes: ['id'],
 		where: {
 			status: params
-		}, raw: true
+		},
+		raw: true
 	}).then(result => {
 		console.log('result in findAcceptedLeaveId', result.id)
 		return result

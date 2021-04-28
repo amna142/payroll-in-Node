@@ -22,11 +22,19 @@
 
 		<div class="row">
 
+			<div class="row">
+				<% if(errorMessage) { %>
+
+				<div class="col s8 user-message user-message--error"><%= errorMessage %>
+				</div>
+				<% } %>
+			</div>
+
 			<div id="leaves" class="col s12">
 
 				<ul class="collapsible">
 					<li>
-						<div class="collapsible-header"><i class="material-icons">details</i>Leaves Requests</div>
+						<div class="collapsible-header"><i class="material-icons">details</i>Leave Requests</div>
 
 						<div class="collapsible-body">
 							<%- include('./leave-requests.ejs'); %>
@@ -37,14 +45,9 @@
 						<div class="collapsible-body">
 							<div class="container" id="leave_request">
 								<h5>Request a Leave</h5>
-								<br />
-								<div class="row">
-									<% if(errorMessage) { %>
-
-									<div class="col s8 user-message user-message--error"><%= errorMessage %>
-									</div>
-									<% } %>
-								</div>
+								
+								
+								
 
 								<div class="row">
 
@@ -160,6 +163,9 @@
 
 	<script>
 		$(document).ready(function () {
+
+			
+
 			$('#from_date').change(validateFromToDate)
 			$('#to_date').change(validateFromToDate)
 			$('.collapsible').collapsible();

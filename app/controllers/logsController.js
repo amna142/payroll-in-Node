@@ -17,7 +17,10 @@ exports.insertLogs = (AUDIT_LOGS) => {
 exports.getLogs = (condition) => {
 	let logsArray = []
 	return db.logs.findAll({
-		where: condition
+		where: condition,
+		order: [
+			['date', 'DESC']
+		]
 	}).then(logArr => {
 		logArr.forEach(element => {
 			logsArray.push(element.dataValues)

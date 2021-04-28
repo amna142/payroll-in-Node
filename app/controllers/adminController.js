@@ -1,3 +1,4 @@
+const Op = require('sequelize').Op;
 const db = require('../util/database')
 const bcrypt = require('bcrypt')
 const constants = require('../util/constants')
@@ -225,7 +226,13 @@ exports.getAddEmployee = async (req, res) => {
 
 let employeeDesignation = function () {
 	let empDesignations = []
-	return db.employee_designation.findAll().then(designations => {
+	return db.employee_designation.findAll({
+		where: {
+			designation_type: {
+				[Op.ne]: 'CEO'
+			}
+		}
+	}).then(designations => {
 		if (designations.length > 0) {
 			designations.forEach(designationObj => {
 				empDesignations.push(designationObj.dataValues)

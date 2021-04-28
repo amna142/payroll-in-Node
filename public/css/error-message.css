@@ -6,10 +6,12 @@
 		border-radius: 3px;
 		text-align: center;
 		background-color: #b9c9ff;
+		text-align: center;
 
 	}
 
 	.user-message--error {
 		border-color: red;
 		background: rgb(255, 176, 176);
+		text-align: center;
 	}
