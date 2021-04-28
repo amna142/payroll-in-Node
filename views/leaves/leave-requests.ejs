@@ -1,3 +1,12 @@
+<script>
+	function getFormattedString(d) {
+		return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()
+		// for time part you may wish to refer http://stackoverflow.com/questions/6312993/javascript-seconds-to-time-string-with-format-hhmmss
+
+	}
+</script>
+
+
 <div class="container" id="leave_request">
 	<h5>Employee Leaves Requests</h5>
 	<br />
@@ -11,7 +20,7 @@
 			<img src="/default-user.jpg" alt="" class="circle">
 			<span class="title"><b><%= leave_requests[i].name %></b> <br>
 				<%= leave_requests[i].email %></span>
-			<p><b>Dates:</b> <%= leave_requests[i].leaves[j].from_date %> to
+			<p><b>Dates:</b>  <%= leave_requests[i].leaves[j].from_date %> to
 				<%= leave_requests[i].leaves[j].to_date %> <br>
 				<b>Days Applied</b> <%= leave_requests[i].leaves[j].days_applied %> <br>
 				<b>Reason:</b> <%= leave_requests[i].leaves[j].comments %> <br>
@@ -27,8 +36,8 @@
 			</div>
 		</li>
 		<% } } }else { %>
-			***No leave Requests
-			<% } %>
+		***No leave Requests
+		<% } %>
 	</ul>
 </div>
 

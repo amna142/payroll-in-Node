@@ -11,7 +11,6 @@ exports.CalculateLateComings = async (req, res) => {
 	let onLeaves = [];
 	let count = 0;
 	let lateByWH = [];
-	let absentees = [];
 	let lateComings = [];
 	let startTimeLate = [];
 	let company_settings = await PreferencesController.fetchDataFromCompanyPreferences();
@@ -26,46 +25,20 @@ exports.CalculateLateComings = async (req, res) => {
 		//late by Working Hours
 		attendance_entries.forEach(entry => {
 			let working_hours = 0;
+			var absentees = [];
 			entry.attendanceRecord.forEach(element => {
 
 				//**************Absence Deductions**************
 				//Absence Deduction occurs when there's no leave of employee in employee Leave Record. 
 				let check_in = element.timeEntries[0].check_in.toLowerCase()
-				if (check_in.includes('leave')) {
-					let isLeave = isLeaveApplied(entry.Name, element.Date)
-					if (isLeave.length === 0) {
-						absentees.push(entry)
-					}
+				
+
+				// Absent Deduction also occurs when HR writes Absent keyword in employee's clock In time entry on working days.
+				if (check_in.includes('absent')) {
+					absentees.push(entry)
 				}
 
-				// //Absent Deduction also occurs when HR writes Absent keyword in employee's clock In time entry on working days.
-				// if (check_in.includes('absent')) {
-				// 	absentees.push(entry)
-				// }
-
-				// //working hours per entry 
-
-				// element.timeEntries.forEach(time_entry => {
-				// 	working_hours = working_hours + time_entry.work_time
-				// });
-				// //***************Late Comings ***************
-
-				// //1. Employee is late if he comes after company specific clock In time
-				// //2. mployee is late if he doesn't complete company's specific Working hours in a day
-				// let late = lateByStartTime(element.timeEntries[0].check_in, office_start_time)
-				// late ? startTimeLate.push(entry) : (working_hours < office_working_hours) ? lateByWH.push(entry) : null
-
-
-				// //in OL clock in time is ignored but late coming will be decided on working hours.
-				// // If he/she can't complete company's specified working hours then he's late. This late will be added in late coming record. 
-				// if (element.timeEntries[0].check_in === 'OL') {
-				// 	if (working_hours < office_working_hours) {
-				// 		count++
-				// 		if (count > 3) {
-				// 			lateByWH.push(entry)
-				// 		}
-				// 	}
-				// }
+				
 			});
 
 
@@ -157,6 +130,7 @@ let mappingObject = (entries) => {
 
 
 let isLeaveApplied = (name, date) => {
+	let leaves = []
 	console.log('date', new Date(date))
 	return Employee.findAll({
 		attributes: ['id', 'attendMachineId'],
@@ -179,7 +153,15 @@ let isLeaveApplied = (name, date) => {
 		}]
 	}).then(result => {
 		console.log('isLeaveApplied', JSON.stringify(result))
-		return result
+		result.forEach(element => {
+			element.leaves.forEach(leave => {
+				if ((leave.from_date >= new Date(date)) && (leave.to_date <= new Date(date))) {
+					leaves.push(element)
+				}
+			});
+		});
+		console.log('leaves', JSON.stringify(leaves))
+		// return result
 	}).catch(err => {
 		console.log('err isLeaveApplied', err)
 	})

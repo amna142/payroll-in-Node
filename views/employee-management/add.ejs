@@ -39,7 +39,7 @@
 				return res.json()
 			}).then(response => {
 				console.log('response', response)
-				if(response.status != 200){
+				if (response.status != 200) {
 					alert('Invalid Date. Min 18 years Age is valid')
 				}
 			}).catch(err => {
@@ -161,10 +161,20 @@
 							</div>
 							<div class="input-field col s6">
 								<i class="material-icons prefix">attach_email</i>
+								<select name="supervisor_email" required="" aria-required="true">
+									<option value="" disabled selected>Choose Supervisior Email</option>
+									<% if(attach_supervisor_emails) { 
+										for(var i = 0; i< attach_supervisor_emails.length; i++) { %>
+									<option value="<%= attach_supervisor_emails[i].email %>">
+										<%= attach_supervisor_emails[i].email %> </option> <% } } %>
+								</select>
+							</div>
+							<!-- <div class="input-field col s6">
+								<i class="material-icons prefix">attach_email</i>
 								<input id="supervisor_email" type="email" name="supervisor_email"
 									aria-describedby="emailHelp" value="" aria-required="true">
 								<label for="supervisor_email">Supervisior Email</label>
-							</div>
+							</div> -->
 						</div>
 					</div>
 

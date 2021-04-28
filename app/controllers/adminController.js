@@ -211,11 +211,13 @@ exports.getAddEmployee = async (req, res) => {
 	let employeeDesignations = await employeeDesignation()
 	let employeeTypes = await typesOfEmployeee();
 	let user = employeeController.isEmployee(req)
+	let supervisor_emails = await employeeController.supervisorEmail();
 	res.render('employee-management/add', {
 		employeeTypes: employeeTypes,
 		employeeDesignations: employeeDesignations,
 		grades: grades,
 		name: req.session.user.name,
+		attach_supervisor_emails: supervisor_emails.length>0 ? supervisor_emails : null,
 		navigation: {
 			role: user.role,
 			pageName: constants.employee,

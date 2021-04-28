@@ -41,22 +41,6 @@ exports.getLeaves = async (req, res) => {
 
 	let remaining_leaves = await EmployeeLeaveBalance(req.session.user.id)
 	console.log('remaining_leaves', remaining_leaves)
-	// console.log('req.flash', {
-	// 	name: req.session.user.name,
-	// 	email: current_user_email,
-	// 	phone: req.session.user.phone,
-	// 	isEmployee: user.isEmployee,
-	// 	leaveDetails: leaveHistory.length > 0 ? leaveHistory : null,
-	// 	leave_requests: leave_requests.length > 0 ? leave_requests : [],
-	// 	supervisor_email: req.session.user.supervisor_email,
-	// 	prefernces: leave_types,
-	// 	remaining_leaves: remaining_leaves,
-	// 	navigation: {
-	// 		role: user.role,
-	// 		pageName: ENUM.leave_prefernces
-	// 	},
-	// 	errorMessage: req.flash('error')[0]
-	// });
 	res.render('leaves', {
 		name: req.session.user.name,
 		email: current_user_email,
@@ -70,11 +54,8 @@ exports.getLeaves = async (req, res) => {
 		navigation: {
 			role: user.role,
 			pageName: ENUM.leave_prefernces,
-
 		},
 		errorMessage: req.flash('error')[0],
-
-
 	})
 }
 

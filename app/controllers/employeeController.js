@@ -1,6 +1,4 @@
-const {
-	template
-} = require('handlebars')
+
 const Sequelize = require('sequelize')
 const fs = require('fs');
 const path = require('path')
@@ -194,7 +192,6 @@ exports.employeesUnderSupervisor = (supervisors) => {
 
 exports.isSupervisor = (email_id, statusid) => {
 	console.log('current user emaiil', email_id)
-	let temp = []
 	let obj = {}
 	return Employee.findAll({
 		attributes: ['id', 'name', 'email'],
@@ -212,15 +209,27 @@ exports.isSupervisor = (email_id, statusid) => {
 			attributes: ['id', 'from_date', 'to_date', 'comments', 'days_applied', 'leaveTypeId', 'leaveRequestStatusId']
 		}]
 	}).then(result => {
+		result.forEach(element => {
+			element.leaves.forEach(leave => {
+				console.log('leave', leave)
+				leave['from_date'] = getFormattedString(leave.from_date)
+				leave['to_date'] = getFormattedString(leave.to_date)
+			});
+		})
 		if (result.length > 0) {
 			obj[email_id] = result
+			console.log('obj amna', JSON.stringify(obj))
 			return obj
 		}
 	}).catch(err => {
 		console.log('err in isSupervisor', err)
 	})
 }
+function getFormattedString(d){
+  return d.getFullYear() + "-"+(d.getMonth()+1) +"-"+d.getDate()
+  // for time part you may wish to refer http://stackoverflow.com/questions/6312993/javascript-seconds-to-time-string-with-format-hhmmss
 
+}
 
 exports.findByPk = (id) => {
 	return Leaves.findByPk(id, {
@@ -407,5 +416,16 @@ exports.findEmployeeSalary = (id) =>{
 		return result
 	}).catch(err=>{
 		console.log('err in findEmployeeSalary', err)
+	})
+}
+
+exports.supervisorEmail = () =>{
+	return Employee.findAll({
+		attributes: ['email']
+	}).then(result=>{
+		console.log('result of supervisorEmail', JSON.stringify(result))
+		return result
+	}).catch(err=>{
+		console.log('err of supervisorEmail', err)
 	})
 }

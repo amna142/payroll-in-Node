@@ -22,12 +22,22 @@ exports.getAttendanceFile = (req, res, next) => {
 		})
 		.on('end', () => {
 			console.log('entries', JSON.stringify(entries))
-			let time_entries = this.attendanceMappingObject(entries)
-			console.log('time_entries', JSON.stringify(time_entries))
-			let attendance = getAttendanceRecords(time_entries)
-			attendanceEntries(attendance.tempAttendance, attendance.checkingTimes, res)
-			// create bulk entries in attendnace table
-			console.log('CSV file successfully processed');
+			if (entries.length > 0) {
+				try {
+					let time_entries = this.attendanceMappingObject(entries)
+					console.log('time_entries', JSON.stringify(time_entries))
+					let attendance = getAttendanceRecords(time_entries)
+					attendanceEntries(attendance.tempAttendance, attendance.checkingTimes, res)
+					// create bulk entries in attendnace table
+					console.log('CSV file successfully processed');
+				} catch (err) {
+					console.log('CSV file not successfully processed', err);
+				}
+			} else {
+				console.log('CSV file not successfully processed');
+				req.flash('error', 'CSV file not successfully processed')
+				res.redirect('/settings')
+			}
 		});
 }
 
@@ -43,7 +53,7 @@ exports.attendanceMappingObject = (entries) => {
 	entries.forEach(entry => {
 		if (tempEmp != entry.Name) {
 			let obj1 = {
-				Date:tempDate,
+				Date: tempDate,
 				Working_hours: workingHours,
 				timeEntries: timeEntries
 			}
@@ -187,12 +197,7 @@ exports.getAttendance = async (req, res) => {
 function formatAMPM(time) {
 	time = time.toLowerCase();
 
-	if (time.includes('leave')) {
-		return time
-	} else if (time === '' || time === undefined || time === null) {
-		let time = '0:00'
-		return time
-	} else {
+	if (time.includes(':')) {
 		var hours = time.split(':')[0];
 		var minutes = time.split(':')[1];
 		var ampm = hours >= 12 ? 'pm' : 'am';
@@ -201,6 +206,8 @@ function formatAMPM(time) {
 		minutes = minutes < 10 ? minutes : minutes;
 		var strTime = hours + ':' + minutes + ' ' + ampm;
 		return strTime;
+	} else {
+		return time
 	}
 }
 
@@ -280,7 +287,7 @@ exports.AttendanceEntries = () => {
 			attributes: ['id', 'check_out', 'check_in', 'attendanceId', 'work_time']
 		}]
 	}).then(result => {
-		if (result) {	
+		if (result) {
 			return result
 		}
 	}).catch(err => {

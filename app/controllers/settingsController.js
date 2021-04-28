@@ -6,7 +6,6 @@ const nodeParser = require('node-date-parser')
 const LogsController = require('../controllers/logsController')
 const FundController = require('../controllers/companyFundsController')
 const constants = require('../util/constants')
-const nodeDateParser = require('node-date-parser')
 var AUDIT_LOGS = []
 
 var errorMessages = [];
