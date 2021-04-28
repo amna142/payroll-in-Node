@@ -126,7 +126,6 @@ exports.postLeave = async (req, res, next) => {
 		// create leaves 
 		console.log('i am creating new leave')
 		LeaveRequest.create(params).then(result => {
-			console.log('result', result)
 			//if created send email to the supervisor
 			if (result) {
 				send_email(

@@ -17,7 +17,7 @@
 	function validateMinMaxSalary(e) {
 		const minSal = $('#add-grade-form #min_salary').val();
 		const maxSal = $('#add-grade-form #max_salary').val();
-		if (+maxSal > 0 && +minSal > 0 && +minSal >= +maxSal) {
+		if (+maxSal > 0 && +minSal > 0 && +minSal > +maxSal) {
 			alert('Max Salary must be greater than Min Salary!')
 		}
 	}

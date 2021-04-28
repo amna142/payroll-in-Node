@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express')
-
+var fs = require('fs');
 const app = express()
 const session = require('express-session')
 const bodyParser = require('body-parser')
@@ -55,8 +55,11 @@ const PORT = process.env.WEB_PORT || 3000
 
 //{force: true}
 db.sequelize.sync().then(result => {
-	
+	var dir = './files';
 	app.listen(PORT, () => {
+		if (!fs.existsSync(dir)) {
+			fs.mkdirSync(dir);
+		}
 		// console.log(result)
 		console.log(`Server is running on port ${PORT}`)
 	})

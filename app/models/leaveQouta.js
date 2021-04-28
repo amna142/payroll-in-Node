@@ -12,7 +12,8 @@ module.exports = (sequelize, Sequelize) =>{
 		leaves_allowed: {
 			type: Sequelize.INTEGER,
 			allowNull: false,
-			required: true
+			required: true,
+			defaultValue: 0
 		},
 	})
 	return LeaveQouta

@@ -54,7 +54,7 @@ exports.postLogin = (req, res) => {
 	}).then(employee => {
 		if (!employee) {
 			console.log('no user found')
-			req.flash('error', 'No User Exist')
+			req.flash('error', 'Email/Password is incorrect')
 			res.redirect('/login')
 		} else {
 			if (employee) {
@@ -87,7 +87,7 @@ exports.postLogin = (req, res) => {
 							})
 						} else {
 							console.log('error in comapring password for admin')
-							req.flash('error', 'Invalid Password')
+							req.flash('error', 'Invalid Email/Password')
 							res.redirect('/login')
 						}
 						// res.setHeader('Set-Cookie', 'adminLoggedIn=true') -- Setting Cookie isn't a good appraoch
@@ -117,7 +117,7 @@ exports.postLogin = (req, res) => {
 					} else {
 
 						console.log('error in comapring password')
-						req.flash('error', 'Invalid Password')
+						req.flash('error', 'Invalid Email/Password')
 						res.redirect('/login')
 					}
 				}
@@ -240,7 +240,7 @@ exports.getNewPassword = (req, res, next) => {
 			})
 		} else {
 			console.log('no employee found')
-			req.flash('error', 'No User Found, Session has expired')
+			req.flash('error', 'Session has expired')
 			console.log(' req.token', token)
 			res.redirect('/new-password')
 		}

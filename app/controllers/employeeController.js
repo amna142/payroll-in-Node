@@ -212,7 +212,6 @@ exports.isSupervisor = (email_id, statusid) => {
 			attributes: ['id', 'from_date', 'to_date', 'comments', 'days_applied', 'leaveTypeId', 'leaveRequestStatusId']
 		}]
 	}).then(result => {
-		console.log('result', result)
 		if (result.length > 0) {
 			obj[email_id] = result
 			return obj
@@ -354,7 +353,7 @@ exports.GradeSalaryValidation = async (req, res) => {
 	//find grade min max range
 	let salaryRange = await EmployeeGradeSalary(gradeId)
 	console.log('salaryRange', salaryRange)
-	if (salary > salaryRange.min_salary && salary < salaryRange.max_salary) {
+	if (salary >= salaryRange.min_salary && salary <= salaryRange.max_salary) {
 		res.json({
 			data: null,
 			status: 200,
