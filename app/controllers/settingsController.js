@@ -76,11 +76,12 @@ exports.getSettings = async (req, res) => {
 			role: user.role,
 			pageName: constants.setting
 		},
+		errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null,
 		funds: funds,
 		designation: designation.designation_type,
 		name: req.session.user.name,
-		logsData: logsArray,
-		errorMessage: req.flash('error').length > 0 ? req.flash('error')[0] : null,
+		logsData: logsArray
+
 	})
 	AUDIT_LOGS = []
 }

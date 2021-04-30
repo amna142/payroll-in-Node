@@ -61,28 +61,25 @@
 						<td><%= data[i].starting_date%></td>
 						<td><%= data[i].employee_designation%></td>
 						<td><%= data[i].employee_type%></td>
-
 						<td>
-
-							
 							<% if(!isEmployee || designation === 'HR') { %>
 							<a class="btn-floating waves-effect waves-light modal-trigger edit"
 								href="../employee/edit/<%=data[i].id%>"><i class="material-icons">edit</i></a>
 							<a class="btn-floating delete modal-trigger waves-effect waves-light red accent-3"
 								href="#delete_employee"><i class="material-icons">delete</i></a>
-								<a class="btn-floating waves-effect waves-light view"
+							<a class="btn-floating waves-effect waves-light view"
 								href="../employee/view/<%=data[i].id%>"><i class="material-icons">
 									remove_red_eye
 								</i></a>
 							<!-- <a class="btn delete modal-trigger red accent-3" href="#delete_employee">Delete</a> -->
 							<% } else { %>
-								<a class="btn-floating waves-effect waves-light view"
+							<a class="btn-floating waves-effect waves-light view"
 								href="../employee/view/<%=data[i].id%>"><i class="material-icons">
 									remove_red_eye
 								</i></a>
-								<a class="btn-floating waves-effect waves-light modal-trigger edit"
+							<a class="btn-floating waves-effect waves-light modal-trigger edit"
 								href="../employee/edit/<%=data[i].id%>"><i class="material-icons">edit</i></a>
-								<% } %>
+							<% } %>
 						</td>
 					</tr>
 					<% }

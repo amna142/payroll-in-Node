@@ -8,11 +8,11 @@ select * from employees
 
 select * from audit_logs
 
-INSERT INTO employees(name, email, password, dob, address, phone, starting_date, resume, attendMachineId, createdAt, updatedAt, roleId, employeeTypeId, employeeDesignationId, employeeGradeId) 
-VALUES ('Qaiser Siddiqui','amna@dynasoftcloud.com', '$2b$08$Xkg5VtiDoYb2eqAl2rYLveGyLpBywcLMbLMNr0CCU/i31NbOM.p9u', '1 May 1997', 'abc address', '0305-6230474', '2/19/2020', 'resume.pdf', 'DSC-01', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1 , 1, NULL);
+INSERT INTO employees(name, last_name, email, password, dob, address, phone, starting_date, resume, attendMachineId, createdAt, updatedAt, roleId, employeeTypeId, employeeDesignationId, employeeGradeId) 
+VALUES ('Qaiser','Siddiqui', 'amna@dynasoftcloud.com', '$2b$08$Xkg5VtiDoYb2eqAl2rYLveGyLpBywcLMbLMNr0CCU/i31NbOM.p9u', '1 May 1997', 'abc address', '0305-6230474', '2/19/2020', 'resume.pdf', 'DSC-01', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1 , 1, NULL);
 
 UPDATE employees
-SET  password='$2b$08$Xkg5VtiDoYb2eqAl2rYLveGyLpBywcLMbLMNr0CCU/i31NbOM.p9u' WHERE id=1;
+SET  attendMachineId='DSC-011' WHERE id=3;
 
 UPDATE leaves
 SET leaveRequestStatusId='1' WHERE id=2;
@@ -22,7 +22,7 @@ UPDATE company_funds SET name='umar' where id=1
 
 INSERT INTO roles(title, createdAt, updatedAt) VALUES ('admin',CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-delete from employees where id=3
+delete from employees where id=2
 
 delete from attendances
 
@@ -33,7 +33,7 @@ select * from time_entries
 SELECT SCOPE_IDENTITY() AS roleId
 
 
-INSERT INTO employee_designations(designation_type, createdAt, updatedAt) VALUES ('HR', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+INSERT INTO employee_designations(designation_type, createdAt, updatedAt) VALUES ('CEO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 
 select * from employee_designations
 

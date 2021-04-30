@@ -26,7 +26,7 @@ router.post('/settings/funds/add', isAuth, settingsController.postFund)
 router.get('/settings/fund/delete/(:id)', isAuth, settingsController.deleteFund)
 router.post('/settings/fund/edit/', isAuth, settingsController.editFund)
 
-router.post('/settings/attendance', isAuth, upload, AttendanceController.getAttendanceFile)
+router.post('/settings/attendance', isAuth, upload, AttendanceController.getAttendanceFile, settingsController.getSettings)
 router.get('/attendance', isAuth, AttendanceController.getAttendance)
 
 module.exports = router

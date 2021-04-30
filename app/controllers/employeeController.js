@@ -429,3 +429,19 @@ exports.supervisorEmail = () =>{
 		console.log('err of supervisorEmail', err)
 	})
 }
+
+
+exports.findEmployeeId = (machine_attendance_id) => {
+	return Employee.findOne({
+		attributes: ['id'],
+		where: {
+			attendMachineId: machine_attendance_id
+		},
+		raw: true
+	}).then(result=>{
+		console.log('result of findEmployeeId', result)
+		return result
+	}).catch(err=>{
+		console.log('err in findEmployeeId', err)
+	})
+}

@@ -7,20 +7,23 @@ module.exports = (sequelize, Sequelize) => {
 			autoIncrement: true,
 			required: true
 		},
-		date: {
-			type: Sequelize.STRING,
-			allowNull: false,
-			required: true
-		},
 		machine_attendance_id: {
 			type: Sequelize.STRING,
 			allowNull: true,
 			required: true
 		},
-		late_type: {
-			type: Sequelize.STRING,
+		total_late_comings: {
+			type: Sequelize.INTEGER,
 			required: true,
-			allowNull: false
+			allowNull: false,
+			default: 0
+		},
+		deducted_leaves: {
+			type: Sequelize.INTEGER,
+			required: true,
+			allowNull: false,
+			default: 0
+
 		}
 	});
 	return LateComing

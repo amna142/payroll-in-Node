@@ -22,8 +22,14 @@
 					<div class="collapsible-header"><i class="material-icons">person</i>Personal Details</div>
 					<div class="collapsible-body">
 						<ul class="collection center-align">
-							<li class="collection-item"><b>Name:</b> <span> <%= employee.name %></span></li>
+							<input type="hidden" id="employeeId" value="<%= employee.id %>" />
+							<li class="collection-item"><b>First Name:</b> <span> <%= employee.name %></span></li>
+							<li class="collection-item"><b>Last Name:</b> <span> <%= employee.last_name %></span></li>
+							<li class="collection-item"><b>Machine Attendance
+									ID:</b><span><%= employee.attendMachineId %> </span></li>
 							<li class="collection-item"><b>Email:</b> <span> <%= employee.email %></span></li>
+							<li class="collection-item"><b>CNIC:</b> <span> <%= employee.cnic %></span></li>
+							
 							<li class="collection-item"><b>Phone:</b> <span> <%= employee.phone %></span></li>
 							<li class="collection-item"><b>Address:</b> <span> <%= employee.address %></span></li>
 							<li class="collection-item"><b>DOB:</b> <span class="chip"> <%= employee.dob %></span></li>
@@ -43,8 +49,9 @@
 									<%= employee.employee_designation.designation_type %></span></li>
 							<li class="collection-item"><b>Hiring Date:</b> <span class="chip">
 									<%= employee.starting_date %></span></li>
-							<li class="collection-item"><b>Resume:</b> <a href="/employee/resume/<%= employee.id %>"><span>Employee Resume</span></a> </li>
-						<li class="collection-item"><b>Supervisior Email:</b> <span>
+							<li class="collection-item"><b>Resume:</b> <a
+									href="/employee/resume/<%= employee.id %>"><span>Employee Resume</span></a> </li>
+							<li class="collection-item"><b>Supervisior Email:</b> <span>
 									<%= employee.supervisor_email %></span></li>
 						</ul>
 					</div>
@@ -74,8 +81,100 @@
 						</ul>
 					</div>
 				</li>
+				<li>
+					<div class="collapsible-header"><i class="material-icons">business_center</i>Late Comings Deduction
+					</div>
+
+					<% if(lates) {
+							for(var i=0; i< lates.length ; i++) {%>
+					<div class="collapsible-body">
+						<ul class="collection center-align">
+
+							<li class="collection-item" id="total_late_comings"><b>Total Late Comings:</b> <span>
+									<%= lates[i].total_late_comings %></span></li>
+							<li class="collection-item" id="deducted_leaves"><b>Total Deduction:</b> <span>
+									<%= lates[i].deducted_leaves %></span></li>
+							<li class="collection-item"><button class="btn waves-effect waves-light" id="<%= i %>"
+									type="submit" value="Add" onclick="deductLeave()">Deduct Leave
+									<i class="material-icons right">check</i>
+								</button>
+								<button id="<%= i %>" class="btn waves-effect waves-light" type="submit" value="Add"
+									onclick="deductSalary()">Deduct Salary
+									<i class="material-icons right">check</i>
+								</button></li>
+						</ul>
+
+					</div>
+					<% } } else { %>
+					<div class="collapsible-body">
+						<ul class="collection center-align">
+
+							<li class="collection-item"><b> No Late Comings</b></li>
+						</ul>
+					</div>
+
+					<% } %>
+				</li>
 			</ul>
 		</div>
 	</main>
 
 	<%- include('../includes/footer'); %>
+
+
+	<script>
+		function deductSalary() {
+			console.log('clicked')
+			let input = document.getElementById('deducted_leaves').innerText;
+			let employee_id = document.getElementById('employeeId').value;
+			let salary = document.getElementById('salary').value;
+			fetch('http://localhost:3000/leave_salary', {
+				method: 'POST',
+				body: JSON.stringify({
+					deduction: input,
+					id: employee_id
+				}),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			}).then(res => {
+				return res.json();
+			}).then(response => {
+				console.log('response', response)
+				// if (response.status !== 200) {
+				// 	alert(response.message)
+				// } else {
+				// 	alert(response.message)
+				// }
+			}).catch(err => {
+				console.log('err in CalculateLateComings', err)
+			})
+		}
+
+		function deductLeave() {
+			console.log('clicked')
+			let input = document.getElementById('deducted_leaves').innerText;
+			let employee_id = document.getElementById('employeeId').value;
+			fetch('http://localhost:3000/deduct_leave', {
+				method: 'POST',
+				body: JSON.stringify({
+					deduction: input,
+					id: employee_id
+				}),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			}).then(res => {
+				return res.json();
+			}).then(response => {
+				console.log('response', response)
+				if (response.status !== 200) {
+					alert(response.message)
+				} else {
+					alert(response.message)
+				}
+			}).catch(err => {
+				console.log('err in CalculateLateComings', err)
+			})
+		}
+	</script>

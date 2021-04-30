@@ -36,7 +36,8 @@ exports.getAttendanceFile = (req, res, next) => {
 			} else {
 				console.log('CSV file not successfully processed');
 				req.flash('error', 'CSV file not successfully processed')
-				res.redirect('/settings')
+				next()
+				return;
 			}
 		});
 }

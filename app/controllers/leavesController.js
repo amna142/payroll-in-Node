@@ -19,8 +19,8 @@ const LeaveRequest = db.leaves
 const leaveRequestStatus = db.leave_request_status
 
 
-
 exports.getLeaves = async (req, res) => {
+
 	let leave_requests = []
 	let user = EmployeeController.isEmployee(req)
 	let leave_types = await leave_prefernces()
@@ -40,7 +40,6 @@ exports.getLeaves = async (req, res) => {
 	console.log('leave_requests', JSON.stringify(leave_requests))
 
 	let remaining_leaves = await EmployeeLeaveBalance(req.session.user.id)
-	console.log('remaining_leaves', remaining_leaves)
 	res.render('leaves', {
 		name: req.session.user.name,
 		email: current_user_email,
@@ -50,12 +49,13 @@ exports.getLeaves = async (req, res) => {
 		leave_requests: leave_requests.length > 0 ? leave_requests : [],
 		supervisor_email: req.session.user.supervisor_email,
 		prefernces: leave_types,
+		errorMessage: req.flash('error')[0],
 		remaining_leaves: remaining_leaves,
 		navigation: {
 			role: user.role,
 			pageName: ENUM.leave_prefernces,
 		},
-		errorMessage: req.flash('error')[0],
+
 	})
 }
 
@@ -338,210 +338,6 @@ let updateLeaveApproveStatus = (leave_request_id, rejection_reason, name, status
 	})
 }
 
-exports.CalculateLateComings = async (req, res) => {
-	let date = req.body.month;
-	let onLeaves = [];
-	let count = 0;
-	let lateByWH = [];
-	let absentees = [];
-	let OL = [];
-	let lateComings = [];
-	let startTimeLate = [];
-	let company_settings = await PreferencesController.fetchDataFromCompanyPreferences();
-	let office_start_time = company_settings.start_time;
-	let office_working_hours = company_settings.working_hours;
-	//get time entries of specific month
-	var attendance_entries = await AttendanceController.AttendanceEntries()
-
-	attendance_entries = weekendsOffDays(attendance_entries)
-
-	attendance_entries = mappingObject(attendance_entries)
-	console.log('attendance_entries', JSON.stringify(attendance_entries))
-	// if (attendance_entries.length > 0) {
-	// 	//late by Working Hours
-	// 	attendance_entries.forEach(entry => {
-	// 		let working_hours = 0;
-	// 		entry.attendanceRecord.forEach(element => {
-
-	// 			//**************Absence Deductions**************
-	// 			//Absence Deduction occurs when there's no leave of employee in employee Leave Record. 
-
-	// 			if (element.timeEntries[0].check_in.includes('leave') || element.timeEntries[0].check_in.includes('Leave') || element.timeEntries[0].check_in.includes('LEAVE')) {
-	// 				let isLeave = isLeaveApplied(entry.Name, element.Date)
-	// 				if (!isLeave) {
-	// 					absentees.push(entry)
-	// 				}
-	// 			}
-
-	// 			//Absent Deduction also occurs when HR writes Absent keyword in employee's clock In time entry on working days.
-	// 			if (element.timeEntries[0].check_in.includes('absent') || element.timeEntries[0].check_in.includes('Absent') || element.timeEntries[0].check_in.includes('ABSENT')) {
-	// 				absentees.push(entry)
-	// 			}
-
-	// 			//working hours per entry 
-
-	// 			element.timeEntries.forEach(time_entry => {
-	// 				working_hours = working_hours + time_entry.work_time
-	// 			});
-	// 			//***************Late Comings ***************
-
-	// 			//1. Employee is late if he comes after company specific clock In time
-	// 			//2. mployee is late if he doesn't complete company's specific Working hours in a day
-	// 			let late = lateByStartTime(element.timeEntries[0].check_in, office_start_time)
-	// 			late ? startTimeLate.push(entry) : (working_hours < office_working_hours) ? lateByWH.push(entry) : null
-
-
-	// 			//in OL clock in time is ignored but late coming will be decided on working hours.
-	// 			// If he/she can't complete company's specified working hours then he's late. This late will be added in late coming record. 
-	// 			if (element.timeEntries[0].check_in === 'OL') {
-	// 				if (working_hours < office_working_hours) {
-	// 					count++
-	// 					if (count > 3) {
-	// 						lateByWH.push(entry)
-	// 					}
-	// 				}
-	// 			}
-	// 		});
-
-
-	// 		lateComings.push({
-	// 			late_by_working_hours: lateByWH,
-	// 			late_by_checkIn_time: startTimeLate,
-	// 		})
-	// 	});
-
-	// 	console.log('lateByWH', JSON.stringify(onLeaves))
-	// 	res.send({
-	// 		status: 200,
-	// 		message: 'success!',
-	// 		data: lateComings
-	// 	})
-	// } else {
-	// 	res.send({
-	// 		status: 301,
-	// 		message: `Attendance Entries for ${date} doesn't exist`,
-	// 		data: null
-	// 	})
-	// }
-}
-
-let mappingObject = (entries) => {
-	var attendance_entries = [];
-	var timeEntries = [];
-	var attendance_record = [];
-	var tempEmp = entries[0].machine_attendance_id;
-	var tempDate = entries[0].date;
-	entries.forEach(entry => {
-		if (tempEmp != entry.machine_attendance_id) {
-			let obj1 = {
-				Date: tempDate,
-				timeEntries: timeEntries
-			}
-			attendance_record.push(obj1)
-			timeEntries = [];
-			workingHours = [];
-			let obj2 = {
-				Name: tempEmp,
-				attendanceRecord: attendance_record
-			}
-			attendance_entries.push(obj2);
-			attendance_record = []
-		}
-
-		if (tempEmp == entry.machine_attendance_id && tempDate != entry.date) {
-
-			let obj1 = {
-				Date: tempDate,
-				timeEntries: timeEntries
-			}
-			attendance_record.push(obj1)
-			timeEntries = [];
-		}
-		timeEntries = entry.time_entries
-		tempDate = entry.date;
-		tempEmp = entry.machine_attendance_id;
-	});
-
-	let obj1 = {
-		Date: tempDate,
-		timeEntries: timeEntries
-	}
-	attendance_record.push(obj1)
-	let obj2 = {
-		Name: tempEmp,
-		attendanceRecord: attendance_record
-	}
-	attendance_entries.push(obj2);
-	console.log('attendance_entries', JSON.stringify(attendance_entries))
-	return attendance_entries
-
-}
-
-let isLeaveApplied = (name, date) => {
-	return Employee.findAll({
-		attributes: ['id', 'attendMachineId'],
-		where: {
-			attendMachineId: name
-		},
-		include: [{
-			model: Leaves,
-			attributes: ['employeeId', 'from_date', 'to_date'],
-			where: {
-				from_date: {
-					[Op.gte]: new Date(date)
-				},
-				to_date: {
-					[Op.lte]: new Date(date)
-				}
-			}
-		}]
-	}).then(result => {
-		console.log('isLeaveApplied', JSON.stringify(result))
-		if (result) {
-			if (result.leaves.length > 0) {
-				return result
-			}
-		}
-	}).catch(err => {
-		console.log('err isLeaveApplied', err)
-	})
-}
-
-let lateByStartTime = (time, office_start_time) => {
-	let late = false
-	let hours = office_start_time.split(':')[0]
-	let minutes = office_start_time.split(':')[1]
-	let hh = time.split(':')[0]
-	let mm = time.split(':')[1]
-	var timeZone = time.split(' ')[1]
-	var office_timeZone = office_start_time.split(' ')[1]
-	if (office_timeZone.toLower !== timeZone) {
-		late = true
-	} else if (hh < hours) {
-		late = true
-	} else if (mm < minutes) {
-		late = true
-	}
-	return late ? late : false
-}
-
-
-let weekendsOffDays = (entries) => {
-	var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-	let weekendsOffArr = []
-	entries.forEach(element => {
-		var d = new Date(element.date);
-		var dayName = days[d.getDay()];
-		if (dayName !== 'Sunday') {
-			element['day'] = dayName
-			weekendsOffArr.push(element)
-		}
-	});
-	return weekendsOffArr
-	// console.log('weekendsOffArr', JSON.stringify(weekendsOffArr))
-}
-
-
 let findLeaveStatusId = (params) => {
 	return leaveRequestStatus.findOne({
 		attributes: ['id'],
@@ -575,8 +371,6 @@ let totalLeaves = () => {
 
 exports.leaveBalance = async (employeeId) => {
 	let leaveCount = await totalLeaves()
-	console.log('hello amna', employeeId)
-	console.log('leaveCount', leaveCount)
 
 	//now create leave balance record
 	if (leaveCount && employeeId) {
@@ -593,4 +387,71 @@ exports.leaveBalance = async (employeeId) => {
 	} else {
 		console.log('please provide leave preferneces')
 	}
+}
+
+
+exports.deductSalary =async (req, res, next) => {
+	let deduction = req.body.deduction;
+	let id = req.body.id;
+	let salary_after_deduction;
+	deduction = deduction.split(':')[1]
+	let leave_balance = await EmployeeLeaveBalance(id)
+	if (!leave_balance) {
+		res.send({
+			status: 301,
+			message: `Employee Leave Balance is null!`,
+			data: null
+		})
+	} else {
+		salary_after_deduction = (leave_balance.remaining_leaves - deduction)
+		let deducted_record = await deductLeaveFromRecord(balance_after_deduction, id)
+		console.log('deduction', deducted_record)
+		res.send({
+			status: 200,
+			message: `${deduction} leaves are deducted successfully!`,
+			data: deducted_record
+		})
+	}
+}
+
+
+exports.deductLeave = async (req, res, next) => {
+	let deduction = req.body.deduction;
+	let balance_after_deduction;
+	deduction = deduction.split(':')[1]
+	let id = req.body.id;
+	let leave_balance = await EmployeeLeaveBalance(id)
+	if (!leave_balance) {
+		res.send({
+			status: 301,
+			message: `Employee Leave Balance is null!`,
+			data: null
+		})
+	} else {
+		balance_after_deduction = (leave_balance.remaining_leaves - deduction)
+		let deducted_record = await deductLeaveFromRecord(balance_after_deduction, id)
+		console.log('deduction', deducted_record)
+		res.send({
+			status: 200,
+			message: `${deduction} leaves are deducted successfully!`,
+			data: deducted_record
+		})
+	}
+}
+
+let deductLeaveFromRecord = (deduction, id) => {
+
+	return employeeLeaveBalance.update({
+		remaining_leaves: deduction,
+
+	}, {
+		where: {
+			employeeId: id
+		}
+	}).then(result => {
+		console.log('result of deductLeaveFromRecord', result)
+		return result
+	}).catch(err => {
+		console.log('err of deductLeaveFromRecord', err)
+	})
 }

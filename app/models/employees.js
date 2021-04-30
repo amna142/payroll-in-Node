@@ -11,6 +11,10 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.STRING,
 			notEmpty: false
 		},
+		last_name: {
+			type: Sequelize.STRING,
+			notEmpty: false
+		},
 		email: {
 			notEmpty: true,
 			type: Sequelize.STRING,
@@ -84,6 +88,13 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.STRING,
 			required: false,
 			allowNull: true
+		},
+		cnic: {
+			type: Sequelize.STRING,
+			required: true,
+			allowNull: false,
+			notEmpty: true,
+			unique: true
 		}
 	});
 	return Employee

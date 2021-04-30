@@ -6,6 +6,7 @@ const email = require('../util/constants')
 const fs = require('fs');
 const isValidBirthdate = require('is-valid-birthdate')
 const LeavesController = require('../controllers/leavesController')
+const LateComingsController = require('../controllers/LateComings')
 const nodeParser = require('node-date-parser')
 const {
 	transporter
@@ -328,6 +329,8 @@ exports.postAddEmployee = async (req, res) => {
 	var params = {
 		email: req.body.email,
 		name: req.body.name,
+		last_name: req.body.last_name,
+		cnic: req.body.cnic,
 		password: hashedPassword,
 		dob: req.body.dob,
 		address: req.body.Address,
@@ -416,6 +419,8 @@ exports.getEditEmployee = async (req, res) => {
 		res.render('employee-management/edit', {
 			pageTitle: 'Employee Edit Form',
 			name: employeeFound.name,
+			last_name: employeeFound.last_name,
+			cnic: employeeFound.cnic,
 			email: employeeFound.email,
 			isEmployee: isUser.isEmployee,
 			id: parseInt(empId),
@@ -635,16 +640,19 @@ exports.getAdminIndexPage = (req, res, next) => {
 
 exports.viewEmployee = async (req, res) => {
 	let employeeId = req.params.id
-	console.log('employeeId', employeeId)
-	//fetch employeeData against this Id
+		//fetch employeeData against this Id
 	let employee = await employeeController.findEmployeeById(employeeId)
 	employee = JSON.parse(employee)
-
+	console.log('employee', employee)
 	employee.starting_date = logsController.convertDate(employee.starting_date)
 	employee.dob = logsController.convertDate(employee.dob)
 	let user_role = employeeController.isEmployee(req)
+	console.log('employee.attendMachineId', employee.attendMachineId)
+	let lates = await LateComingsController.getEmployeeLateComings(employee.attendMachineId)
+	console.log('lates', JSON.stringify(lates))
 	res.render('employee-management/view', {
 		employee: employee,
+		lates: lates.length> 0 ? lates : null,
 		name: req.session.user.name,
 		navigation: {
 			role: user_role.role,

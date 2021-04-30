@@ -59,6 +59,7 @@ db.leave_request_status = require('../models/leaveRequestStatus')(sequelize, Seq
 db.company_preferences = require('../models/companyPreferences')(sequelize, Sequelize)
 db.events = require('../models/events')(sequelize, Sequelize)
 db.employee_leave_balance = require('../models/employeeLeaveBalance')(sequelize, Sequelize)
+db.late_comings = require('../models/lateComings')(sequelize, Sequelize)
 //1 employee can have many roles
 //1 role can be assigend to many employees (1(role) -> many(employees))
 
@@ -252,6 +253,17 @@ db.employee.hasOne(db.employee_leave_balance, {
 	}
 })
 db.employee_leave_balance.belongsTo(db.employee, {
+	constraints: false,
+	onDelete: null,
+	onUpdate: 'CASCADE'
+})
+
+db.employee.hasOne(db.late_comings, {
+	foreignKey: {
+		allowNull: false
+	}
+})
+db.late_comings.belongsTo(db.employee, {
 	constraints: false,
 	onDelete: null,
 	onUpdate: 'CASCADE'

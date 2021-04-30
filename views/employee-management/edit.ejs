@@ -37,6 +37,12 @@
 							<label for="name">Your Name</label>
 						</div>
 						<div class="input-field col s4">
+							<i class="material-icons prefix">account_circle</i>
+							<input type="text" class="form-control" required="" aria-required="true" name="last_name"
+								id="last_name" value="<%= last_name %>">
+							<label for="last_name">Last Name</label>
+						</div>
+						<div class="input-field col s4">
 							<i class="material-icons prefix">email</i>
 							<% if(isEmployee && designation!=='HR') {%>
 							<input type="email" name="email" required="" scale_text aria-required="true" id="email"
@@ -47,30 +53,38 @@
 							<% } %>
 							<label for="email">Email</label>
 						</div>
+					</div>
+					<div class="row">
 						<div class="input-field col s4">
 							<i class="material-icons prefix">phone</i>
 							<input id="icon_telephone" type="tel" name="phone" id="phone" value="<%= phone %>"
 								required="" aria-required="true" class="validate">
 							<label for="icon_telephone">Telephone</label>
 						</div>
-					</div>
-					<div class="row">
 						<div class="input-field col s6">
 							<i class="material-icons prefix">home</i>
 							<textarea class="materialize-textarea" data-length="120" class="validate" name="address"
 								id="address"><%= address %></textarea>
 							<label for="address">Address</label>
 						</div>
+					</div>
+					<div class="row">
 						<div class="input-field col s3">
 							<i class="material-icons prefix">date_range</i>
 							<% if(isEmployee && designation!=='HR') {%>
-							<input type="date" name="dob" id="dob" value="<%= dob %>" 
-								disabled>
+							<input type="date" name="dob" id="dob" value="<%= dob %>" disabled>
 							<%} else if(navigation.role === 'Admin' || designation=== 'HR'){ %>
 							<input type="date" name="dob" id="dob" value="<%= dob %>" required="" aria-required="true">
 							<% } %>
 							<label for="dob">DOB</label>
 						</div>
+						<div class="input-field col s6">
+							<i class="material-icons prefix">vpn_key</i>
+							<input type="tel" name="cnic" max="13" aria-describedby="cnic" required=""
+								aria-required="true" id="cnic" value="<%= cnic %>">
+							<label for="address">CNIC</label>
+						</div>
+
 					</div>
 					<h5><b style="color: coral;">Employment Details</b></h5>
 					<div class="divider"></div>

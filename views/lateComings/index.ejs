@@ -1,0 +1,63 @@
+<%- include('../includes/header'); %>
+<link rel="stylesheet" href="/css/home.css">
+<link rel="stylesheet" href="/css/buttons.css">
+<link rel="stylesheet" href="/css/user_profile.css">
+</head>
+<style>
+	thead input {
+		width: 100%;
+	}
+</style>
+
+<body>
+	<%- include('../admin/partials/side-nav', {data: name}); %>
+	<%- include('../admin/partials/nav-bar.ejs', {data: navigation}); %>
+	<!-- Modal Structure -->
+	<main>
+
+		<div style="padding-left: 1%; padding-top: 2%;">
+			<% var d = JSON.stringify(late_comings) %>
+			<table id="late_comings_table" class="display" style="width:100%">
+				<thead>
+					<tr>
+						<th>Employee</th>
+						<th>Total Late Comings</th>
+						<th>Deducted Leaves</th>
+					</tr>
+				</thead>
+				<tbody>
+
+				</tbody>
+
+			</table>
+		</div>
+	</main>
+
+	<script>
+		var editor;
+		$(document).ready(function () {
+			var dataSet = '<%- d %>'
+			console.log('dataSet for attendance', JSON.parse(dataSet))
+			var table = $('#late_comings_table').DataTable({
+				dom: 'Bfrtip',
+				data: JSON.parse(dataSet),
+				select: true,
+				pageLength: 25,
+				"columns": [{
+						data: "machine_attendance_id",
+					},
+					{
+						data: "total_late_comings"
+					}, {
+						data: 'deducted_leaves'
+					}
+				],
+				buttons: [
+					'csv', 'excel', 'pdf'
+				]
+
+			});
+			table.buttons().container()
+				.appendTo('#example_wrapper .col-sm-6:eq(0)');
+		})
+	</script>
